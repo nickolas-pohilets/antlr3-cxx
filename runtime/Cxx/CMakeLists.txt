@@ -1,0 +1,52 @@
+include_directories("./antlr3")
+
+set(SOURCES
+	antlr3/Defs.hpp
+	antlr3/BaseRecognizer.cpp
+	antlr3/BaseRecognizer.hpp
+	antlr3/BaseTree.cpp
+	antlr3/BaseTree.hpp
+	antlr3/BaseTreeAdaptor.hpp
+	antlr3/Bitset.cpp
+	antlr3/Bitset.hpp
+	antlr3/CharStream.cpp
+	antlr3/CharStream.hpp
+	antlr3/CommonToken.cpp
+	antlr3/CommonToken.hpp
+	antlr3/CommonTree.cpp
+	antlr3/CommonTree.hpp
+	antlr3/CommonTreeAdaptor.cpp
+	antlr3/CommonTreeAdaptor.hpp
+	antlr3/CommonTreeNodeStream.cpp
+	antlr3/CommonTreeNodeStream.hpp
+	antlr3/ConvertUTF.cpp
+	antlr3/ConvertUTF.hpp
+	antlr3/CyclicDFA.cpp
+	antlr3/CyclicDFA.hpp
+	antlr3/DebugEventListener.hpp
+	antlr3/DebugEventSocketProxy.cpp
+	antlr3/DebugEventSocketProxy.hpp
+	antlr3/Exception.cpp
+	antlr3/Exception.hpp
+	antlr3/IntStream.hpp
+	antlr3/Lexer.cpp
+	antlr3/Lexer.hpp
+	antlr3/Location.hpp
+	antlr3/Parser.cpp
+	antlr3/Parser.hpp
+	antlr3/RecognizerSharedState.hpp
+	antlr3/RewriteStreams.cpp
+	antlr3/RewriteStreams.hpp
+	antlr3/Socket.hpp
+	antlr3/String.cpp
+	antlr3/String.hpp
+	antlr3/TokenStream.cpp
+	antlr3/TokenStream.hpp
+	antlr3/TreeAdaptor.cpp
+	antlr3/TreeAdaptor.hpp
+	antlr3/TreeParser.cpp
+	antlr3/TreeParser.hpp
+	antlr3/Visitor.hpp
+	antlr3/antlr3.hpp
+)
+add_library(antlr3cxx ${SOURCES})

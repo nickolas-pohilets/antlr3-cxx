@@ -1,0 +1,532 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CE51DA8C16CEB656009AC739 /* antlr3baserecognizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320DF16CBA6940011FB7F /* antlr3baserecognizer.cpp */; };
+		CE51DA8D16CEB656009AC739 /* antlr3basetree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E116CBA6940011FB7F /* antlr3basetree.cpp */; };
+		CE51DA8E16CEB656009AC739 /* antlr3basetreeadaptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E216CBA6940011FB7F /* antlr3basetreeadaptor.cpp */; };
+		CE51DA8F16CEB656009AC739 /* antlr3bitset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E416CBA6940011FB7F /* antlr3bitset.cpp */; };
+		CE51DA9016CEB656009AC739 /* antlr3collections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E516CBA6940011FB7F /* antlr3collections.cpp */; };
+		CE51DA9116CEB656009AC739 /* antlr3commontoken.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E616CBA6940011FB7F /* antlr3commontoken.cpp */; };
+		CE51DA9216CEB656009AC739 /* antlr3commontree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E716CBA6940011FB7F /* antlr3commontree.cpp */; };
+		CE51DA9316CEB656009AC739 /* antlr3commontreeadaptor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320E916CBA6940011FB7F /* antlr3commontreeadaptor.cpp */; };
+		CE51DA9416CEB656009AC739 /* antlr3commontreenodestream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320EA16CBA6940011FB7F /* antlr3commontreenodestream.cpp */; };
+		CE51DA9516CEB656009AC739 /* antlr3convertutf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320EB16CBA6940011FB7F /* antlr3convertutf.cpp */; };
+		CE51DA9616CEB656009AC739 /* antlr3cyclicdfa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320EC16CBA6940011FB7F /* antlr3cyclicdfa.cpp */; };
+		CE51DA9716CEB656009AC739 /* antlr3debughandlers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320ED16CBA6940011FB7F /* antlr3debughandlers.cpp */; };
+		CE51DA9816CEB656009AC739 /* antlr3encodings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320EF16CBA6940011FB7F /* antlr3encodings.cpp */; };
+		CE51DA9916CEB656009AC739 /* antlr3exception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F016CBA6940011FB7F /* antlr3exception.cpp */; };
+		CE51DA9A16CEB656009AC739 /* antlr3filestream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F116CBA6940011FB7F /* antlr3filestream.cpp */; };
+		CE51DA9B16CEB656009AC739 /* antlr3inputstream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F316CBA6940011FB7F /* antlr3inputstream.cpp */; };
+		CE51DA9C16CEB656009AC739 /* antlr3intstream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F516CBA6940011FB7F /* antlr3intstream.cpp */; };
+		CE51DA9D16CEB656009AC739 /* antlr3lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F616CBA6940011FB7F /* antlr3lexer.cpp */; };
+		CE51DA9E16CEB656009AC739 /* antlr3parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F816CBA6940011FB7F /* antlr3parser.cpp */; };
+		CE51DA9F16CEB656009AC739 /* antlr3rewritestreams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320F916CBA6940011FB7F /* antlr3rewritestreams.cpp */; };
+		CE51DAA016CEB656009AC739 /* antlr3string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320FA16CBA6940011FB7F /* antlr3string.cpp */; };
+		CE51DAA116CEB656009AC739 /* antlr3tokenstream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320FB16CBA6940011FB7F /* antlr3tokenstream.cpp */; };
+		CE51DAA216CEB656009AC739 /* antlr3treeparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CE8320FC16CBA6940011FB7F /* antlr3treeparser.cpp */; };
+		CE83212216CBC4080011FB7F /* CxxTarget.java in Sources */ = {isa = PBXBuildFile; fileRef = CE83212116CBC4080011FB7F /* CxxTarget.java */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CE51DAA316CEB699009AC739 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE83209A16CBA4480011FB7F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE51DA7E16CEB650009AC739;
+			remoteInfo = antlr3cxx;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CE8320A116CBA4480011FB7F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		CE51DA7F16CEB650009AC739 /* antlr3cxx.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = antlr3cxx.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE8320A316CBA4480011FB7F /* Cxx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Cxx; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE8320B516CBA6930011FB7F /* antlr3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3.h; sourceTree = "<group>"; };
+		CE8320B616CBA6930011FB7F /* antlr3baserecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3baserecognizer.h; sourceTree = "<group>"; };
+		CE8320B716CBA6930011FB7F /* antlr3basetree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3basetree.h; sourceTree = "<group>"; };
+		CE8320B916CBA6940011FB7F /* antlr3basetreeadaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3basetreeadaptor.h; sourceTree = "<group>"; };
+		CE8320BB16CBA6940011FB7F /* antlr3bitset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3bitset.h; sourceTree = "<group>"; };
+		CE8320BC16CBA6940011FB7F /* antlr3collections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3collections.h; sourceTree = "<group>"; };
+		CE8320BD16CBA6940011FB7F /* antlr3commontoken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3commontoken.h; sourceTree = "<group>"; };
+		CE8320BE16CBA6940011FB7F /* antlr3commontree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3commontree.h; sourceTree = "<group>"; };
+		CE8320C016CBA6940011FB7F /* antlr3commontreeadaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3commontreeadaptor.h; sourceTree = "<group>"; };
+		CE8320C116CBA6940011FB7F /* antlr3commontreenodestream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3commontreenodestream.h; sourceTree = "<group>"; };
+		CE8320C216CBA6940011FB7F /* antlr3config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3config.h; sourceTree = "<group>"; };
+		CE8320C316CBA6940011FB7F /* antlr3convertutf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3convertutf.h; sourceTree = "<group>"; };
+		CE8320C416CBA6940011FB7F /* antlr3cyclicdfa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3cyclicdfa.h; sourceTree = "<group>"; };
+		CE8320C516CBA6940011FB7F /* antlr3debugeventlistener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3debugeventlistener.h; sourceTree = "<group>"; };
+		CE8320C716CBA6940011FB7F /* antlr3defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3defs.h; sourceTree = "<group>"; };
+		CE8320C916CBA6940011FB7F /* antlr3encodings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3encodings.h; sourceTree = "<group>"; };
+		CE8320CA16CBA6940011FB7F /* antlr3errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3errors.h; sourceTree = "<group>"; };
+		CE8320CB16CBA6940011FB7F /* antlr3exception.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3exception.h; sourceTree = "<group>"; };
+		CE8320CD16CBA6940011FB7F /* antlr3filestream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3filestream.h; sourceTree = "<group>"; };
+		CE8320CE16CBA6940011FB7F /* antlr3input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3input.h; sourceTree = "<group>"; };
+		CE8320CF16CBA6940011FB7F /* antlr3interfaces.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3interfaces.h; sourceTree = "<group>"; };
+		CE8320D116CBA6940011FB7F /* antlr3intstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3intstream.h; sourceTree = "<group>"; };
+		CE8320D216CBA6940011FB7F /* antlr3lexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3lexer.h; sourceTree = "<group>"; };
+		CE8320D416CBA6940011FB7F /* antlr3memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3memory.h; sourceTree = "<group>"; };
+		CE8320D516CBA6940011FB7F /* antlr3parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3parser.h; sourceTree = "<group>"; };
+		CE8320D616CBA6940011FB7F /* antlr3parsetree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3parsetree.h; sourceTree = "<group>"; };
+		CE8320D716CBA6940011FB7F /* antlr3recognizersharedstate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3recognizersharedstate.h; sourceTree = "<group>"; };
+		CE8320D916CBA6940011FB7F /* antlr3rewritestreams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3rewritestreams.h; sourceTree = "<group>"; };
+		CE8320DA16CBA6940011FB7F /* antlr3string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3string.h; sourceTree = "<group>"; };
+		CE8320DB16CBA6940011FB7F /* antlr3tokenstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3tokenstream.h; sourceTree = "<group>"; };
+		CE8320DD16CBA6940011FB7F /* antlr3treeparser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = antlr3treeparser.h; sourceTree = "<group>"; };
+		CE8320DF16CBA6940011FB7F /* antlr3baserecognizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3baserecognizer.cpp; sourceTree = "<group>"; };
+		CE8320E116CBA6940011FB7F /* antlr3basetree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3basetree.cpp; sourceTree = "<group>"; };
+		CE8320E216CBA6940011FB7F /* antlr3basetreeadaptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3basetreeadaptor.cpp; sourceTree = "<group>"; };
+		CE8320E416CBA6940011FB7F /* antlr3bitset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3bitset.cpp; sourceTree = "<group>"; };
+		CE8320E516CBA6940011FB7F /* antlr3collections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3collections.cpp; sourceTree = "<group>"; };
+		CE8320E616CBA6940011FB7F /* antlr3commontoken.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3commontoken.cpp; sourceTree = "<group>"; };
+		CE8320E716CBA6940011FB7F /* antlr3commontree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3commontree.cpp; sourceTree = "<group>"; };
+		CE8320E916CBA6940011FB7F /* antlr3commontreeadaptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3commontreeadaptor.cpp; sourceTree = "<group>"; };
+		CE8320EA16CBA6940011FB7F /* antlr3commontreenodestream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3commontreenodestream.cpp; sourceTree = "<group>"; };
+		CE8320EB16CBA6940011FB7F /* antlr3convertutf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3convertutf.cpp; sourceTree = "<group>"; };
+		CE8320EC16CBA6940011FB7F /* antlr3cyclicdfa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3cyclicdfa.cpp; sourceTree = "<group>"; };
+		CE8320ED16CBA6940011FB7F /* antlr3debughandlers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3debughandlers.cpp; sourceTree = "<group>"; };
+		CE8320EF16CBA6940011FB7F /* antlr3encodings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3encodings.cpp; sourceTree = "<group>"; };
+		CE8320F016CBA6940011FB7F /* antlr3exception.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3exception.cpp; sourceTree = "<group>"; };
+		CE8320F116CBA6940011FB7F /* antlr3filestream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3filestream.cpp; sourceTree = "<group>"; };
+		CE8320F316CBA6940011FB7F /* antlr3inputstream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3inputstream.cpp; sourceTree = "<group>"; };
+		CE8320F516CBA6940011FB7F /* antlr3intstream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3intstream.cpp; sourceTree = "<group>"; };
+		CE8320F616CBA6940011FB7F /* antlr3lexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3lexer.cpp; sourceTree = "<group>"; };
+		CE8320F816CBA6940011FB7F /* antlr3parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3parser.cpp; sourceTree = "<group>"; };
+		CE8320F916CBA6940011FB7F /* antlr3rewritestreams.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3rewritestreams.cpp; sourceTree = "<group>"; };
+		CE8320FA16CBA6940011FB7F /* antlr3string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3string.cpp; sourceTree = "<group>"; };
+		CE8320FB16CBA6940011FB7F /* antlr3tokenstream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3tokenstream.cpp; sourceTree = "<group>"; };
+		CE8320FC16CBA6940011FB7F /* antlr3treeparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = antlr3treeparser.cpp; sourceTree = "<group>"; };
+		CE83211716CBA69F0011FB7F /* Calc.g */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Calc.g; sourceTree = "<group>"; };
+		CE83211B16CBC3AE0011FB7F /* AST.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = AST.stg; sourceTree = "<group>"; };
+		CE83211C16CBC3AE0011FB7F /* ASTDbg.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ASTDbg.stg; sourceTree = "<group>"; };
+		CE83211D16CBC3AE0011FB7F /* ASTParser.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ASTParser.stg; sourceTree = "<group>"; };
+		CE83211E16CBC3AE0011FB7F /* ASTTreeParser.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ASTTreeParser.stg; sourceTree = "<group>"; };
+		CE83211F16CBC3AE0011FB7F /* Cxx.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cxx.stg; sourceTree = "<group>"; };
+		CE83212016CBC3AE0011FB7F /* Dbg.stg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Dbg.stg; sourceTree = "<group>"; };
+		CE83212116CBC4080011FB7F /* CxxTarget.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; name = CxxTarget.java; path = src/main/java/org/antlr/codegen/CxxTarget.java; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CE51DA7C16CEB650009AC739 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE8320A016CBA4480011FB7F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CE83209816CBA4480011FB7F = {
+			isa = PBXGroup;
+			children = (
+				CE83211816CBC3780011FB7F /* Runtime */,
+				CE83211916CBC3820011FB7F /* Tool */,
+				CE83211616CBA69F0011FB7F /* test */,
+				CE8320A416CBA4480011FB7F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CE8320A416CBA4480011FB7F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CE8320A316CBA4480011FB7F /* Cxx */,
+				CE51DA7F16CEB650009AC739 /* antlr3cxx.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE8320B416CBA6930011FB7F /* include */ = {
+			isa = PBXGroup;
+			children = (
+				CE8320B516CBA6930011FB7F /* antlr3.h */,
+				CE8320B616CBA6930011FB7F /* antlr3baserecognizer.h */,
+				CE8320B716CBA6930011FB7F /* antlr3basetree.h */,
+				CE8320B916CBA6940011FB7F /* antlr3basetreeadaptor.h */,
+				CE8320BB16CBA6940011FB7F /* antlr3bitset.h */,
+				CE8320BC16CBA6940011FB7F /* antlr3collections.h */,
+				CE8320BD16CBA6940011FB7F /* antlr3commontoken.h */,
+				CE8320BE16CBA6940011FB7F /* antlr3commontree.h */,
+				CE8320C016CBA6940011FB7F /* antlr3commontreeadaptor.h */,
+				CE8320C116CBA6940011FB7F /* antlr3commontreenodestream.h */,
+				CE8320C216CBA6940011FB7F /* antlr3config.h */,
+				CE8320C316CBA6940011FB7F /* antlr3convertutf.h */,
+				CE8320C416CBA6940011FB7F /* antlr3cyclicdfa.h */,
+				CE8320C516CBA6940011FB7F /* antlr3debugeventlistener.h */,
+				CE8320C716CBA6940011FB7F /* antlr3defs.h */,
+				CE8320C916CBA6940011FB7F /* antlr3encodings.h */,
+				CE8320CA16CBA6940011FB7F /* antlr3errors.h */,
+				CE8320CB16CBA6940011FB7F /* antlr3exception.h */,
+				CE8320CD16CBA6940011FB7F /* antlr3filestream.h */,
+				CE8320CE16CBA6940011FB7F /* antlr3input.h */,
+				CE8320CF16CBA6940011FB7F /* antlr3interfaces.h */,
+				CE8320D116CBA6940011FB7F /* antlr3intstream.h */,
+				CE8320D216CBA6940011FB7F /* antlr3lexer.h */,
+				CE8320D416CBA6940011FB7F /* antlr3memory.h */,
+				CE8320D516CBA6940011FB7F /* antlr3parser.h */,
+				CE8320D616CBA6940011FB7F /* antlr3parsetree.h */,
+				CE8320D716CBA6940011FB7F /* antlr3recognizersharedstate.h */,
+				CE8320D916CBA6940011FB7F /* antlr3rewritestreams.h */,
+				CE8320DA16CBA6940011FB7F /* antlr3string.h */,
+				CE8320DB16CBA6940011FB7F /* antlr3tokenstream.h */,
+				CE8320DD16CBA6940011FB7F /* antlr3treeparser.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		CE8320DE16CBA6940011FB7F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				CE8320DF16CBA6940011FB7F /* antlr3baserecognizer.cpp */,
+				CE8320E116CBA6940011FB7F /* antlr3basetree.cpp */,
+				CE8320E216CBA6940011FB7F /* antlr3basetreeadaptor.cpp */,
+				CE8320E416CBA6940011FB7F /* antlr3bitset.cpp */,
+				CE8320E516CBA6940011FB7F /* antlr3collections.cpp */,
+				CE8320E616CBA6940011FB7F /* antlr3commontoken.cpp */,
+				CE8320E716CBA6940011FB7F /* antlr3commontree.cpp */,
+				CE8320E916CBA6940011FB7F /* antlr3commontreeadaptor.cpp */,
+				CE8320EA16CBA6940011FB7F /* antlr3commontreenodestream.cpp */,
+				CE8320EB16CBA6940011FB7F /* antlr3convertutf.cpp */,
+				CE8320EC16CBA6940011FB7F /* antlr3cyclicdfa.cpp */,
+				CE8320ED16CBA6940011FB7F /* antlr3debughandlers.cpp */,
+				CE8320EF16CBA6940011FB7F /* antlr3encodings.cpp */,
+				CE8320F016CBA6940011FB7F /* antlr3exception.cpp */,
+				CE8320F116CBA6940011FB7F /* antlr3filestream.cpp */,
+				CE8320F316CBA6940011FB7F /* antlr3inputstream.cpp */,
+				CE8320F516CBA6940011FB7F /* antlr3intstream.cpp */,
+				CE8320F616CBA6940011FB7F /* antlr3lexer.cpp */,
+				CE8320F816CBA6940011FB7F /* antlr3parser.cpp */,
+				CE8320F916CBA6940011FB7F /* antlr3rewritestreams.cpp */,
+				CE8320FA16CBA6940011FB7F /* antlr3string.cpp */,
+				CE8320FB16CBA6940011FB7F /* antlr3tokenstream.cpp */,
+				CE8320FC16CBA6940011FB7F /* antlr3treeparser.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		CE83211616CBA69F0011FB7F /* test */ = {
+			isa = PBXGroup;
+			children = (
+				CE83211716CBA69F0011FB7F /* Calc.g */,
+			);
+			path = test;
+			sourceTree = "<group>";
+		};
+		CE83211816CBC3780011FB7F /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				CE8320B416CBA6930011FB7F /* include */,
+				CE8320DE16CBA6940011FB7F /* src */,
+			);
+			name = Runtime;
+			sourceTree = "<group>";
+		};
+		CE83211916CBC3820011FB7F /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				CE83211A16CBC3AE0011FB7F /* Cxx */,
+				CE83212116CBC4080011FB7F /* CxxTarget.java */,
+			);
+			name = Tool;
+			path = ../../tool;
+			sourceTree = "<group>";
+		};
+		CE83211A16CBC3AE0011FB7F /* Cxx */ = {
+			isa = PBXGroup;
+			children = (
+				CE83211B16CBC3AE0011FB7F /* AST.stg */,
+				CE83211C16CBC3AE0011FB7F /* ASTDbg.stg */,
+				CE83211D16CBC3AE0011FB7F /* ASTParser.stg */,
+				CE83211E16CBC3AE0011FB7F /* ASTTreeParser.stg */,
+				CE83211F16CBC3AE0011FB7F /* Cxx.stg */,
+				CE83212016CBC3AE0011FB7F /* Dbg.stg */,
+			);
+			name = Cxx;
+			path = src/main/resources/org/antlr/codegen/templates/Cxx;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		CE51DA7D16CEB650009AC739 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		CE51DA7E16CEB650009AC739 /* antlr3cxx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE51DA8916CEB650009AC739 /* Build configuration list for PBXNativeTarget "antlr3cxx" */;
+			buildPhases = (
+				CE51DA7B16CEB650009AC739 /* Sources */,
+				CE51DA7C16CEB650009AC739 /* Frameworks */,
+				CE51DA7D16CEB650009AC739 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = antlr3cxx;
+			productName = antlr3cxx;
+			productReference = CE51DA7F16CEB650009AC739 /* antlr3cxx.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		CE8320A216CBA4480011FB7F /* Cxx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE8320AD16CBA4480011FB7F /* Build configuration list for PBXNativeTarget "Cxx" */;
+			buildPhases = (
+				CE51DAA516CEB69E009AC739 /* ShellScript */,
+				CE83209F16CBA4480011FB7F /* Sources */,
+				CE8320A016CBA4480011FB7F /* Frameworks */,
+				CE8320A116CBA4480011FB7F /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CE51DAA416CEB699009AC739 /* PBXTargetDependency */,
+			);
+			name = Cxx;
+			productName = Cxx;
+			productReference = CE8320A316CBA4480011FB7F /* Cxx */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CE83209A16CBA4480011FB7F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "Nickolas V. Pohilets";
+			};
+			buildConfigurationList = CE83209D16CBA4480011FB7F /* Build configuration list for PBXProject "Cxx" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = CE83209816CBA4480011FB7F;
+			productRefGroup = CE8320A416CBA4480011FB7F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CE8320A216CBA4480011FB7F /* Cxx */,
+				CE51DA7E16CEB650009AC739 /* antlr3cxx */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CE51DAA516CEB69E009AC739 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "python ./run-antlr.py test/Calc.g -o test/generated -j ../../antlr-complete/target/antlr-complete-3.5.jar";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CE51DA7B16CEB650009AC739 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE51DA8C16CEB656009AC739 /* antlr3baserecognizer.cpp in Sources */,
+				CE51DA8D16CEB656009AC739 /* antlr3basetree.cpp in Sources */,
+				CE51DA8E16CEB656009AC739 /* antlr3basetreeadaptor.cpp in Sources */,
+				CE51DA8F16CEB656009AC739 /* antlr3bitset.cpp in Sources */,
+				CE51DA9016CEB656009AC739 /* antlr3collections.cpp in Sources */,
+				CE51DA9116CEB656009AC739 /* antlr3commontoken.cpp in Sources */,
+				CE51DA9216CEB656009AC739 /* antlr3commontree.cpp in Sources */,
+				CE51DA9316CEB656009AC739 /* antlr3commontreeadaptor.cpp in Sources */,
+				CE51DA9416CEB656009AC739 /* antlr3commontreenodestream.cpp in Sources */,
+				CE51DA9516CEB656009AC739 /* antlr3convertutf.cpp in Sources */,
+				CE51DA9616CEB656009AC739 /* antlr3cyclicdfa.cpp in Sources */,
+				CE51DA9716CEB656009AC739 /* antlr3debughandlers.cpp in Sources */,
+				CE51DA9816CEB656009AC739 /* antlr3encodings.cpp in Sources */,
+				CE51DA9916CEB656009AC739 /* antlr3exception.cpp in Sources */,
+				CE51DA9A16CEB656009AC739 /* antlr3filestream.cpp in Sources */,
+				CE51DA9B16CEB656009AC739 /* antlr3inputstream.cpp in Sources */,
+				CE51DA9C16CEB656009AC739 /* antlr3intstream.cpp in Sources */,
+				CE51DA9D16CEB656009AC739 /* antlr3lexer.cpp in Sources */,
+				CE51DA9E16CEB656009AC739 /* antlr3parser.cpp in Sources */,
+				CE51DA9F16CEB656009AC739 /* antlr3rewritestreams.cpp in Sources */,
+				CE51DAA016CEB656009AC739 /* antlr3string.cpp in Sources */,
+				CE51DAA116CEB656009AC739 /* antlr3tokenstream.cpp in Sources */,
+				CE51DAA216CEB656009AC739 /* antlr3treeparser.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE83209F16CBA4480011FB7F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE83212216CBC4080011FB7F /* CxxTarget.java in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CE51DAA416CEB699009AC739 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE51DA7E16CEB650009AC739 /* antlr3cxx */;
+			targetProxy = CE51DAA316CEB699009AC739 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		CE51DA8A16CEB650009AC739 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CE51DA8B16CEB650009AC739 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		CE8320AB16CBA4480011FB7F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CE8320AC16CBA4480011FB7F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/include",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CE8320AE16CBA4480011FB7F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CE8320AF16CBA4480011FB7F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CE51DA8916CEB650009AC739 /* Build configuration list for PBXNativeTarget "antlr3cxx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE51DA8A16CEB650009AC739 /* Debug */,
+				CE51DA8B16CEB650009AC739 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		CE83209D16CBA4480011FB7F /* Build configuration list for PBXProject "Cxx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE8320AB16CBA4480011FB7F /* Debug */,
+				CE8320AC16CBA4480011FB7F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE8320AD16CBA4480011FB7F /* Build configuration list for PBXNativeTarget "Cxx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE8320AE16CBA4480011FB7F /* Debug */,
+				CE8320AF16CBA4480011FB7F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CE83209A16CBA4480011FB7F /* Project object */;
+}
