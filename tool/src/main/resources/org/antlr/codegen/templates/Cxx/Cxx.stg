@@ -145,19 +145,19 @@ outputFile( LEXER,
  */
 <endif>
 
-/* -----------------------------------------
- * Include the ANTLR3 generated header file.
- */
 #include "<name>.hpp"
-using antlr3::isBetween;
+<recognizer.grammar.delegators: {g|#include "<g.recognizerName>.hpp"}; separator="\n">
+<if(actions.(actionScope).postinclude)>
 
 <actions.(actionScope).postinclude>
-/* ----------------------------------------- */
+<endif>
 
 <docComment>
 
+using antlr3::isBetween;
+
 <if(literals)>
-/** String literals used by <name> that we must do things like MATCHS() with.
+/** String literals used by <name> that we must do things like matchs() with.
  *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
  *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
  *  we perform this little trick of defining the literals as arrays of UINT32
@@ -182,9 +182,7 @@ using antlr3::isBetween;
  * confusing the reader of the generated output, who may not wish to know the gory
  * details of the interface inheritance.
  */
-
-#define		CTX	ctx
-
+ 
 /* Aids in accessing scopes for grammar programmers
  */
 #undef	SCOPE_TYPE
@@ -195,256 +193,6 @@ using antlr3::isBetween;
 #define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
 #define	SCOPE_SIZE(scope)		ctx->p<name>_##scope##Stack_limit
 #define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
-
-<if(LEXER)>
-
-/* Macros for accessing things in a lexer
- */
-#undef	    LEXER
-#undef	    RECOGNIZER
-#undef	    RULEMEMO
-#undef	    GETCHARINDEX
-#undef	    GETLINE
-#undef	    GETCHARPOSITIONINLINE
-#undef	    EMIT
-#undef	    EMITNEW
-#undef	    MATCHC
-#undef	    MATCHS
-#undef	    MATCHRANGE
-#undef	    LTOKEN
-#undef	    HASFAILED
-#undef	    FAILEDFLAG
-#undef	    INPUT
-#undef	    STRSTREAM
-#undef	    LA
-#undef	    HASEXCEPTION
-#undef	    EXCEPTION
-#undef	    CONSUME
-#undef	    LRECOVER
-#undef	    MARK
-#undef	    REWIND
-#undef	    BACKTRACKING
-#undef		MATCHANY
-#undef		MEMOIZE
-#undef		HAVEPARSEDRULE
-#undef		GETTEXT
-#undef		INDEX
-#undef		SEEK
-#undef		PUSHSTREAM
-#undef		POPSTREAM
-#undef		SETTEXT
-#undef		SETTEXT8
-
-#define	    LEXER					ctx->pLexer
-#define	    RECOGNIZER			    LEXER->rec
-#define		LEXSTATE				state_
-#define	    GETCHARINDEX()			charIndex()
-#define	    GETLINE()				line()
-#define	    GETTEXT()				text()
-#define	    GETCHARPOSITIONINLINE() charPositionInLine()
-#define	    EMIT()					LEXSTATE->type = _type; emit()
-#define	    EMITNEW(t)				emitNew(t)
-#define	    MATCHC(c)				matchc(c)
-#define	    MATCHS(s)				matchs(s)
-#define	    MATCHRANGE(c1,c2)	    matchRange(c1, c2)
-#define	    MATCHANY()				matchAny()
-#define	    LTOKEN  				LEXSTATE->token
-#define	    HASFAILED()				(LEXSTATE->failed)
-#define	    BACKTRACKING			LEXSTATE->backtracking
-#define	    FAILEDFLAG				LEXSTATE->failed
-#define	    INPUT					charStream()
-#define	    STRSTREAM				INPUT
-#define		ISTREAM					INPUT
-#define		INDEX()					ISTREAM->index()
-#define		SEEK(n)					ISTREAM->seek(n)
-#define	    HASEXCEPTION()			(LEXSTATE->error)
-#define	    EXCEPTION				LEXSTATE->exception
-#define	    LRECOVER()				recover()
-#define	    MARK()					ISTREAM->mark()
-#define	    REWIND(m)				ISTREAM->rewind(m)
-#define		MEMOIZE(ri,si)			RECOGNIZER->memoize(RECOGNIZER, ri, si)
-#define		HAVEPARSEDRULE(r)		RECOGNIZER->alreadyParsedRule(RECOGNIZER, r)
-#define		PUSHSTREAM(str)			pushCharStream(str)
-#define		POPSTREAM()				popCharStream()
-#define		SETTEXT(str)			LEXSTATE->text = str
-//#define		SKIP()					LEXSTATE->token = &(TOKSOURCE->skipToken)
-#define		RULEMEMO				LEXSTATE->ruleMemo
-#define		DBG						debugger_
-
-/* If we have been told we can rely on the standard 8 bit or UTF16 input
- * stream, then we can define our macros to use the direct pointers
- * in the input object, which is much faster than indirect calls. This
- * is really only significant to lexers with a lot of fragment rules (which
- * do not place LA(1) in a temporary at the moment) and even then
- * only if there is a lot of input (order of say 1M or so).
- */
-#if	defined(InlineInput8bit) || defined(InlineInputUtf16)
-
-# ifdef	InlineInput8bit
-
-/* 8 bit character set */
-
-#  define	    NEXTCHAR	((pANTLR3_UINT8)(INPUT->nextChar))
-#  define	    DATAP	((pANTLR3_UINT8)(INPUT->data))
-
-# else
-
-#  define	    NEXTCHAR	((pANTLR3_UINT16)(INPUT->nextChar))
-#  define	    DATAP	((pANTLR3_UINT16)(INPUT->data))
-
-# endif
-
-# define	    LA(n) ((NEXTCHAR + n) > (DATAP + INPUT->sizeBuf) ? CharstreamEof : (Char)(*(NEXTCHAR + n - 1)))
-# define            CONSUME()                                           \\
-{                                                                       \\
-    if        (NEXTCHAR \< (DATAP + INPUT->sizeBuf))                     \\
-    {                                                                   \\
-        INPUT->charPositionInLine++;                                    \\
-        if  ((Char)(*NEXTCHAR) == INPUT->newlineChar)           \\
-        {                                                               \\
-            INPUT->line++;                                              \\
-            INPUT->charPositionInLine        = 0;                       \\
-            INPUT->currentLine                = (void *)(NEXTCHAR + 1); \\
-        }                                                               \\
-        INPUT->nextChar = (void *)(NEXTCHAR + 1);                       \\
-    }                                                                   \\
-}
-
-#else
-
-// Pick up the input character by calling the input stream implementation.
-//
-#define	    CONSUME()   INPUT->consume()
-#define	    LA(n)       INPUT->_LA(n)
-
-#endif
-<endif>
-
-<if(PARSER)>
-/* Macros for accessing things in the parser
- */
-
-#undef	    PARSER
-#undef	    RECOGNIZER
-#undef	    HAVEPARSEDRULE
-#undef		MEMOIZE
-#undef	    INPUT
-#undef	    STRSTREAM
-#undef	    HASEXCEPTION
-#undef	    EXCEPTION
-#undef	    MATCHT
-#undef	    MATCHANYT
-#undef	    PRECOVER
-#undef	    PREPORTERROR
-#undef	    LA
-#undef	    LT
-#undef	    CONSUME
-#undef	    MARK
-#undef	    REWIND
-#undef	    PERRORRECOVERY
-#undef	    HASFAILED
-#undef	    FAILEDFLAG
-#undef		INDEX
-#undef      ADAPTOR
-#undef		SEEK
-#undef	    RULEMEMO
-#undef		DBG
-
-#define	    PARSER				ctx->pParser
-#define	    RECOGNIZER				PARSER->rec
-#define	    PSRSTATE				state_
-#define	    HAVEPARSEDRULE(r)		alreadyParsedRule(r)
-#define	    MEMOIZE(ri,si)			memoize(ri, si)
-#define	    INPUT				    tokenStream()
-#define	    STRSTREAM				INPUT
-#define	    ISTREAM				INPUT
-#define	    INDEX()				ISTREAM->index()
-#define	    HASEXCEPTION()			(PSRSTATE->error == true)
-#define	    EXCEPTION				PSRSTATE->exception
-#define	    MATCHT(t, fs)			match(t, fs)
-#define	    MATCHANYT()				matchAny()
-#define	    FOLLOWSTACK				PSRSTATE->following
-#define	    PRECOVER()				recover()
-#define	    PREPORTERROR()			reportError()
-#define	    LA(n)				INPUT->_LA(n)
-#define	    LT(n)				INPUT->_LT(n)
-#define	    CONSUME()				ISTREAM->consume()
-#define	    MARK()				ISTREAM->mark()
-#define	    REWIND(m)				ISTREAM->rewind(m)
-#define	    SEEK(n)				ISTREAM->seek(n)
-#define	    PERRORRECOVERY			PSRSTATE->errorRecovery
-#define	    FAILEDFLAG				PSRSTATE->failed
-#define	    HASFAILED()				(FAILEDFLAG == true)
-#define	    BACKTRACKING			PSRSTATE->backtracking
-#define     ADAPTOR                         adaptor_
-#define		RULEMEMO						PSRSTATE->ruleMemo
-#define		DBG								debugger_
-
-<endif>
-
-<if(TREE_PARSER)>
-/* Macros for accessing things in the parser
- */
-
-#undef	    PARSER
-#undef	    RECOGNIZER
-#undef	    HAVEPARSEDRULE
-#undef	    INPUT
-#undef	    STRSTREAM
-#undef	    HASEXCEPTION
-#undef	    EXCEPTION
-#undef	    MATCHT
-#undef	    MATCHANYT
-#undef	    PRECOVER
-#undef	    PREPORTERROR
-#undef	    LA
-#undef	    LT
-#undef	    CONSUME
-#undef	    MARK
-#undef	    REWIND
-#undef	    PERRORRECOVERY
-#undef	    HASFAILED
-#undef	    FAILEDFLAG
-#undef	    BACKTRACKING
-#undef      ADAPTOR
-#undef	    RULEMEMO
-#undef		SEEK
-#undef		INDEX
-#undef		DBG
-
-#define	    PARSER							ctx->pTreeParser
-#define	    RECOGNIZER						PARSER->rec
-#define		PSRSTATE						state_
-#define	    HAVEPARSEDRULE(r)				alreadyParsedRule(r)
-#define	    INPUT							treeNodeStream()
-#define		ISTREAM							INPUT
-#define	    STRSTREAM						INPUT
-#define	    HASEXCEPTION()					(PSRSTATE->error == true)
-#define	    EXCEPTION						PSRSTATE->exception
-#define	    MATCHT(t, fs)					match(t, fs)
-#define	    MATCHANYT()						matchAny()
-#define	    PRECOVER()						recover()
-#define	    PREPORTERROR()					reportError()
-#define	    LA(n)							ISTREAM->_LA(n)
-#define	    LT(n)							INPUT->_LT(n)
-#define	    CONSUME()						ISTREAM->consume()
-#define	    MARK()							ISTREAM->mark()
-#define	    REWIND(m)						ISTREAM->rewind(m)
-#define	    PERRORRECOVERY					PSRSTATE->errorRecovery
-#define	    FAILEDFLAG						PSRSTATE->failed
-#define	    HASFAILED()						(FAILEDFLAG == true)
-#define	    BACKTRACKING					PSRSTATE->backtracking
-#define     ADAPTOR                         INPUT->treeAdaptor()
-#define		RULEMEMO						PSRSTATE->ruleMemo
-#define		SEEK(n)							ISTREAM->seek(n)
-#define		INDEX()							ISTREAM->index()
-#define		DBG								debugger_
-
-
-<endif>
-
-#define		TOKTEXT(tok, txt)				tok, (pANTLR3_UINT8)txt
-
 
 /* =============================================================================
  * Functions to create and destroy scopes. First come the rule scopes, followed
@@ -574,17 +322,10 @@ has the callable functions (rules) shown below,
 // End of standard antlr 3 runtime definitions =================================
 <actions.(actionScope).includes>
 
-// Forward declare the context typedef so that we can use it before it is
-// properly defined. Delegators and delegates (from import statements) are
-// interdependent and their context structures contain pointers to each other
-// C only allows such things to be declared if you pre-declare the typedef.
-//
-class <name>;
-
 <if(recognizer.grammar.delegates)>
 // Include delegate definition header files
 //
-<recognizer.grammar.delegates: {g|#include	\<<g.recognizerName>.h>}; separator="\n">
+<recognizer.grammar.delegates: {g|#include "<g.recognizerName>.hpp"}; separator="\n">
 
 <endif>
 
@@ -603,14 +344,10 @@ class <name>;
 <scopes:{it | <if(it.isDynamicGlobalScope)><globalAttributeScopeDecl(it)><endif>}>
 <rules:{r |<ruleAttributeScopeDecl(scope=r.ruleDescriptor.ruleScope)>}>
 <if(recognizer.grammar.delegators)>
-// Include delegator definition header files
-//
-<recognizer.grammar.delegators: {g|#include	\<<g.recognizerName>.h>}; separator="\n">
-
+// Forward declarations for delegator classes
+<recognizer.grammar.delegators: {g|class <g.recognizerName>;<\n>}>
 <endif>
 
-/** Context tracking structure for <mainName()>
- */
 <if(PARSER)>
 class <name> : public antlr3::Parser
 <endif>
@@ -627,18 +364,10 @@ public:
         <tokens:{it |<it.name> = <it.type>}; separator=",\n">
     };
 
-    <name>(<inputType()> instream<recognizer.grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>);
-    <name>(<inputType()> instream, antlr3::RecognizerSharedStatePtr state<recognizer.grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>);
+    <name>(<inputType()> instream<recognizer.grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>);
+    <name>(<inputType()> instream, antlr3::RecognizerSharedStatePtr state<recognizer.grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>);
     ~<name>();
 
-<if(recognizer.grammar.delegates)>
-	<recognizer.grammar.delegates:
-         {g|p<g.recognizerName>	<g:delegateName()>;}; separator="\n">
-<endif>
-<if(recognizer.grammar.delegators)>
-	<recognizer.grammar.delegators:
-         {g|p<g.recognizerName>	<g:delegateName()>;}; separator="\n">
-<endif>
 <scopes:{it | <if(it.isDynamicGlobalScope)>
     <globalAttributeScopeDef(it)>
 <endif>}; separator="\n\n">
@@ -652,21 +381,35 @@ public:
     <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> <r.ruleDescriptor.name>(<r.ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
 <! generate rule/method definitions for imported rules so they
    appear to be defined in this recognizer. !>
+<if(recognizer.grammar.delegatedRules)>
     // Delegated rules
 <recognizer.grammar.delegatedRules:{ruleDescriptor|
     <headerReturnType(ruleDescriptor)> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
 <endif>
+<endif>
+
 
     const char * grammarFileName();
     void reset();
 
     <actions.(actionScope).context>
+
+<if(recognizer.grammar.delegates)>
 private:
-    <@members><@end>
-    <@dbgMembers><@end>
+    <recognizer.grammar.delegates:
+         {g|std::shared_ptr\<<g.recognizerName>\> <g:delegateName()>_;}; separator="\n">
+<endif>
+<if(recognizer.grammar.delegators)>
+private:
+    <recognizer.grammar.delegators:
+         {g|<g.recognizerName> * <g:delegateName()>_;}; separator="\n">
+<endif>
+<@members><@end>
+<@dbgMembers><@end>
 
 <if(cyclicDFAs)>
 <! Forward declare DFA specials !>
+private:
 <cyclicDFAs:declDFA_SST()>
 friend class <name>_SST_Func_Provider;
 <endif>
@@ -678,39 +421,25 @@ extern char const * const <recognizer.grammar.composite.rootGrammar.recognizerNa
 
 #endif // _<name>_hpp_
 
-/* END - Note:Keep extra line feed to satisfy UNIX systems */
-
 >>
 
-inputType() ::=<<
-<if(LEXER)>antlr3::CharStreamPtr<endif><//>
-<if(PARSER)>antlr3::CommonTokenStreamPtr<endif><\\>
+inputType() ::= <%
+<if(LEXER)>antlr3::CharStreamPtr<endif>
+<if(PARSER)>antlr3::CommonTokenStreamPtr<endif>
 <if(TREE_PARSER)>antlr3::CommonTreeNodeStreamPtr<endif>
->>
+%>
 
-grammarType() ::= <<
-<if(PARSER)>
-parser
-<endif>
-<if(LEXER)>
-lexer
-<endif>
-<if(TREE_PARSER)>
-tree parser
-<endif>
->>
+grammarType() ::= <%
+<if(PARSER)>parser<endif>
+<if(LEXER)>lexer<endif>
+<if(TREE_PARSER)>tree parser<endif>
+%>
 
-mainName() ::= <<
-<if(PARSER)>
-<name>
-<endif>
-<if(LEXER)>
-<name>
-<endif>
-<if(TREE_PARSER)>
-<name>
-<endif>
->>
+mainName() ::= <%
+<if(PARSER)><name><endif>
+<if(LEXER)><name><endif>
+<if(TREE_PARSER)><name><endif>
+%>
 
 headerReturnScope(ruleDescriptor) ::= "<returnScope(...)>"
 
@@ -740,17 +469,18 @@ lexer(  grammar,
  */
 static CommonTokenPtr <name>NextToken   (pANTLR3_TOKEN_SOURCE toksource);
 
-/* Override the normal MEMOIZE and HAVEALREADYPARSED macros as this is a filtering
- * lexer. In filter mode, the memoizing and backtracking are gated at BACKTRACKING > 1 rather
- * than just BACKTRACKING. In some cases this might generate code akin to:
- *   if (BACKTRACKING) if (BACKTRACKING > 1) memoize.
+/* Override the normal memoize and alreadyParsedRule macros as this is a filtering
+ * lexer. In filter mode, the memoizing and backtracking are gated at state_->backtracking > 1 rather
+ * than just state_->backtracking. In some cases this might generate code akin to:
+ *   if (state_->backtracking) if (state_->backtracking > 1) memoize.
  * However, I assume that the C compilers/optimizers are smart enough to work this one out
  * these days - Jim
  */
-#undef		MEMOIZE
-#define		MEMOIZE(ri,si)			if (BACKTRACKING>1) { RECOGNIZER->memoize(RECOGNIZER, ri, si) }
-#undef		HAVEPARSEDRULE
-#define		HAVEPARSEDRULE(r)		if (BACKTRACKING>1) { RECOGNIZER->alreadyParsedRule(RECOGNIZER, r) }
+#error "Following macros should be fixed"
+#undef		memoize
+#define		memoize(ri,si)			if (state_->backtracking>1) { RECOGNIZER->memoize(RECOGNIZER, ri, si) }
+#undef		alreadyParsedRule
+#define		alreadyParsedRule(r)		if (state_->backtracking>1) { RECOGNIZER->alreadyParsedRule(RECOGNIZER, r) }
 <endif>
 
 #ifdef EOF
@@ -770,19 +500,11 @@ static CommonTokenPtr <name>NextToken   (pANTLR3_TOKEN_SOURCE toksource);
 <name>::~<name>()
 {
 <if(memoize)>
-	if	(RULEMEMO != NULL)
+	if	(state_->ruleMemo != NULL)
 	{
-		RULEMEMO->free(RULEMEMO);
-		RULEMEMO = NULL;
+		state_->ruleMemo->free(state_->ruleMemo);
+		state_->ruleMemo = NULL;
 	}
-<endif>
-<if(grammar.directDelegates)>
-	// Free the lexers that we delegated to
-	// functions to. NULL the state so we only free it once.
-	//
-	<grammar.directDelegates:
-         {g|ctx-><g:delegateName()>->pLexer->rec->state = NULL;
-         ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
 <endif>
 }
 
@@ -813,7 +535,7 @@ const char * <name>::grammarFileName()
  *     - Success p<name> initialized for the lex start
  *     - Fail NULL
  */
-<name>::<name>(<inputType()> instream<grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>)
+<name>::<name>(<inputType()> instream<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
     : <name>(instream, NULL<grammar.delegators:{g|, <g:delegateName()>}>)
 {
 }
@@ -826,8 +548,14 @@ const char * <name>::grammarFileName()
  *     - Success p<name> initialized for the lex start
  *     - Fail NULL
  */
-<name>::<name>(antlr3::CharStreamPtr instream, antlr3::RecognizerSharedStatePtr state<grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>)
+<name>::<name>(antlr3::CharStreamPtr instream, antlr3::RecognizerSharedStatePtr state<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
     : Lexer(instream, state)
+<if(grammar.directDelegates)>
+    // Initialize the lexers that we are going to delegate some functions to.
+    <grammar.directDelegates:
+         {g|, <g:delegateName()>_(new <g.recognizerName>(instream, state_, this<grammar.delegators:{g|, <g:delegateName()>}>);};
+         separator="\n">
+<endif>
 {
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
@@ -836,20 +564,10 @@ const char * <name>::grammarFileName()
     state_->ruleMemo = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
 <endif>
 <endif>
-
-<if(grammar.directDelegates)>
-	// Initialize the lexers that we are going to delegate some
-	// functions to.
-	//
-	<grammar.directDelegates:
-         {g|ctx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, ctx->pLexer->rec->state, ctx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-<endif>
 <if(grammar.delegators)>
-	// Install the pointers back to lexers that will delegate us to perform certain functions
-	// for them.
-	//
+	// Install the pointers back to lexers that will delegate us to perform certain functions for them.
 	<grammar.delegators:
-         {g|ctx-><g:delegateName()>			= <g:delegateName()>;}; separator="\n">
+         {g|<g:delegateName()>_ = <g:delegateName()>;}; separator="\n">
 <endif>
 <if(filterMode)>
     /* We have filter mode turned on, so install the filtering nextToken function
@@ -908,9 +626,9 @@ public:
 filteringNextToken() ::= <<
 /** An override of the lexer's nextToken() method that backtracks over mTokens() looking
  *  for matches in lexer filterMode.  No error can be generated upon error; just rewind, consume
- *  a token and then try again.  BACKTRACKING needs to be set as well.
+ *  a token and then try again. state_->backtracking needs to be set as well.
  *  Make rule memoization happen only at levels above 1 as we start mTokens
- *  at BACKTRACKING==1.
+ *  at state_->backtracking==1.
  */
 static CommonTokenPtr
 <name>NextToken(pANTLR3_TOKEN_SOURCE toksource)
@@ -966,7 +684,7 @@ static CommonTokenPtr
 			lexer->mTokens(lexer->ctx);
     		state->backtracking	= 0;
 
-    		<! mTokens backtracks with synpred at BACKTRACKING==2
+    		<! mTokens backtracks with synpred at state_->backtracking==2
 				and we set the synpredgate to allow actions at level 1. !>
 
 			if	(state->failed == true)
@@ -984,9 +702,9 @@ static CommonTokenPtr
 }
 >>
 
-actionGate() ::= "BACKTRACKING==0"
+actionGate() ::= "state_->backtracking == 0"
 
-filteringActionGate() ::= "BACKTRACKING==1"
+filteringActionGate() ::= "state_->backtracking == 1"
 
 /** How to generate a parser */
 genericParser(  grammar,
@@ -1002,7 +720,7 @@ genericParser(  grammar,
                 labelType,
 				members,
 				rewriteElementType, filterMode,
-                ASTLabelType="antlr3::BaseTreePtr"
+                ASTLabelType="antlr3::ItemPtr"
               ) ::= <<
 
 #ifdef EOF
@@ -1019,26 +737,14 @@ antlr3::ConstString const <name>TokenNames[<length(tokenNames)>+4] = {
     ANTLR3_T("\<EOR>"),
     ANTLR3_T("\<DOWN>"),
     ANTLR3_T("\<UP>"),
-    <tokenNames:{it|    ANTLR3_T(<it>)}; separator=",\n">
+    <tokenNames:{it|ANTLR3_T(<it>)}; separator=",\n">
 };
 <endif>
 
-    <@members>
+<@members><@end>
 
-    <@end>
 <rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
 <scopes:{it |<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(it)><endif>}>
-
-<if(!LEXER)>
-<! generate rule/method definitions for imported rules so they
-   appear to be defined in this recognizer. !>
-<if(recognizer.grammar.delegatedRules)>
-// Delegated rules
-//
-<recognizer.grammar.delegatedRules:{ruleDescriptor|static <headerReturnType(ruleDescriptor)> <ruleDescriptor.name>(p<name> ctx<if(ruleDescriptor.parameterScope)>, <endif><ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
-
-<endif>
-<endif>
 
 /** \brief Name of the grammar file that generated this code
  */
@@ -1056,7 +762,7 @@ const char * <name>::grammarFileName()
  *
  * \return Pointer to new parser context upon success.
  */
-<name>::<name>(<inputStreamType> instream<grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>)
+<name>::<name>(<inputStreamType> instream<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
     : <name>(instream, NULL<grammar.delegators:{g|, <g:delegateName()>}>)
 {
 }
@@ -1067,12 +773,23 @@ const char * <name>::grammarFileName()
  *
  * \return Pointer to new parser context upon success.
  */
-<name>::<name>(<inputStreamType> instream, antlr3::RecognizerSharedStatePtr state<grammar.delegators:{g|, p<g.recognizerName> <g:delegateName()>}>)
+<name>::<name>(<inputStreamType> instream, antlr3::RecognizerSharedStatePtr state<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
 <if(PARSER)>
     : Parser(instream, state)
 <endif>
 <if(TREE_PARSER)>
     : TreeParser(instream, state)
+<endif>
+<if(grammar.directDelegates)>
+    // Initialize the parsers that we are going to delegate some functions to.
+    <grammar.directDelegates:
+        {g|, <g:delegateName()>_(new <g.recognizerName>(instream, state_, this<grammar.delegators:{g|, <g:delegateName()>}>))};
+        separator="\n">
+<endif>
+<if(grammar.delegators)>
+    // Install the pointers back to parsers that will delegate us to perform certain functions for them.
+    <grammar.delegators:
+         {g|, <g:delegateName()>_(<g:delegateName()>)}; separator="\n">
 <endif>
 {
     /* Install the scope pushing methods.
@@ -1086,32 +803,18 @@ const char * <name>::grammarFileName()
     <@apifuncs>
 
     <@end>
-<if(grammar.directDelegates)>
-	// Initialize the parsers that we are going to delegate some
-	// functions to.
-	//
-	<grammar.directDelegates:
-         {g|ctx-><g:delegateName()> = <g.recognizerName>NewSSD(instream, PSRSTATE, ctx<grammar.delegators:{g|, <g:delegateName()>}>);}; separator="\n">
-<endif>
-<if(grammar.delegators)>
-	// Install the pointers back to parsers that will delegate us to perform certain functions
-	// for them.
-	//
-	<grammar.delegators:
-         {g|ctx-><g:delegateName()>			= <g:delegateName()>;}; separator="\n">
-<endif>
     <actions.parser.apifuncs>
     <actions.treeparser.apifuncs>
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
     /* Create a LIST for recording rule memos.
      */
-     RULEMEMO    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
+     state_->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
 <endif>
 <endif>
     /* Install the token table
      */
-    PSRSTATE->tokenNames   = <grammar.composite.rootGrammar.recognizerName>TokenNames;
+    state_->tokenNames   = <grammar.composite.rootGrammar.recognizerName>TokenNames;
 
     <@debugStuff()>
 }
@@ -1137,28 +840,20 @@ void <name>::reset()
 
     <@cleanup>
     <@end>
-<if(grammar.directDelegates)>
-	// Free the parsers that we delegated to
-	// functions to.NULL the state so we only free it once.
-	//
-	<grammar.directDelegates:
-         {g| ctx-><g:delegateName()>-><if(TREE_PARSER)>pTreeParser<else>pParser<endif>->rec->state = NULL;
-         ctx-><g:delegateName()>->free(ctx-><g:delegateName()>);}; separator="\n">
-<endif>
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
-	if	(RULEMEMO != NULL)
+	if	(state_->ruleMemo != NULL)
 	{
-		RULEMEMO->free(RULEMEMO);
-		RULEMEMO = NULL;
+		state_->ruleMemo->free(state_->ruleMemo);
+		state_->ruleMemo = NULL;
 	}
 <endif>
 <endif>
 }
     <members>
 
-/* Declare the bitsets
- */
+// Declare bitsets defining follow sets for error recovery
+//
 <bitsets:{it | <bitsetDeclare(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
                     words64=it.bits)>}>
 
@@ -1179,14 +874,14 @@ void <name>::reset()
  */
 <rules; separator="\n\n">
 <if(grammar.delegatedRules)>
-	// Delegated methods that appear to be a part of this
-	// parser
-	//
+
+// Delegated methods that appear to be a part of this parser
+
 <grammar.delegatedRules:{ruleDescriptor|
-    <returnType()> <name>::<ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>)
-    \{
-        <if(ruleDescriptor.hasReturnValue)>return <endif>ctx-><ruleDescriptor.grammar:delegateName()>-><ruleDescriptor.name>(ctx-><ruleDescriptor.grammar:delegateName()><if(ruleDescriptor.parameterScope.attributes)>, <endif><ruleDescriptor.parameterScope.attributes:{a|<a.name>}; separator=", ">);
-	\}}; separator="\n">
+<returnType()> <name>::<ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>)
+{
+    <if(ruleDescriptor.hasReturnValue)>return <endif><ruleDescriptor.grammar:delegateName()>_-><ruleDescriptor.name>(<ruleDescriptor.parameterScope.attributes:{a|<a.name>}; separator=", ">);
+\}}; separator="\n">
 
 <endif>
 /* End of parsing rules
@@ -1237,7 +932,7 @@ treeParser(	grammar,
 			bitsets,
 			filterMode,
 			labelType={<ASTLabelType>},
-			ASTLabelType="antlr3::BaseTreePtr",
+			ASTLabelType="antlr3::ItemPtr",
 			superClass="TreeParser",
 			members={<actions.treeparser.members>}
 			) ::= <<
@@ -1259,10 +954,9 @@ static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:param
 	<ruleLabelDefs()>
 	<ruleLabelInitializations()>
 <if(trace)>
-    Printf("enter <ruleName> %d failed = %d, backtracking = %d\\n",LT(1),failed,BACKTRACKING);
+    traceIn(ANTLR3_T("<ruleName>_fragment"), <ruleDescriptor.index>);
     <block>
-    Printf("exit <ruleName> %d, failed = %d, backtracking = %d\\n",LT(1),failed,BACKTRACKING);
-
+    traceOut(ANTLR3_T("<ruleName>_fragment"), <ruleDescriptor.index>);
 <else>
     <block>
 <endif>
@@ -1274,15 +968,15 @@ static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:param
 synpred(predname) ::= <<
 static bool <predname>(p<name> ctx)
 {
-    BACKTRACKING++;
+    state_->backtracking++;
     <@start()>
-    antlr3::Marker start	= MARK();
-    <predname>_fragment(ctx);	    // can never throw exception
-    bool success	= !(FAILEDFLAG);
-    REWIND(start);
+    antlr3::Marker start = input_->mark();
+    <predname>_fragment(ctx); // can never throw exception
+    bool success = !state_->failed;
+    input_->rewind(start);
     <@stop()>
-    BACKTRACKING--;
-    FAILEDFLAG	= false;
+    state_->backtracking--;
+    state_->failed = false;
     return success;
 }<\n>
 >>
@@ -1293,7 +987,7 @@ lexerSynpred(predname) ::= <<
 
 ruleMemoization(rname) ::= <<
 <if(memoize)>
-if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
+if (state_->backtracking > 0 && alreadyParsedRule(<ruleDescriptor.index>))
 {
 <if(ruleDescriptor.hasMultipleReturnValues)>
 <if(!ruleDescriptor.isSynPred)>
@@ -1312,12 +1006,12 @@ if ( (BACKTRACKING>0) && (HAVEPARSEDRULE(<ruleDescriptor.index>)) )
 
 /** How to test for failure and return from rule */
 checkRuleBacktrackFailure() ::= <<
-if  (HASEXCEPTION())
+if (state_->error)
 {
     goto rule<ruleDescriptor.name>Ex;
 }
 <if(backtracking)>
-if (HASFAILED())
+if (state_->failed)
 {
     <scopeClean()>
     <@debugClean()>
@@ -1329,9 +1023,9 @@ if (HASFAILED())
 /** This rule has failed, exit indicating failure during backtrack */
 ruleBacktrackFailure() ::= <<
 <if(backtracking)>
-if (BACKTRACKING>0)
+if (state_->backtracking > 0)
 {
-    FAILEDFLAG = <true_value()>;
+    state_->failed = <true_value()>;
     <scopeClean()>
     return <ruleReturnValue()>;
 }
@@ -1348,7 +1042,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
  */
 <returnType()> <name>::<ruleName>(<ruleDescriptor.parameterScope:parameterScope()>)
 {
-    <if(trace)>Printf("enter <ruleName> %s failed=%d, backtracking=%d\n", LT(1), BACKTRACKING);<endif>
+    <if(trace)>traceIn(ANTLR3_T("<ruleName>"), <ruleDescriptor.index>);<endif>
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
@@ -1363,7 +1057,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
 
     <ruleCleanUp()>
 <if(exceptions)>
-    if	(HASEXCEPTION())
+    if (state_->error)
     {
 	<exceptions:{e|<catch(decl=e.decl,action=e.action)><\n>}>
     }
@@ -1376,10 +1070,10 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
         <if(actions.(actionScope).rulecatch)>
             <actions.(actionScope).rulecatch>
         <else>
-            if (HASEXCEPTION())
+            if (state_->error)
             {
-                PREPORTERROR();
-                PRECOVER();
+                reportError();
+                recover();
                 <@setErrorReturnValue()>
             }
             <if(ruleDescriptor.actions.after)>
@@ -1392,7 +1086,7 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
     <endif>
 <endif>
 
-    <if(trace)>Printf("exit <ruleName> %d failed=%s backtracking=%s\n", LT(1), failed, BACKTRACKING);<endif>
+    <if(trace)>traceOut(ANTLR3_T("<ruleName>"), <ruleDescriptor.index>);<endif>
     <memoize()>
 <if(finally)>
     <finalCode(finalBlock=finally)>
@@ -1446,7 +1140,7 @@ ruleInitializations() ::= <<
 }>
 <endif>
 <if(memoize)>
-<ruleDescriptor.name>_StartIndex = INDEX();<\n>
+<ruleDescriptor.name>_StartIndex = input_->index();<\n>
 <endif>
 <ruleDescriptor.useScopes:{it |<scopeTop(it)> = <scopePush(it)>;}; separator="\n">
 <ruleDescriptor.ruleScope:{it |<scopeTop(it.name)> = <scopePush(it.name)>;}; separator="\n">
@@ -1454,23 +1148,16 @@ ruleInitializations() ::= <<
 
 ruleLabelDefs() ::= <<
 <[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{it |<labelType>    <it.label.text>;}; separator="\n"
+    :{it |<labelType> <it.label.text>;//}; separator="\n"
 >
-<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{it |pANTLR3_VECTOR    list_<it.label.text>;}; separator="\n"
->
+<ruleDescriptor.tokenListLabels:{it|std::vector\<antlr3::CommonTokenPtr> list_<it.label.text>;}; separator="\n">
+<ruleDescriptor.ruleListLabels:{it|std::vector\<<ASTLabelType>\> list_<it.label.text>;}; separator="\n">
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelDef(); separator="\n"
 >
 >>
 
 ruleLabelInitializations() ::= <<
-<[ruleDescriptor.tokenLabels,ruleDescriptor.tokenListLabels]
-    :{it |<it.label.text>       = NULL;}; separator="\n"
->
-<[ruleDescriptor.tokenListLabels,ruleDescriptor.ruleListLabels]
-    :{it |list_<it.label.text>     = NULL;}; separator="\n"
->
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelInitVal(); separator="\n"
 >
@@ -1536,7 +1223,7 @@ retval
 memoize() ::= <<
 <if(memoize)>
 <if(backtracking)>
-if ( BACKTRACKING>0 ) { MEMOIZE(<ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
+if ( state_->backtracking > 0 ) { memoize(<ruleDescriptor.index>, <ruleDescriptor.name>_StartIndex); }
 <endif>
 <endif>
 >>
@@ -1582,7 +1269,7 @@ void <name>::m<ruleName>(<ruleDescriptor.parameterScope:parameterScope()>)
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <lexerRuleLabelDefs()>
-    <if(trace)>System.out.println("enter <ruleName> '"+(char)LA(1)+"' line="+GETLINE()+":"+GETCHARPOSITIONINLINE()+" failed="+failed+" backtracking="+BACKTRACKING);<endif>
+    <if(trace)>traceIn(ANTLR3_T("m<ruleName>"), <ruleDescriptor.index>);<endif>
 
 <if(nakedBlock)>
     <ruleMemoization(rname=ruleName)>
@@ -1598,9 +1285,9 @@ void <name>::m<ruleName>(<ruleDescriptor.parameterScope:parameterScope()>)
     <ruleDescriptor.actions.init>
 
     <block>
-	LEXSTATE->type = _type;
+	state_->type = _type;
 <endif>
-    <if(trace)> Fprintf(stderr, "exit <ruleName> '%c' line=%d:%d failed = %d, backtracking =%d\n",LA(1),GETLINE(),GETCHARPOSITIONINLINE(),failed,BACKTRACKING);<endif>
+    <if(trace)>traceOut(ANTLR3_T("m<ruleName>"), <ruleDescriptor.index>);<endif>
     <ruleCleanUp()>
     <lexerRuleLabelFree()>
     <(ruleDescriptor.actions.after):execAfter()>
@@ -1795,7 +1482,7 @@ element(e) ::= <<
 
 /** match a token optionally with a label in front */
 tokenRef(token,label,elementIndex,terminalOptions) ::= <<
-<if(label)><label> = antlr3::pointer_cast\< <labelType> >(<endif> MATCHT(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>)<if(label)>)<endif>;
+<if(label)><label> = antlr3::pointer_cast\< <labelType> >(<endif> match(<token>, FOLLOW_<token>_in_<ruleName><elementIndex>)<if(label)>)<endif>;
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1806,11 +1493,7 @@ tokenRefAndListLabel(token,label,elementIndex,terminalOptions) ::= <<
 >>
 
 listLabel(label,elem) ::= <<
-if (list_<label> == NULL)
-{
-    list_<label>=ctx->vectors->newVector(ctx->vectors);
-}
-list_<label>->add(list_<label>, <elem>, NULL);
+list_<label>.push_back(<elem>);
 >>
 
 
@@ -1819,7 +1502,7 @@ charRef(char,label) ::= <<
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
-MATCHC(<char>);
+matchc(<char>);
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1828,7 +1511,7 @@ charRangeRef(a,b,label) ::= <<
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
-MATCHRANGE(<a>, <b>);
+matchRange(<a>, <b>);
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1843,12 +1526,12 @@ matchSet(s,label,elementIndex,terminalOptions,postmatchCode="") ::= <<
 <endif>
 if ( <s> )
 {
-    CONSUME();
+    input_->consume();
     <postmatchCode>
 <if(!LEXER)>
-    PERRORRECOVERY=false;
+    state_->errorRecovery=false;
 <endif>
-    <if(backtracking)>FAILEDFLAG=false;<\n><endif>
+    <if(backtracking)>state_->failed = false;<\n><endif>
 }
 else
 {
@@ -1856,7 +1539,7 @@ else
     <mismatchedSetEx()>
     <@mismatchedSetException()>
 <if(LEXER)>
-    LRECOVER();
+    recover();
 <else>
     recoverFromMismatchedSet(FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
@@ -1878,16 +1561,16 @@ matchSetAndListLabel(s,label,elementIndex,postmatchCode) ::= <<
 /** Match a string literal */
 lexerStringRef(string,label,elementIndex) ::= <<
 <if(label)>
-<label>Start = GETCHARINDEX();
-MATCHS(<string>);
+<label>Start = charIndex();
+matchs(<string>);
 <checkRuleBacktrackFailure()>
-<label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
+<label> = state_->tokFactory->newToken(state_->tokFactory);
 <label>->setType(<label>, TokenInvalid);
 <label>->setStartIndex(<label>, <label>Start);
-<label>->setStopIndex(<label>, GETCHARINDEX()-1);
+<label>->setStopIndex(<label>, charIndex()-1);
 <label>->input = INPUT->tnstream->istream;
 <else>
-MATCHS(<string>);
+matchs(<string>);
 <checkRuleBacktrackFailure()><\n>
 <endif>
 >>
@@ -1896,7 +1579,7 @@ wildcard(token,label,elementIndex,terminalOptions) ::= <<
 <if(label)>
 <label>=(<labelType>)LT(1);<\n>
 <endif>
-MATCHANYT();
+matchAny();
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1910,7 +1593,7 @@ wildcardChar(label, elementIndex) ::= <<
 <if(label)>
 <label> = LA(1);<\n>
 <endif>
-MATCHANY();
+matchAny();
 <checkRuleBacktrackFailure()>
 >>
 
@@ -1927,7 +1610,7 @@ wildcardCharListLabel(label, elementIndex) ::= <<
  */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
 followPush(&FOLLOW_<rule.name>_in_<ruleName><elementIndex>);
-<if(label)><label>=<endif><if(scope)>ctx-><scope:delegateName()>-><endif><rule.name>(<if(scope)>-><scope:delegateName()><endif><if(args)>, <args; separator=", "><endif>);<\n>
+<if(label)><label>=<endif><if(scope)>ctx-><scope:delegateName()>-><endif><rule.name>(<if(scope)>-><scope:delegateName()><endif><if(args)><args; separator=", "><endif>);<\n>
 followPop();
 <checkRuleBacktrackFailure()>
 >>
@@ -1947,13 +1630,13 @@ lexerRuleRef(rule,label,args,elementIndex,scope) ::= <<
 /* <description> */
 <if(label)>
 {
-    antlr3::Index <label>Start<elementIndex> = GETCHARINDEX();
+    antlr3::Index <label>Start<elementIndex> = charIndex();
     <if(scope)>ctx-><scope:delegateName()>-><endif>m<rule.name>(<if(scope)>-><scope:delegateName()><endif> <if(args)>, <endif><args; separator=", ">);
     <checkRuleBacktrackFailure()>
-    <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
+    <label> = state_->tokFactory->newToken(state_->tokFactory);
     <label>->setType(<label>, TokenInvalid);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
-    <label>->setStopIndex(<label>, GETCHARINDEX()-1);
+    <label>->setStopIndex(<label>, charIndex()-1);
     <label>->input = INPUT;
 }
 <else>
@@ -1973,17 +1656,17 @@ lexerMatchEOF(label,elementIndex) ::= <<
 <if(label)>
 {
     <labelType> <label>;
-    std::uint32_t <label>Start<elementIndex> = GETCHARINDEX();
-    MATCHC(CharstreamEof);
+    std::uint32_t <label>Start<elementIndex> = charIndex();
+    matchc(CharstreamEof);
     <checkRuleBacktrackFailure()>
-    <label> = LEXSTATE->tokFactory->newToken(LEXSTATE->tokFactory);
+    <label> = state_->tokFactory->newToken(state_->tokFactory);
     <label>->setType(<label>, TokenEof);
     <label>->setStartIndex(<label>, <label>Start<elementIndex>);
-    <label>->setStopIndex(<label>, GETCHARINDEX()-1);
+    <label>->setStopIndex(<label>, charIndex()-1);
     <label>->input = INPUT->tnstream->istream;
 }
 <else>
-    MATCHC(CharstreamEof);
+    matchc(CharstreamEof);
     <checkRuleBacktrackFailure()>
     <endif>
 >>
@@ -2001,17 +1684,17 @@ tree(root, actionsAfterRoot, children, nullableChildList, enclosingTreeLevel, tr
 <actionsAfterRoot:element()>
 <if(nullableChildList)>
 if ( LA(1)==antlr3::TokenDown ) {
-    MATCHT(antlr3::TokenDown, NULL);
+    match(antlr3::TokenDown, antlr3::Bitset());
     <checkRuleBacktrackFailure()>
     <children:element()>
-    MATCHT(antlr3::TokenUp, NULL);
+    match(antlr3::TokenUp, antlr3::Bitset());
     <checkRuleBacktrackFailure()>
 }
 <else>
-MATCHT(antlr3::TokenDown, NULL);
+match(antlr3::TokenDown, antlr3::Bitset());
 <checkRuleBacktrackFailure()>
 <children:element()>
-MATCHT(antlr3::TokenUp, NULL);
+match(antlr3::TokenUp, antlr3::Bitset());
 <checkRuleBacktrackFailure()>
 <endif>
 >>
@@ -2184,42 +1867,34 @@ cyclicDFA(dfa) ::= <<
 /** Static dfa state tables for Cyclic dfa:
  *    <dfa.description>
  */
-static const std::int32_t dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] =
-    {
+static const std::int32_t dfa<dfa.decisionNumber>_eot[<dfa.numberOfStates>] = {
 	<dfa.eot; wrap="\n", separator=", ", null="-1">
-    };
-static const std::int32_t dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] =
-    {
+};
+static const std::int32_t dfa<dfa.decisionNumber>_eof[<dfa.numberOfStates>] = {
 	<dfa.eof; wrap="\n", separator=", ", null="-1">
-    };
-static const std::int32_t dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] =
-    {
+};
+static const std::int32_t dfa<dfa.decisionNumber>_min[<dfa.numberOfStates>] = {
 	<dfa.min; wrap="\n", separator=", ", null="-1">
-    };
-static const std::int32_t dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] =
-    {
+};
+static const std::int32_t dfa<dfa.decisionNumber>_max[<dfa.numberOfStates>] = {
 	<dfa.max; wrap="\n", separator=", ", null="-1">
-    };
-static const std::int32_t dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] =
-    {
+};
+static const std::int32_t dfa<dfa.decisionNumber>_accept[<dfa.numberOfStates>] = {
 	<dfa.accept; wrap="\n", separator=", ", null="-1">
-    };
-static const std::int32_t dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] =
-    {
+};
+static const std::int32_t dfa<dfa.decisionNumber>_special[<dfa.numberOfStates>] = {
 	<dfa.special; wrap="\n", separator=", ", null="-1">
-    };
+};
 
 <dfa.edgeTransitionClassMap.keys:{ table |
-static const std::int32_t dfa<dfa.decisionNumber>_T<i0>[] =
-    {
+static const std::int32_t dfa<dfa.decisionNumber>_T<i0>[] = {
 	<table; separator=", ", wrap="\n", null="-1">
-    \};}; null = "">
+\};<\n>}; null = "">
 
 /* Transition tables are a table of sub tables, with some tables
  * reused for efficiency.
  */
-static const std::int32_t * const dfa<dfa.decisionNumber>_transitions[] =
-{
+static const std::int32_t * const dfa<dfa.decisionNumber>_transitions[] = {
     <dfa.transitionEdgeTables:{xref|dfa<dfa.decisionNumber>_T<xref>}; separator=", ", wrap="\n", null="NULL">
 };
 
@@ -2235,9 +1910,9 @@ std::int32_t <name>::dfa<dfa.decisionNumber>_sst(antlr3::BaseRecognizer * recogn
 	<state>}; separator="\n">
     }
 <if(backtracking)>
-    if (BACKTRACKING > 0)
+    if (state_->backtracking > 0)
     {
-        FAILEDFLAG = true;
+        state_->failed = true;
         return -1;
     }
 <endif>
@@ -2305,13 +1980,13 @@ cyclicDFAState(decisionNumber,stateNumber,edges,needErrorClause,semPredState) ::
 {
     std::uint32_t LA<decisionNumber>_<stateNumber> = LA(1);<\n>
     <if(semPredState)> <! get next lookahead symbol to test edges, then rewind !>
-    antlr3::Index index<decisionNumber>_<stateNumber> = INDEX();<\n>
+    antlr3::Index index<decisionNumber>_<stateNumber> = input_->index();<\n>
     marker->rewind();<\n>
     <endif>
     s = -1;
     <edges; separator="\nelse ">
 	<if(semPredState)> <! return input cursor to state before we rewound !>
-	SEEK(index<decisionNumber>_<stateNumber>);<\n>
+	input_->seek(index<decisionNumber>_<stateNumber>);<\n>
 	<endif>
     if ( s>=0 )
     {
@@ -2755,7 +2430,7 @@ ruleLabelDef(label) ::= <<
 ruleLabelInitVal(label) ::= <<
 >>
 
-ASTLabelType() ::= "<if(recognizer.ASTLabelType)><recognizer.ASTLabelType><else>antlr3::BaseTreePtr<endif>"
+ASTLabelType() ::= "<if(recognizer.ASTLabelType)><recognizer.ASTLabelType><else>antlr3::ItemPtr<endif>"
 
 /** Define a return struct for a rule if the code needs to access its
  *  start/stop tokens, tree stuff, attributes, ...  Leave a hole for
@@ -2764,21 +2439,20 @@ ASTLabelType() ::= "<if(recognizer.ASTLabelType)><recognizer.ASTLabelType><else>
 returnScope(scope) ::= <<
 <if(!ruleDescriptor.isSynPred)>
 <if(ruleDescriptor.hasMultipleReturnValues)>
-typedef struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>_struct
+struct <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>
 {
 <if(!TREE_PARSER)>
     /** Generic return elements for ANTLR3 rules that are not in tree parsers or returning trees
      */
-    antlr3::CommonTokenPtr    start;
-    antlr3::CommonTokenPtr    stop;
+    antlr3::CommonTokenPtr start;
+    antlr3::CommonTokenPtr stop;
 <else>
-    <recognizer.ASTLabelType>       start;
-    <recognizer.ASTLabelType>       stop;
+    <recognizer.ASTLabelType> start;
+    <recognizer.ASTLabelType> stop;
 <endif>
     <@ruleReturnMembers()>
     <ruleDescriptor.returnScope.attributes:{it |<it.type> <it.name>;}; separator="\n">
-}
-    <ruleDescriptor.grammar.recognizerName>_<ruleDescriptor:returnStructName()>;<\n><\n>
+};
 <endif>
 <endif>
 >>
@@ -2824,21 +2498,21 @@ scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <%
 isolatedDynamicScopeRef(scope) ::= "ctx->SCOPE_STACK(<scope>)"
 
 /** reference an attribute of rule; might only have single return value */
-ruleLabelRef(referencedRule,scope,attr) ::= <<
+ruleLabelRef(referencedRule,scope,attr) ::= <%
 <if(referencedRule.hasMultipleReturnValues)>
 <scope>.<attr.name>
 <else>
 <scope>
 <endif>
->>
+%>
 
-returnAttributeRef(ruleDescriptor,attr) ::= <<
+returnAttributeRef(ruleDescriptor,attr) ::= <%
 <if(ruleDescriptor.hasMultipleReturnValues)>
 retval.<attr.name>
 <else>
 <attr.name>
 <endif>
->>
+%>
 
 returnSetAttributeRef(ruleDescriptor,attr,expr) ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
@@ -2857,7 +2531,13 @@ listLabelRef(label) ::= "list_<label>"
 
 // not sure the next are the right approach
 //
-tokenLabelPropertyRef_text(scope,attr) ::= "<scope>->text()"
+tokenLabelPropertyRef_text(scope,attr) ::= <%
+<if(TREE_PARSER)>
+adaptor_->getText(<scope>)
+<else>
+<scope>->text()
+<endif>
+%>
 tokenLabelPropertyRef_type(scope,attr) ::= "<scope>->type()"
 tokenLabelPropertyRef_line(scope,attr) ::= "<scope>->line()"
 tokenLabelPropertyRef_pos(scope,attr) ::= "<scope>->charPositionInLine()"
@@ -2871,9 +2551,9 @@ ruleLabelPropertyRef_stop(scope,attr) ::= "<scope>.stop"
 ruleLabelPropertyRef_tree(scope,attr) ::= "<scope>.tree"
 ruleLabelPropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-(STRSTREAM->toStringSS(STRSTREAM, <scope>.start, <scope>.start))
+(treeNodeStream()->toString(<scope>.start, <scope>.start))
 <else>
-(STRSTREAM->toStringTT(STRSTREAM, <scope>.start, <scope>.stop))
+(tokenStream()->toString(<scope>.start, <scope>.stop))
 <endif>
 >>
 
@@ -2895,19 +2575,19 @@ rulePropertyRef_stop(scope,attr) ::= "retval.stop"
 rulePropertyRef_tree(scope,attr) ::= "retval.tree"
 rulePropertyRef_text(scope,attr) ::= <<
 <if(TREE_PARSER)>
-INPUT->toStringSS(INPUT, ADAPTOR->getTokenStartIndex(ADAPTOR, retval.start), ADAPTOR->getTokenStopIndex(ADAPTOR, retval.start))
+treeNodeStream()->toString(adaptor_->getTokenStartIndex(retval.start), adaptor_->getTokenStopIndex(retval.start))
 <else>
-STRSTREAM->toStringTT(STRSTREAM, retval.start, LT(-1))
+tokenStream()->toString(retval.start, LT(-1))
 <endif>
 >>
 rulePropertyRef_st(scope,attr) ::= "retval.st"
 
 lexerRulePropertyRef_text(scope,attr) ::= "LEXER->getText(LEXER)"
 lexerRulePropertyRef_type(scope,attr) ::= "_type"
-lexerRulePropertyRef_line(scope,attr) ::= "LEXSTATE->tokenStartLine"
-lexerRulePropertyRef_pos(scope,attr) ::= "LEXSTATE->tokenStartCharPositionInLine"
-lexerRulePropertyRef_channel(scope,attr) ::= "LEXSTATE->channel"
-lexerRulePropertyRef_start(scope,attr) ::= "LEXSTATE->tokenStartCharIndex"
+lexerRulePropertyRef_line(scope,attr) ::= "state_->tokenStartLine"
+lexerRulePropertyRef_pos(scope,attr) ::= "state_->tokenStartCharPositionInLine"
+lexerRulePropertyRef_channel(scope,attr) ::= "state_->channel"
+lexerRulePropertyRef_start(scope,attr) ::= "state_->tokenStartCharIndex"
 lexerRulePropertyRef_stop(scope,attr) ::= "(LEXER->getCharIndex(LEXER)-1)"
 lexerRulePropertyRef_index(scope,attr) ::= "-1" // undefined token index in lexer
 lexerRulePropertyRef_int(scope,attr) ::= "LEXER->getText(LEXER)->toInt32(LEXER->getText(LEXER))"
@@ -2937,7 +2617,7 @@ if ( <actions.(actionScope).synpredgate> )
     <action>
 }
 <else>
-if ( BACKTRACKING == 0 )
+if ( state_->backtracking == 0 )
 {
     <action>
 }
@@ -2952,13 +2632,7 @@ if ( BACKTRACKING == 0 )
 // M I S C (properties, etc...)
 
 bitsetDeclare(name, words64) ::= <<
-
-/** Bitset defining follow set for error recovery in rule state: <name>  */
-static antlr3::Bitset const <name> = antlr3::Bitset::fromData({ <words64:{it |<it>ull}; separator=", "> });
->>
-
-bitset(name, words64) ::= <<
-antlr3BitsetSetAPI(&<name>);<\n>
+static antlr3::Bitset const <name> = antlr3::Bitset::fromData({ <words64:{it |<it>ull}; separator=", "> });<\n>
 >>
 
 codeFileExtension() ::= ".cpp"

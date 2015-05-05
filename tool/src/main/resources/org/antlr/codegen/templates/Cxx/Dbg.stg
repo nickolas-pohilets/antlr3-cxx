@@ -32,6 +32,7 @@
  *  If ASTs are built, then you'll also get ASTDbg.stg loaded.
  */
 @headerFile.dbgMembers() ::= <<
+private:
 <if(recognizer.grammar.grammarIsRoot)> <! grammar imports other grammar(s) !>
 	std::uint32_t ruleLevel_ = 0;
 	std::uint32_t ruleLevel() { return ruleLevel_; }
@@ -60,10 +61,10 @@
 
 @genericParser.members() ::= <<
 <if(grammar.grammarIsRoot)>
-const char * ruleNames[] =
-{
-    "invalidRule", <grammar.allImportedRules:{rST | "<rST.name>"}; wrap="\n    ", separator=", ">
-};<\n>
+//static const char * ruleNames[] =
+//{
+//    "invalidRule", <grammar.allImportedRules:{rST | "<rST.name>"}; wrap="\n//    ", separator=", ">
+//};<\n>
 <endif>
 <if(profile)>
 // Profiling not yet implemented for Cxx target
@@ -99,12 +100,15 @@ createListenerAndHandshake() ::= <<
 	// DEBUG MODE code
 	//
 <if(TREE_PARSER)>
-	auto proxy = std::make_shared\<DebugEventSocketProxy>(ADAPTOR);
+	auto proxy = std::make_shared\<antlr3::DebugEventSocketProxy>(adaptor_);
 <else>
-	auto proxy = std::make_shared\<DebugEventSocketProxy>(nullptr);
+	auto proxy = std::make_shared\<antlr3::DebugEventSocketProxy>(nullptr);
 <endif>
 	proxy->setGrammarFileName(grammarFileName());
+<if(TREE_PARSER)>
+<else>
 	setDebugListener(proxy);
+<endif>
 
 	// Try to connect to the debugger (waits forever for a connection)
 	//
@@ -119,48 +123,48 @@ createListenerAndHandshake() ::= <<
 @rule.preamble() ::= <<
 if ( ruleLevel()==0 )
 {
-	DBG->commence();
+	debugger_->commence();
 }
-DBG->enterRule(grammarFileName(), (const char *)"<ruleName>");
+debugger_->enterRule(grammarFileName(), (const char *)"<ruleName>");
 incRuleLevel();
-DBG->location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.charPositionInLine>);<\n>
+debugger_->location(<ruleDescriptor.tree.line>, <ruleDescriptor.tree.charPositionInLine>);<\n>
 >>
 
 @rule.postamble() ::= <<
-DBG->location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.charPositionInLine>);<\n>
-DBG->exitRule(grammarFileName(), "<ruleName>");
+debugger_->location(<ruleDescriptor.EORNode.line>, <ruleDescriptor.EORNode.charPositionInLine>);<\n>
+debugger_->exitRule(grammarFileName(), "<ruleName>");
 decRuleLevel();
 if ( ruleLevel()==0 )
 {
-	DBG->terminate();
+	debugger_->terminate();
 }
 <\n>
 >>
 
 @checkRuleBacktrackFailure.debugClean() ::= <<
-DBG->exitRule(grammarFileName(), "<ruleName>");
+debugger_->exitRule(grammarFileName(), "<ruleName>");
 decRuleLevel();
 >>
 
-@synpred.start() ::= "DBG->beginBacktrack(BACKTRACKING);"
+@synpred.start() ::= "debugger_->beginBacktrack(BACKTRACKING);"
 
-@synpred.stop() ::= "DBG->endBacktrack(BACKTRACKING, success);"
+@synpred.stop() ::= "debugger_->endBacktrack(BACKTRACKING, success);"
 
 // Common debug event triggers used by region overrides below
 
 enterSubRule() ::=
-    "DBG->enterSubRule(<decisionNumber>);<\n>"
+    "debugger_->enterSubRule(<decisionNumber>);<\n>"
 
 exitSubRule() ::=
-    "DBG->exitSubRule(<decisionNumber>);<\n>"
+    "debugger_->exitSubRule(<decisionNumber>);<\n>"
 
 enterDecision() ::=
-    "DBG->enterDecision(<decisionNumber>);<\n>"
+    "debugger_->enterDecision(<decisionNumber>);<\n>"
 
 exitDecision() ::=
-    "DBG->exitDecision(<decisionNumber>);<\n>"
+    "debugger_->exitDecision(<decisionNumber>);<\n>"
 
-enterAlt(n) ::= "DBG->enterAlt(<n>);<\n>"
+enterAlt(n) ::= "debugger_->enterAlt(<n>);<\n>"
 
 // Region overrides that tell various constructs to add debugging triggers
 
@@ -187,7 +191,7 @@ enterAlt(n) ::= "DBG->enterAlt(<n>);<\n>"
 @positiveClosureBlock.postdecision() ::= "<exitDecision()>"
 
 @positiveClosureBlock.earlyExitException() ::=
-    "DBG->recognitionException(EXCEPTION);<\n>"
+    "debugger_->recognitionException(state_->exception);<\n>"
 
 @closureBlock.preloop() ::= "<enterSubRule()>"
 
@@ -200,18 +204,18 @@ enterAlt(n) ::= "DBG->enterAlt(<n>);<\n>"
 @altSwitchCase.prealt() ::= "<enterAlt(altNum)>"
 
 @element.prematch() ::=
-    "DBG->location(<e.line>, <e.pos>);" // e is arg of element
+    "debugger_->location(<e.line>, <e.pos>);" // e is arg of element
 
 @matchSet.mismatchedSetException() ::=
-    "DBG->recognitionException(EXCEPTION);"
+    "debugger_->recognitionException(state_->exception);"
 
-@newNVException.noViableAltException() ::= "DBG->recognitionException(EXCEPTION);"
+@newNVException.noViableAltException() ::= "debugger_->recognitionException(state_->exception);"
 
 dfaDecision(decisionNumber,description) ::= <<
 alt<decisionNumber> = cdfa<decisionNumber>.predict(this, this, input_.get());
-if  (HASEXCEPTION())
+if  (state_->error)
 {
-	DBG->recognitionException(EXCEPTION);
+	debugger_->recognitionException(state_->exception);
     goto rule<ruleDescriptor.name>Ex;
 }
 <checkRuleBacktrackFailure()>
@@ -221,11 +225,11 @@ if  (HASEXCEPTION())
 //static void
 //dfaError(p<name> ctx)
 //{
-//    DBG->recognitionException(EXCEPTION);
+//    debugger_->recognitionException(state_->exception);
 //}
 >>
 
 /** Force predicate validation to trigger an event */
 evalPredicate(pred,description) ::= <<
-evalPredicate(DBG, <pred>, (const char *)"<description>")
+evalPredicate(<pred>, "<description>")
 >>

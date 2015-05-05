@@ -60,10 +60,10 @@ _first_0 = NULL;<\n>
 noRewrite(rewriteBlockLevel, treeLevel) ::= <<
 <if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <if(rewriteMode)>
-retval.tree = (<ASTLabelType>)_first_0;
-if ( ADAPTOR->getParent(retval.tree) != NULL && ADAPTOR->isNilNode(ADAPTOR->getParent(retval.tree) ) )
+retval.tree = antlr3::pointer_cast\<<ASTLabelType>\>(_first_0);
+if (adaptor_->getParent(retval.tree) != nullptr && adaptor_->isNil(adaptor_->getParent(retval.tree)))
 {
-    retval.tree = (<ASTLabelType>)ADAPTOR->getParent(retval.tree);
+    retval.tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->getParent(retval.tree));
 }
 <endif>
 <if(backtracking)>}<endif>
@@ -74,7 +74,7 @@ if ( ADAPTOR->getParent(retval.tree) != NULL && ADAPTOR->isNilNode(ADAPTOR->getP
  */
 tree(root, actionsAfterRoot, children, nullableChildList,
      enclosingTreeLevel, treeLevel) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 {
 <ASTLabelType> _save_last_<treeLevel>;
 <ASTLabelType> _first_<treeLevel>;
@@ -84,7 +84,7 @@ _last = (<ASTLabelType>)LT(1);
 _save_last_<treeLevel> = _last;
 _first_<treeLevel>     = NULL;
 <if(!rewriteMode)>
-root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->nilNode(ADAPTOR));
+root_<treeLevel> = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->nil());
 <endif>
 <root:element()>
 <if(rewriteMode)>
@@ -109,7 +109,7 @@ MATCHT(antlr3::TokenDown, NULL);
 MATCHT(antlr3::TokenUp, NULL);
 <endif>
 <if(!rewriteMode)>
-ADAPTOR->addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
+adaptor_->addChild(root_<enclosingTreeLevel>, root_<treeLevel>);
 <endif>
 _last = _save_last_<treeLevel>;
 }<\n>
@@ -121,22 +121,22 @@ _last = _save_last_<treeLevel>;
  *  setting of _last
  */
 tokenRefBang(token,label,elementIndex,terminalOptions) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.tokenRef(...)>
 >>
 
 /** ID auto construct */
 tokenRef(token,label,elementIndex,terminalOptions) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
 <if(terminalOptions.node)>
 <label>_tree = <terminalOptions.node>New(<label>);
 <else>
-<label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(<label>);
+<label>_tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->dupNode(<label>));
 <endif>
-ADAPTOR->addChild(root_<treeLevel>, <label>_tree);
+adaptor_->addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <else>
 <if(backtracking)>if ( BACKTRACKING ==0 ) {<endif>
@@ -153,16 +153,16 @@ tokenRefAndListLabel(token,label,elementIndex,terminalOptions) ::= <<
 
 /** ^(ID ...) auto construct */
 tokenRefRuleRoot(token,label,elementIndex,terminalOptions) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.tokenRef(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( BACKTRACKING == 0 ) {<endif>
 <if(terminalOptions.node)>
 <label>_tree = <terminalOptions.node>New(<label>);
 <else>
-<label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(<label>);
+<label>_tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->dupNode(<label>));
 <endif><\n>
-root_<treeLevel> = (<ASTLabelType>)ADAPTOR->becomeRoot(<label>_tree, root_<treeLevel>);
+root_<treeLevel> = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->becomeRoot(<label>_tree, root_<treeLevel>));
 <if(backtracking)>}<endif>
 <endif>
 >>
@@ -175,12 +175,12 @@ tokenRefRuleRootAndListLabel(token,label,elementIndex,terminalOptions) ::= <<
 
 /** Match . wildcard and auto dup the node/subtree */
 wildcard(token,label,elementIndex,terminalOptions) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.wildcard(...)>
 <if(!rewriteMode)>
 <if(backtracking)>if ( <actions.(actionScope).synpredgate> ) {<endif>
-<label>_tree = (<ASTLabelType>)ADAPTOR->dupTree(<label>);
-ADAPTOR->addChild(root_<treeLevel>, <label>_tree);
+<label>_tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->dupTree(<label>));
+adaptor_->addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>}<endif>
 <else> <! rewrite mode !>
 <if(backtracking)>if ( <actions.(actionScope).synpredgate> )<endif>
@@ -191,16 +191,16 @@ if ( _first_<treeLevel>==null ) _first_<treeLevel> = <label>;
 // SET AST
 
 matchSet(s,label,terminalOptions,elementIndex,postmatchCode) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.matchSet(postmatchCode={
 <if(!rewriteMode)>
 <if(backtracking)>if ( BACKTRACKING == 0 ) {<endif>
 <if(terminalOptions.node)>
 <label>_tree = <terminalOptions.node>New(<label>);
 <else>
-<label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(<label>);
+<label>_tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->dupNode(<label>));
 <endif><\n>
-ADAPTOR->addChild(root_<treeLevel>, <label>_tree);
+adaptor_->addChild(root_<treeLevel>, <label>_tree);
 <if(backtracking)>\}<endif>
 <endif>
 }
@@ -213,7 +213,7 @@ matchRuleBlockSet(s,label,terminalOptions,elementIndex,postmatchCode,treeLevel="
 >>
 
 matchSetBang(s,label,terminalOptions,elementIndex,postmatchCode) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.matchSet(...)>
 >>
 
@@ -224,9 +224,9 @@ matchSetRuleRoot(s,label,terminalOptions,elementIndex,debug) ::= <<
 <if(terminalOptions.node)>
 <label>_tree = <terminalOptions.node>New(<label>);
 <else>
-<label>_tree = (<ASTLabelType>)ADAPTOR->dupNode(<label>);
+<label>_tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->dupNode(<label>));
 <endif>
-root_<treeLevel> = (<ASTLabelType>)ADAPTOR->becomeRoot(<label>_tree, root_<treeLevel>);
+root_<treeLevel> = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->becomeRoot(<label>_tree, root_<treeLevel>));
 <if(backtracking)>\}<endif>
 <endif>
 }, ...
@@ -237,15 +237,15 @@ root_<treeLevel> = (<ASTLabelType>)ADAPTOR->becomeRoot(<label>_tree, root_<treeL
 
 /** rule auto construct */
 ruleRef(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRef(...)>
 <if(backtracking)>if ( <actions.(actionScope).synpredgate> )
 {
 <endif>
 <if(!rewriteMode)>
-	ADAPTOR->addChild(root_<treeLevel>, <label>.tree);
+    adaptor_->addChild(root_<treeLevel>, <label>.tree);
 <else>
-	if ( _first_<treeLevel> == NULL ) _first_<treeLevel> = <label>.tree;
+    if ( _first_<treeLevel> == NULL ) _first_<treeLevel> = <label>.tree;
 <endif>
 <if(backtracking)>}<endif>
 >>
@@ -258,10 +258,10 @@ ruleRefAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 /** ^(rule ...) auto construct */
 ruleRefRuleRoot(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRef(...)>
 <if(!rewriteMode)>
-<if(backtracking)>if ( ( <actions.(actionScope).synpredgate> ) ) <endif>root_<treeLevel> = (<ASTLabelType>)(ADAPTOR->becomeRoot(<label>.tree, root_<treeLevel>));
+<if(backtracking)>if ( ( <actions.(actionScope).synpredgate> ) ) <endif>root_<treeLevel> = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->becomeRoot(<label>.tree, root_<treeLevel>));
 <endif>
 >>
 
@@ -273,24 +273,24 @@ ruleRefRuleRootAndListLabel(rule,label,elementIndex,args,scope) ::= <<
 
 /** rule when output=AST and tracking for rewrite */
 ruleRefTrack(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRefTrack(...)>
 >>
 
 /** x+=rule when output=AST and tracking for rewrite */
 ruleRefTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRefTrackAndListLabel(...)>
 >>
 /** ^(rule ...) rewrite */
 ruleRefRuleRootTrack(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRefRootTrack(...)>
 >>
 
 /** ^(x+=rule ...) rewrite */
 ruleRefRuleRootTrackAndListLabel(rule,label,elementIndex,args,scope) ::= <<
-_last = (<ASTLabelType>)LT(1);
+_last = antlr3::pointer_cast\<<ASTLabelType>\>(LT(1));
 <super.ruleRefRuleRootTrackAndListLabel(...)>
 >>
 
@@ -300,9 +300,9 @@ _last = (<ASTLabelType>)LT(1);
  */
 createRewriteNodeFromElement(token,terminalOptions,scope) ::= <<
 <if(terminalOptions.node)>
-<terminalOptions.node>New(stream_<token>->nextNode(stream_<token>))
+<terminalOptions.node>New(stream_<token>.nextNode())
 <else>
-stream_<token>->nextNode(stream_<token>)
+stream_<token>.nextNode()
 <endif>
 >>
 
@@ -312,14 +312,10 @@ ruleCleanUp() ::= <<
 if ( <actions.(actionScope).synpredgate> ) {<\n>
 <endif>
 <if(!ruleDescriptor.isSynPred)>
-	retval.stop = LT(-1);<\n>
+retval.stop = LT(-1);<\n>
 <endif>
-	retval.tree = (<ASTLabelType>)ADAPTOR->rulePostProcessing(root_0);
+retval.tree = antlr3::pointer_cast\<<ASTLabelType>\>(adaptor_->rulePostProcessing(root_0));
 <if(backtracking)>
 }
 <endif>
-<ruleDescriptor.allTokenRefsInAltsWithRewrites
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
-<ruleDescriptor.allRuleRefsInAltsWithRewrites
-    :{if (stream_<it> != NULL) stream_<it>->free(stream_<it>);}; separator="\n">
 >>
