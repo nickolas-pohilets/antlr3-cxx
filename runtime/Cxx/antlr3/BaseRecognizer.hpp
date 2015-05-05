@@ -266,6 +266,8 @@ protected:
 
     IntStreamPtr input_;
     
+    bool filteringMode_;
+    
     std::uint32_t LA(std::int32_t i) {
         std::uint32_t t = input_->LA(i);
         return t;

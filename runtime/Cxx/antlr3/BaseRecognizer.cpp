@@ -61,6 +61,7 @@ BaseRecognizer::BaseRecognizer(RecognizerSharedStatePtr state)
 : state_(state ? state : std::make_shared<RecognizerSharedState>())
     , debugger_()
     , input_()
+    , filteringMode_(false)
 {
     assert(state_ != nullptr);
 }
@@ -795,27 +796,31 @@ Index BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
  */
 bool BaseRecognizer::alreadyParsedRule(Index ruleIndex)
 {
-    /* See if we have a memo marker for this.
-     */
-    Index stopIndex = getRuleMemoization(ruleIndex, input_->index());
+    if (!filteringMode_ || state_->backtracking > 1) {
+        /* See if we have a memo marker for this.
+         */
+        Index stopIndex = getRuleMemoization(ruleIndex, input_->index());
 
-    if(stopIndex == MEMO_RULE_UNKNOWN)
-    {
+        if (stopIndex == MEMO_RULE_UNKNOWN)
+        {
+            return false;
+        }
+
+        if (stopIndex == MEMO_RULE_FAILED)
+        {
+            state_->failed = true;
+        }
+        else
+        {
+            input_->seek(stopIndex + 1);
+        }
+
+        /* If here then the rule was executed for this input already
+         */
+        return  true;
+    } else {
         return false;
     }
-
-    if(stopIndex == MEMO_RULE_FAILED)
-    {
-        state_->failed = true;
-    }
-    else
-    {
-        input_->seek(stopIndex + 1);
-    }
-
-    /* If here then the rule was executed for this input already
-     */
-    return  true;
 }
 
 /** Record whether or not this rule parsed the input at this position
@@ -823,11 +828,11 @@ bool BaseRecognizer::alreadyParsedRule(Index ruleIndex)
  */
 void BaseRecognizer::memoize(Index ruleIndex, Index ruleParseStart)
 {
-    /* The rule memos are an List of List.
-     */
-    Index stopIndex = state_->failed == true ? MEMO_RULE_FAILED : input_->index();
-    auto & ruleList = state_->ruleMemo[ruleIndex];
-    ruleList[ruleParseStart] = stopIndex;
+    if (!filteringMode_ || state_->backtracking > 1) {
+        Index stopIndex = state_->failed == true ? MEMO_RULE_FAILED : input_->index();
+        auto & ruleList = state_->ruleMemo[ruleIndex];
+        ruleList[ruleParseStart] = stopIndex;
+    }
 }
 
 /** A syntactic predicate.  Returns true/false depending on whether

@@ -162,6 +162,8 @@ protected:
     virtual String traceCurrentItem() override;
 private:
     CommonTokenPtr nextTokenStr();
+    CommonTokenPtr nextTokenNormal();
+    CommonTokenPtr nextTokenFiltering();
 };
 
 } // namespace antlr3

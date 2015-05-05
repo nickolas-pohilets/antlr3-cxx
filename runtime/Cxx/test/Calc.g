@@ -5,22 +5,22 @@ options
     language=Cxx;
 }
 
-@parser::includes
-{
+@parser::header_postincludes {
 #include <unordered_map>
 #include <string>
 #include <sstream>
+}
 
+@parser::before_class {
 struct parser_context
 {
 	std::unordered_map<antlr3::String, int> vars;
 	std::stringstream ss;
 };
-
 }
 
-@parser::context
-{
+@parser::declarations {
+public:
     parser_context* c;
 }
 

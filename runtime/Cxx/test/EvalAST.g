@@ -7,22 +7,22 @@ options
     ASTLabelType='antlr3::ItemPtr';
 }
 
-@includes
-{
+@postincludes {
 #include <unordered_map>
 #include <string>
 #include <sstream>
+}
 
+@before_class {
 struct parser_context2
 {
 	std::unordered_map<antlr3::String, int> vars;
 	std::stringstream ss;
 };
-
 }
 
-@context
-{
+@declarations {
+public:
     parser_context2* c;
 }
 

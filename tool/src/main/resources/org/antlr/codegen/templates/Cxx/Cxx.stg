@@ -203,6 +203,7 @@ headerFile( LEXER,
             backtracking,
             synpreds,
             memoize,
+            filterMode,
             numRules,
             fileName,
             ANTLRVersion,
@@ -389,26 +390,6 @@ lexer(  grammar,
         superClass,
         labelType="antlr3::CommonTokenPtr") ::= <<
 
-<if(filterMode)>
-/* Forward declare implementation function for TokenSource interface when
- * this is a filter mode lexer.
- */
-static CommonTokenPtr <name>NextToken   (pANTLR3_TOKEN_SOURCE toksource);
-
-/* Override the normal memoize and alreadyParsedRule macros as this is a filtering
- * lexer. In filter mode, the memoizing and backtracking are gated at state_->backtracking > 1 rather
- * than just state_->backtracking. In some cases this might generate code akin to:
- *   if (state_->backtracking) if (state_->backtracking > 1) memoize.
- * However, I assume that the C compilers/optimizers are smart enough to work this one out
- * these days - Jim
- */
-#error "Following macros should be fixed"
-#undef		memoize
-#define		memoize(ri,si)			if (state_->backtracking>1) { RECOGNIZER->memoize(RECOGNIZER, ri, si) }
-#undef		alreadyParsedRule
-#define		alreadyParsedRule(r)		if (state_->backtracking>1) { RECOGNIZER->alreadyParsedRule(RECOGNIZER, r) }
-<endif>
-
 #ifdef EOF
 #undef EOF
 #endif
@@ -442,10 +423,6 @@ const char * <name>::grammarFileName()
 	return fileName;
 }
 
-<if(filterMode)>
-    <filteringNextToken()>
-<endif>
-
 <name>::<name>(<inputType()> instream<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
     : <name>(instream, NULL<grammar.delegators:{g|, <g:delegateName()>}>)
 {
@@ -461,6 +438,9 @@ const char * <name>::grammarFileName()
 <endif>
 <actions.(actionScope).initializers>
 {
+<if(filterMode)>
+    antlr3::BaseRecognizer::filteringMode_ = true;
+<endif>
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
     // Create a LIST for recording rule memos.
@@ -473,13 +453,9 @@ const char * <name>::grammarFileName()
 	<grammar.delegators:
          {g|<g:delegateName()>_ = <g:delegateName()>;}; separator="\n">
 <endif>
-<if(filterMode)>
-    /* We have filter mode turned on, so install the filtering nextToken function
-     */
-    state_->tokSource->nextToken = <name>NextToken;
-<endif>
 <actions.(actionScope).ctor_body>
 }
+
 <if(cyclicDFAs)>
 
 class <name>_SST_Func_Provider
@@ -524,86 +500,6 @@ public:
  * ================================================
  */
 
->>
-
-
-filteringNextToken() ::= <<
-/** An override of the lexer's nextToken() method that backtracks over mTokens() looking
- *  for matches in lexer filterMode.  No error can be generated upon error; just rewind, consume
- *  a token and then try again. state_->backtracking needs to be set as well.
- *  Make rule memoization happen only at levels above 1 as we start mTokens
- *  at state_->backtracking==1.
- */
-static CommonTokenPtr
-<name>NextToken(pANTLR3_TOKEN_SOURCE toksource)
-{
-    pANTLR3_LEXER   lexer;
-	pANTLR3_RECOGNIZER_SHARED_STATE state;
-
-    lexer   = (pANTLR3_LEXER)(toksource->super);
-    state	= lexer->rec->state;
-
-    /* Get rid of any previous token (token factory takes care of
-     * any deallocation when this token is finally used up.
-     */
-    state		->token	    = NULL;
-    state		->error	    = false;	    /* Start out without an exception	*/
-    state		->failed    = false;
-
-    /* Record the start of the token in our input stream.
-     */
-    state->tokenStartCharIndex			= lexer->input->istream->index(lexer->input->istream);
-    state->tokenStartCharPositionInLine	= lexer->input->getCharPositionInLine(lexer->input);
-    state->tokenStartLine				= lexer->input->getLine(lexer->input);
-    state->text							= NULL;
-
-    /* Now call the matching rules and see if we can generate a new token
-     */
-    for	(;;)
-    {
-		if  (lexer->input->istream->_LA(lexer->input->istream, 1) == CharstreamEof)
-		{
-			/* Reached the end of the stream, nothing more to do.
-			 */
-			CommonTokenPtr    teof = &(toksource->eofToken);
-
-			teof->setStartIndex (teof, lexer->getCharIndex(lexer));
-			teof->setStopIndex  (teof, lexer->getCharIndex(lexer));
-			teof->setLine		(teof, lexer->getLine(lexer));
-			return  teof;
-		}
-
-		state->token		= NULL;
-		state->error		= false;	    /* Start out without an exception	*/
-
-		{
-			Marker   m;
-
-			m						= lexer->input->istream->mark(lexer->input->istream);
-			state->backtracking		= 1;				/* No exceptions */
-			state->failed			= false;
-
-			/* Call the generated lexer, see if it can get a new token together.
-			 */
-			lexer->mTokens(lexer->ctx);
-    		state->backtracking	= 0;
-
-    		<! mTokens backtracks with synpred at state_->backtracking==2
-				and we set the synpredgate to allow actions at level 1. !>
-
-			if	(state->failed == true)
-			{
-				lexer->input->istream->rewind(lexer->input->istream, m);
-				lexer->input->istream->consume(lexer->input->istream); <! advance one char and try again !>
-			}
-			else
-			{
-				lexer->emit(lexer);					/* Assemble the token and emit it to the stream */
-				return	state->token;
-			}
-		}
-    }
-}
 >>
 
 actionGate() ::= "state_->backtracking == 0"

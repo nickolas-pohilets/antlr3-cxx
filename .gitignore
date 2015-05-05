@@ -19,3 +19,4 @@ nb-configuration.xml
 # Python runtime files
 *.py[co]
 .DS_Store
+runtime/Cxx/test/generated

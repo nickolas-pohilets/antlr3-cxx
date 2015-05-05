@@ -83,7 +83,10 @@ void Lexer::reset()
 /// 
 /// \see nextToken
 ///
-CommonTokenPtr Lexer::nextTokenStr()
+CommonTokenPtr Lexer::nextTokenStr() {
+    return filteringMode_ ? nextTokenFiltering() : nextTokenNormal();
+}
+CommonTokenPtr Lexer::nextTokenNormal()
 {
     /// Loop until we get a non skipped token or EOF
     ///
@@ -154,6 +157,68 @@ CommonTokenPtr Lexer::nextTokenStr()
                 //
                 return  state_->token;
             }
+        }
+    }
+}
+
+/** An override of the lexer's nextToken() method that backtracks over mTokens() looking
+ *  for matches in lexer filterMode.  No error can be generated upon error; just rewind, consume
+ *  a token and then try again. state_->backtracking needs to be set as well.
+ *  Make rule memoization happen only at levels above 1 as we start mTokens
+ *  at state_->backtracking==1.
+ */
+CommonTokenPtr Lexer::nextTokenFiltering()
+{
+    /* Get rid of any previous token (token factory takes care of
+     * any deallocation when this token is finally used up.
+     */
+    state_->token = nullptr;
+    state_->error = false;	 // Start out without an exception
+    state_->failed = false;
+
+    // Record the start of the token in our input stream.
+    state_->tokenStartCharIndex = input_->index();
+    state_->text = antlr3::String();
+
+    // Now call the matching rules and see if we can generate a new token
+    for	(;;)
+    {
+		if (input_->LA(1) == antlr3::CharstreamEof)
+		{
+			/* Reached the end of the stream, nothing more to do.
+			 */
+			antlr3::CommonTokenPtr teof = std::make_shared<CommonToken>(antlr3::TokenEof);
+            teof->setInputStream(charStream());
+            teof->setStartIndex(charIndex());
+            teof->setStopIndex(charIndex());
+            return teof;
+		}
+
+		state_->token = nullptr;
+		state_->error = false; // Start out without an exception
+
+        antlr3::MarkerPtr m = input_->mark();
+        state_->backtracking = 1; // No exceptions
+        state_->failed = false;
+
+        // Call the generated lexer, see if it can get a new token together.
+        mTokens();
+        state_->backtracking = 0;
+
+        // mTokens backtracks with synpred at state_->backtracking==2
+        // and we set the synpredgate to allow actions at level 1.
+
+        if (state_->failed)
+        {
+            // Advance one char and try again
+            m->rewind();
+            input_->consume();
+        }
+        else
+        {
+            // Assemble the token and emit it to the stream
+            emit();
+            return state_->token;
         }
     }
 }
