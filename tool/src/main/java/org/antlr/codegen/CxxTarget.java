@@ -34,6 +34,7 @@ import org.stringtemplate.v4.misc.Aggregate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,7 @@ public class CxxTarget extends Target {
         // we need to add all the string literals that we are going to match
         //
         outputFileST.add("literals", strings);
+        registerNamespaceAttributes(grammar, outputFileST);
         String fileName = generator.getRecognizerFileName(grammar.name, grammar.type);
         generator.write(outputFileST, fileName);
     }
@@ -63,6 +65,8 @@ public class CxxTarget extends Target {
             ST headerFileST,
             String extName)
             throws IOException {
+
+        registerNamespaceAttributes(grammar, headerFileST);
         
         //Its better we remove the EOF Token, as it would have been defined everywhere in C.
         //we define it later as "EOF_TOKEN" instead of "EOF"
@@ -352,6 +356,25 @@ public class CxxTarget extends Target {
         // must do.
         //
         super.performGrammarAnalysis(generator, grammar);
+    }
+
+    private void registerNamespaceAttributes(Grammar g, ST st) {
+        if (g.composite != null) {
+            g = g.composite.getRootGrammar();
+        }
+
+        String actionScope = g.getDefaultActionScope(g.type);
+        Map<String, Object> map = g.getActions().get(actionScope);
+        if (map == null) return;
+        Object val = map.get("namespace");
+        if (val == null) return;
+
+        String ns = String.join("", (ArrayList<String>)val);
+        String[] namespaceComponets = ns.split("::");
+        for (int i = 0; i < namespaceComponets.length; ++i) {
+            namespaceComponets[i] = namespaceComponets[i].trim();
+        }
+        st.add("namespaceComponents", Arrays.asList(namespaceComponets));
     }
 }
 
