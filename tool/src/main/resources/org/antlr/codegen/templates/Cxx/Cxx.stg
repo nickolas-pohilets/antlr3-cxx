@@ -130,48 +130,6 @@ using antlr3::isBetween;
 
 <endif>
 
-
-
-
-/* MACROS that hide the C interface implementations from the
- * generated code, which makes it a little more understandable to the human eye.
- * I am very much against using C pre-processor macros for function calls and bits
- * of code as you cannot see what is happening when single stepping in debuggers
- * and so on. The exception (in my book at least) is for generated code, where you are
- * not maintaining it, but may wish to read and understand it. If you single step it, you know that input()
- * hides some indirect calls, but is always referring to the input stream. This is
- * probably more readable than ctx->input->istream->input(snarfle0->blarg) and allows me to rejig
- * the runtime interfaces without changing the generated code too often, without
- * confusing the reader of the generated output, who may not wish to know the gory
- * details of the interface inheritance.
- */
- 
-/* Aids in accessing scopes for grammar programmers
- */
-#undef	SCOPE_TYPE
-#undef	SCOPE_STACK
-#undef	SCOPE_TOP
-#define	SCOPE_TYPE(scope)   p<name>_##scope##_SCOPE
-#define SCOPE_STACK(scope)  p<name>_##scope##Stack
-#define	SCOPE_TOP(scope)    ctx->p<name>_##scope##Top
-#define	SCOPE_SIZE(scope)		ctx->p<name>_##scope##Stack_limit
-#define SCOPE_INSTANCE(scope, i)	(ctx->SCOPE_STACK(scope)->get(ctx->SCOPE_STACK(scope),i))
-
-/* =============================================================================
- * Functions to create and destroy scopes. First come the rule scopes, followed
- * by the global declared scopes.
- */
-
-<rules: {r |<if(r.ruleDescriptor.ruleScope)>
-<ruleAttributeScopeFuncDecl(scope=r.ruleDescriptor.ruleScope)>
-<ruleAttributeScopeFuncs(scope=r.ruleDescriptor.ruleScope)>
-<endif>}>
-
-<recognizer.scopes:{it | <if(it.isDynamicGlobalScope)>
-<globalAttributeScopeFuncDecl(it)>
-<globalAttributeScopeFuncs(it)>
-<endif>}>
-
 <recognizer>
 
 <actions.(actionScope).postdefinitions>
@@ -203,7 +161,6 @@ headerFile( LEXER,
             backtracking,
             synpreds,
             memoize,
-            filterMode,
             numRules,
             fileName,
             ANTLRVersion,
@@ -292,12 +249,6 @@ public:
     <name>(<inputType()> instream, antlr3::RecognizerSharedStatePtr state<recognizer.grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>);
     ~<name>();
 
-<scopes:{it | <if(it.isDynamicGlobalScope)>
-    <globalAttributeScopeDef(it)>
-<endif>}; separator="\n\n">
-<rules: {r |<if(r.ruleDescriptor.ruleScope)>
-    <ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)>
-<endif>}>
 <if(LEXER)>
     <rules:{r | <if(!r.ruleDescriptor.isSynPred)><headerReturnType(ruleDescriptor=r.ruleDescriptor)> m<r.ruleDescriptor.name>(<r.ruleDescriptor.parameterScope:parameterScope()>);<endif>}; separator="\n">
 <endif>
@@ -315,25 +266,17 @@ public:
     const char * grammarFileName();
     void reset();
 
-<if(recognizer.grammar.delegates)>
 private:
-    <recognizer.grammar.delegates:
-         {g|std::shared_ptr\<<g.recognizerName>\> <g:delegateName()>_;}; separator="\n">
-<endif>
-<if(recognizer.grammar.delegators)>
-private:
-    <recognizer.grammar.delegators:
-         {g|<g.recognizerName> * <g:delegateName()>_;}; separator="\n">
-<endif>
-<@members><@end>
-<@dbgMembers><@end>
-
+    <recognizer.grammar.delegates:{g|std::shared_ptr\<<g.recognizerName>\> <g:delegateName()>_;}; separator="\n">
+    <recognizer.grammar.delegators:{g|<g.recognizerName> * <g:delegateName()>_;}; separator="\n">
+    <scopes:{it | <if(it.isDynamicGlobalScope)><globalAttributeScopeDef(it)><endif>}; separator="\n">
+    <rules: {r |<if(r.ruleDescriptor.ruleScope)><ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)><endif>}; separator="\n">
 <if(cyclicDFAs)>
-<! Forward declare DFA specials !>
-private:
     friend class <name>_SST_Func_Provider;
     <cyclicDFAs:declDFA_SST()>
 <endif>
+<@members><@end>
+<@dbgMembers><@end>
 };
 
 <if(!recognizer.grammar.grammarIsRoot)>
@@ -399,9 +342,6 @@ lexer(  grammar,
  * Lexer matching rules end.
  * =========================================================================
  */
-
-<scopes:{it |<if(it.isDynamicGlobalScope)><globalAttributeScope(it)><endif>}>
-
 <name>::~<name>()
 {
 <actions.(actionScope).dtor_body>
@@ -543,9 +483,6 @@ antlr3::ConstString const <name>TokenNames[<length(tokenNames)>+4] = {
 
 <@members><@end>
 
-<rules:{r |<ruleAttributeScopeFuncMacro(scope=r.ruleDescriptor.ruleScope)>}>
-<scopes:{it |<if(it.isDynamicGlobalScope)><globalAttributeScopeFuncMacro(it)><endif>}>
-
 /** \brief Name of the grammar file that generated this code
  */
 static const char fileName[] = "<fileName>";
@@ -593,19 +530,8 @@ const char * <name>::grammarFileName()
 <endif>
 <actions.(actionScope).initializers>
 {
-    /* Install the scope pushing methods.
-     */
-    <rules: {r |<if(r.ruleDescriptor.ruleScope)>
-<ruleAttributeScope(scope=r.ruleDescriptor.ruleScope)><\n>
-<endif>}>
-    <recognizer.scopes:{it |<if(it.isDynamicGlobalScope)>
-<globalAttributeScope(it)><\n>
-<endif>}>
     <@apifuncs>
-
     <@end>
-    <actions.parser.apifuncs>
-    <actions.treeparser.apifuncs>
 <if(memoize)>
 <if(grammar.grammarIsRoot)>
     /* Create a LIST for recording rule memos.
@@ -836,7 +762,8 @@ rule(ruleName,ruleDescriptor,block,emptyRule,description,exceptions,finally,memo
     <ruleDeclarations()>
     <ruleDescriptor.actions.declarations>
     <ruleLabelDefs()>
-    <ruleInitializations()>
+    <ruleDescriptor.useScopes:{it |<scopeStack(sname=it,...)>.emplace_back();}; separator="\n">
+    <ruleDescriptor.ruleScope:{it |<scopeStack(sname=it.name,...)>.emplace_back();}; separator="\n">
     <ruleDescriptor.actions.init>
     <ruleMemoization(rname=ruleName)>
     <ruleLabelInitializations()>
@@ -906,34 +833,27 @@ catch(decl,action) ::= <<
 
 ruleDeclarations() ::= <<
 <if(ruleDescriptor.hasMultipleReturnValues)>
-<returnType()> retval;<\n>
-<else>
-<ruleDescriptor.returnScope.attributes:{ a |
-<a.type> <a.name>;
-}>
+<returnType()> retval = {
+<if(!ruleDescriptor.isSynPred)>
+    .start = LT(1),
+    .stop = LT(1),
+<endif>
+    <ruleDescriptor.returnScope.attributes:{ a |<initField(a.type, a.name, a.initValue)>}>
+};
+<elseif(ruleDescriptor.returnScope)>
+<ruleDescriptor.returnScope.attributes:{ a |<initLocalVar(a.type, a.name, a.initValue)>}>
 <endif>
 <if(memoize)>
-antlr3::Index <ruleDescriptor.name>_StartIndex;
+antlr3::Index <ruleDescriptor.name>_StartIndex = input_->index();
 <endif>
 >>
 
-ruleInitializations() ::= <<
-/* Initialize rule variables
- */
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<ruleDescriptor.returnScope.attributes:{ a |
-<if(a.initValue)>retval.<a.name> = <a.initValue>;<endif>
-}>
-<else>
-<ruleDescriptor.returnScope.attributes:{ a |
-<if(a.initValue)><a.name> = <a.initValue>;<endif>
-}>
-<endif>
-<if(memoize)>
-<ruleDescriptor.name>_StartIndex = input_->index();<\n>
-<endif>
-<ruleDescriptor.useScopes:{it |<scopeTop(it)> = <scopePush(it)>;}; separator="\n">
-<ruleDescriptor.ruleScope:{it |<scopeTop(it.name)> = <scopePush(it.name)>;}; separator="\n">
+initField(type, name, init) ::= <<
+<if(init)>.<name> = <init>,<elseif(cxxTypeInitMap.(type))>.name = <cxxTypeInitMap.(type)>,<endif>
+>>
+
+initLocalVar(type, name, init) ::= <<
+<type> <name><if(init)> = <init><elseif(cxxTypeInitMap.(type))> = <cxxTypeInitMap.(type)><endif>;
 >>
 
 ruleLabelDefs() ::= <<
@@ -951,11 +871,6 @@ ruleLabelInitializations() ::= <<
 <[ruleDescriptor.ruleLabels,ruleDescriptor.ruleListLabels]
     :ruleLabelInitVal(); separator="\n"
 >
-<if(ruleDescriptor.hasMultipleReturnValues)>
-<if(!ruleDescriptor.isSynPred)>
-retval.start = LT(1); retval.stop = retval.start;<\n>
-<endif>
-<endif>
 >>
 
 lexerRuleLabelDefs() ::= <<
@@ -1034,8 +949,8 @@ retval.stop = LT(-1);<\n>
 >>
 
 scopeClean() ::= <<
-<ruleDescriptor.useScopes:{it |<scopePop(it)>}; separator="\n">
-<ruleDescriptor.ruleScope:{it |<scopePop(it.name)>}; separator="\n">
+<ruleDescriptor.useScopes:{it |<scopeStack(sname=it,...)>.pop_back();}; separator="\n">
+<ruleDescriptor.ruleScope:{it |<scopeStack(sname=it.name,...)>.pop_back();}; separator="\n">
 
 >>
 /** How to generate a rule in the lexer; naked blocks are used for
@@ -1834,291 +1749,48 @@ setTest(ranges) ::= "<ranges; separator=\" || \">"
 // A T T R I B U T E S
 
 makeScopeSet() ::= <<
-struct <scopeStruct(sname=scope.name,...)>
+struct <scopeType(sname=scope.name,...)>
 {
     <scope.attributes:{it |<it.decl>;}; separator="\n">
 };
 >>
 
 globalAttributeScopeDecl(scope) ::= <<
+<if(scope)>
 <if(scope.attributes)>
 <makeScopeSet(...)>
+<endif>
 <endif>
 >>
 
 ruleAttributeScopeDecl(scope) ::= <<
+<if(scope)>
 <if(scope.attributes)>
 <makeScopeSet(...)>
 <endif>
->>
-
-globalAttributeScopeFuncDecl(scope) ::=
-<<
-/* globalAttributeScopeFuncDecl(scope)
- */
-<if(scope.attributes)>
-/* -----------------------------------------------------------------------------
- * Function declaration for creating a <name>_<scope.name> scope set
- */
-static <scopeType(sname=scope.name,...)>   <scopePushName(sname=scope.name,...)>(p<name> ctx);
-static void Cdecl <scope.name>Free(<scopeType(sname=scope.name)> scope);
-/* ----------------------------------------------------------------------------- */
-
 <endif>
 >>
 
-globalAttributeScopeFuncMacro(scope) ::= <<
+globalAttributeScopeDef(scope) ::= <<
 <if(scope.attributes)>
-/* globalAttributeScopeFuncMacro(scope)
- */
-/** Function  for popping the top value from a <scopeStack(sname=scope.name)>
- */
-void
-<scopePopName(sname=scope.name,...)>(p<name> ctx)
-{
-    // First see if the user defined a function they want to be called when a
-    // scope is popped/freed.
-    //
-	// If the user supplied the scope entries with a free function,then call it first
-	//
-    if	(SCOPE_TOP(<scope.name>)->free != NULL)
-	{
-        SCOPE_TOP(<scope.name>)->free(SCOPE_TOP(<scope.name>));
-	}
-
-    // Now we decrement the scope's upper limit bound. We do not actually pop the scope as
-    // we want to reuse scope entries if we do continuous push and pops. Most scopes don't
-    // next too far so we don't want to keep freeing and allocating them
-    //
-    ctx-><scopeStack(sname=scope.name,...)>_limit--;
-    SCOPE_TOP(<scope.name>) = (<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->get(ctx-><scopeStack(sname=scope.name,...)>, ctx-><scopeStack(sname=scope.name,...)>_limit - 1));
-}
-<endif>
->>
-
-ruleAttributeScopeFuncDecl(scope) ::= <<
-<if(scope.attributes)>
-/* ruleAttributeScopeFuncDecl(scope)
- */
-/* -----------------------------------------------------------------------------
- * Function declarations for creating a <name>_<scope.name> scope set
- */
-static <scopeType(sname=scope.name,...)>   <scopePushName(sname=scope.name,...)>(p<name> ctx);
-static void Cdecl <scope.name>Free(<scopeType(sname=scope.name)> scope);
-/* ----------------------------------------------------------------------------- */
-
-<endif>
->>
-
-ruleAttributeScopeFuncMacro(scope) ::= <<
-<if(scope.attributes)>
-/* ruleAttributeScopeFuncMacro(scope)
- */
-/** Function for popping the top value from a <scopeStack(sname=scope.name,...)>
- */
-void
-<scopePopName(sname=scope.name,...)>(p<name> ctx)
-{
-    // First see if the user defined a function they want to be called when a
-    // scope is popped/freed.
-    //
-	// If the user supplied the scope entries with a free function,then call it first
-	//
-    if	(SCOPE_TOP(<scope.name>)->free != NULL)
-	{
-        SCOPE_TOP(<scope.name>)->free(SCOPE_TOP(<scope.name>));
-	}
-
-    // Now we decrement the scope's upper limit bound. We do not actually pop the scope as
-    // we want to reuse scope entries if we do continuous push and pops. Most scopes don't
-    // next too far so we don't want to keep freeing and allocating them
-    //
-    ctx-><scopeStack(sname=scope.name,...)>_limit--;
-    SCOPE_TOP(<scope.name>) = (<scopeType(sname=scope.name)>)(ctx-><scopeStack(sname=scope.name,...)>->get(ctx-><scopeStack(sname=scope.name,...)>, ctx-><scopeStack(sname=scope.name,...)>_limit - 1));
-}
-
-<endif>
->>
-
-globalAttributeScopeDef(scope) ::=
-<<
-<if(scope.attributes)>
-/** Pointer to the  <scope.name> stack for use by <scopePushName(sname=scope.name)>()
- *  and <scopePopName(sname=scope.name,...)>()
- */
-pANTLR3_STACK <scopeStack(sname=scope.name)>;
-std::uint32_t <scopeStack(sname=scope.name)>_limit;
-/** Pointer to the top of the stack for the global scope <scopeStack(sname=scope.name)>
- */
-<scopeType(sname=scope.name,...)>    (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
-<scopeType(sname=scope.name,...)>    <scopeTopDecl(sname=scope.name,...)>;
-
+std::vector\< <scopeType(sname=scope.name,...)> > <scopeStack(sname=scope.name)>;
 <endif>
 >>
 
 ruleAttributeScopeDef(scope) ::= <<
 <if(scope.attributes)>
-/* ruleAttributeScopeDef(scope)
- */
-/** Pointer to the  <scope.name> stack for use by <scopePushName(sname=scope.name)>()
- *  and <scopePopName(sname=scope.name,...)>()
- */
-pANTLR3_STACK <scopeStack(sname=scope.name,...)>;
-std::uint32_t <scopeStack(sname=scope.name,...)>_limit;
-<scopeType(sname=scope.name,...)>   (*<scopePushName(sname=scope.name,...)>)(struct <name>_Ctx_struct * ctx);
-<scopeType(sname=scope.name,...)>   <scopeTopDecl(sname=scope.name,...)>;
-
+std::vector\< <scopeType(sname=scope.name,...)> > <scopeStack(sname=scope.name)>;
 <endif>
->>
-
-globalAttributeScopeFuncs(scope) ::= <<
-<if(scope.attributes)>
-/* globalAttributeScopeFuncs(scope)
- */
-<attributeFuncs(scope)>
-<endif>
->>
-
-ruleAttributeScopeFuncs(scope) ::= <<
-<if(scope.attributes)>
-/* ruleAttributeScopeFuncs(scope)
- */
-<attributeFuncs(scope)>
-<endif>
->>
-
-globalAttributeScope(scope) ::= <<
-<if(scope.attributes)>
-/* globalAttributeScope(scope)
- */
-ctx-><scopePushName(sname=scope.name,...)>     = <scopePushName(sname=scope.name,...)>;
-ctx-><scopeStack(sname=scope.name,...)>    = new Stack(0);
-ctx-><scopeStack(sname=scope.name,...)>_limit    = 0;
-<scopeTop(sname=scope.name,...)>      = NULL;
-<endif>
->>
-
-ruleAttributeScope(scope) ::=
-<<
-<if(scope.attributes)>
-/* ruleAttributeScope(scope)
- */
-ctx-><scopePushName(sname=scope.name,...)>     = <scopePushName(sname=scope.name,...)>;
-ctx-><scopeStack(sname=scope.name,...)>    = new Stack(0);
-ctx-><scopeStack(sname=scope.name,...)>_limit    = 0;
-<scopeTop(sname=scope.name,...)>      = NULL;
-<endif>
->>
-
-scopeTopDecl(sname) ::= <<
-p<name>_<sname>Top
->>
-
-scopeTop(sname) ::= <<
-ctx-><scopeTopDecl(sname=sname,...)>
->>
-
-scopePop(sname) ::= <<
-<scopePopName(sname=sname,...)>(ctx);
->>
-
-scopePush(sname) ::= <<
-p<name>_<sname>Push(ctx)
->>
-
-scopePopName(sname) ::= <<
-p<name>_<sname>Pop
->>
-
-scopePushName(sname) ::= <<
-p<name>_<sname>Push
 >>
 
 scopeType(sname) ::= <<
-p<name>_<sname>_SCOPE
->>
-
-scopeStruct(sname) ::= <<
 <name>_<sname>_SCOPE
 >>
 
 scopeStack(sname) ::= <<
-p<name>_<sname>Stack
+<name>_<sname>_stack_
 >>
 
-attributeFuncs(scope) ::= <<
-<if(scope.attributes)>
-/* attributeFuncs(scope)
- */
-
-/** \brief Allocate initial memory for a <name> <scope.name> scope variable stack entry and
- *         add it to the top of the stack.
- *
- * \remark
- * By default the structure is freed with ANTLR_FREE(), but you can use the
- * the \@init action to install a pointer to a custom free() routine by
- * adding the code:
- * \code
- *   <scopeTop(sname=scope.name)>->free = myroutine;
- * \endcode
- *
- * With lots of comments of course! The routine should be declared in
- * \@members { } as:
- * \code
- *   void Cdecl myfunc( <scopeType(sname=scope.name)> ptr).
- * \endcode
- *
- * It should perform any custom freeing stuff that you need (call ANTLR_FREE3, not free()
- * NB: It should not free the pointer it is given, which is the scope stack entry itself
- * and will be freed by the function that calls your custom free routine.
- *
- */
-static <scopeType(sname=scope.name)>
-<scopePushName(sname=scope.name)>(p<name> ctx)
-{
-    /* Pointer used to create a new set of attributes
-     */
-    <scopeType(sname=scope.name)>      newAttributes;
-
-    /* Allocate the memory for a new structure if we need one.
-     */
-    if (ctx-><scopeStack(sname=scope.name)>->size(ctx-><scopeStack(sname=scope.name)>) > ctx-><scopeStack(sname=scope.name)>_limit)
-    {
-        // The current limit value was less than the number of scopes available on the stack so
-        // we can just reuse one. Our limit tracks the stack count, so the index of the entry we want
-        // is one less than that, or conveniently, the current value of limit.
-        //
-        newAttributes = (<scopeType(sname=scope.name)>)ctx-><scopeStack(sname=scope.name)>->get(ctx-><scopeStack(sname=scope.name)>, ctx-><scopeStack(sname=scope.name)>_limit);
-    }
-    else
-    {
-        // Need a new allocation
-        //
-        newAttributes = (<scopeType(sname=scope.name)>) Malloc(sizeof(<scopeStruct(sname=scope.name)>));
-        if  (newAttributes != NULL)
-        {
-            /* Standard ANTLR3 library implementation
-             */
-            ctx-><scopeStack(sname=scope.name)>->push(ctx-><scopeStack(sname=scope.name)>, newAttributes, (void (*)(void *))<scope.name>Free);
-        }
-    }
-
-    // Blank out any previous free pointer, the user might or might install a new one.
-    //
-    newAttributes->free = NULL;
-
-    // Indicate the position in the available stack that the current level is at
-    //
-    ctx-><scopeStack(sname=scope.name)>_limit++;
-
-	/* Return value is the pointer to the new entry, which may be used locally
-	 * without de-referencing via the context.
-     */
-    return  newAttributes;
-}<\n>
-
-<endif>
->>
 returnStructName(r) ::= "<r.name>_return"
 
 returnType() ::= <%
@@ -2154,13 +1826,6 @@ void
 
 delegateName(d) ::= <<
 <if(d.label)><d.label><else>g<it.name><endif>
->>
-
-/** Using a type to init value map, try to init a type; if not in table
- *  must be an object, default value is "0".
- */
-initValue(typeName) ::= <<
- = <cTypeInitMap.(typeName)>
 >>
 
 /** Define a rule label  */
@@ -2210,24 +1875,24 @@ parameterSetAttributeRef(attr,expr) ::= "<attr.name>=<expr>;"
  */
 scopeAttributeRef(scope,attr,index,negIndex) ::= <%
 <if(negIndex)>
-	((SCOPE_TYPE(<scope>))(ctx->SCOPE_STACK(<scope>)->get( ctx->SCOPE_STACK(<scope>), ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>)) - <negIndex> - 1) ))-><attr.name>
+    <scopeStack(sname=scope,...)>[<scopeStack(sname=scope,...)>.size() - <negIndex> - 1].<attr.name>
 <else>
 <if(index)>
-	((SCOPE_TYPE(<scope>))(ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), (std::uint32_t)<index> ) ))-><attr.name>
+    <scopeStack(sname=scope,...)>[<index>].<attr.name>
 <else>
-	(SCOPE_TOP(<scope>))-><attr.name>
+    <scopeStack(sname=scope,...)>.back().<attr.name>
 <endif>
 <endif>
 %>
 
 scopeSetAttributeRef(scope,attr,expr,index,negIndex) ::= <%
 <if(negIndex)>
-	((SCOPE_TYPE(<scope>))(ctx->SCOPE_STACK(<scope>)->get( ctx->SCOPE_STACK(<scope>), ctx->SCOPE_STACK(<scope>)->size(ctx->SCOPE_STACK(<scope>)) - <negIndex> - 1) ))-><attr.name> = <expr>;
+    <scopeStack(sname=scope,...)>[<scopeStack(sname=scope,...)>.size() - <negIndex> - 1].<attr.name> = <expr>;
 <else>
 <if(index)>
-	((SCOPE_TYPE(<scope>))(ctx->SCOPE_STACK(<scope>)->get(ctx->SCOPE_STACK(<scope>), (std::uint32_t)<index> ) ))-><attr.name> = <expr>;
+    <scopeStack(sname=scope,...)>[<index>].<attr.name> =<expr>;
 <else>
-	(SCOPE_TOP(<scope>))-><attr.name>=<expr>;
+    <scopeStack(sname=scope,...)>.back().<attr.name> =<expr>;
 <endif>
 <endif>
 %>

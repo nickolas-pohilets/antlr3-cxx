@@ -5,6 +5,10 @@ options
     language=Cxx;
 }
 
+scope Foo {
+    std::string str;
+}
+
 @parser::header_postincludes {
 #include <unordered_map>
 #include <string>
@@ -17,12 +21,18 @@ struct parser_context
 	std::unordered_map<antlr3::String, int> vars;
 	std::stringstream ss;
 };
+
+struct Foo {};
 }
 
 @parser::declarations {
 public:
     parser_context* c;
 }
+
+foo returns [std::vector<Foo> value]
+    : prog
+    ;
 
 prog: stat+ EOF;
 stat: expr NEWLINE
@@ -38,14 +48,17 @@ stat: expr NEWLINE
 	  }
 	;
 
-expr returns [int value]
-    @init { $value = 0; }
+expr returns [int value=2, std::vector<Foo> bar]
+    scope Foo;
+    @init { $value = -1; $Foo::str = "expr"; }
 	: e1=multExpr
       {
+          (void)sizeof($Foo[-0]::str);
           $value = $e1.value;
       }
       ( '+' e2=multExpr
         {
+            (void)sizeof($Foo[0]::str);
             $value += $e2.value;
         }
       | '-' e2=multExpr
@@ -55,7 +68,7 @@ expr returns [int value]
       )*
 	;
 
-multExpr returns [int value]
+multExpr returns [int value=5]
     @init { $value = 0; }
 	: e1=atom
 	  {
@@ -69,7 +82,7 @@ multExpr returns [int value]
 	;
 
 atom returns [int value]
-    @init { $value = 0; }
+    @init { $value = 0; assert(!$Foo::str.empty()); }
 	: INT
 	  {
 	      $value = atoi(antlr3::toUTF8($INT.text).c_str());
