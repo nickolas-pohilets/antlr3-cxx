@@ -838,7 +838,7 @@ ruleDeclarations() ::= <<
     .start = LT(1),
     .stop = LT(1),
 <endif>
-    <ruleDescriptor.returnScope.attributes:{ a |<initField(a.type, a.name, a.initValue)>}>
+    <ruleDescriptor.returnScope.attributes:{ a |<initField(a.type, a.name, a.initValue)>}; separator="\n">
 };
 <elseif(ruleDescriptor.returnScope)>
 <ruleDescriptor.returnScope.attributes:{ a |<initLocalVar(a.type, a.name, a.initValue)>}>
@@ -848,12 +848,16 @@ antlr3::Index <ruleDescriptor.name>_StartIndex = input_->index();
 <endif>
 >>
 
+initInCtor(type, name, init) ::= <<
+<if(init)><name> = <init>;<\n><elseif(cxxTypeInitMap.(type))><name> = <cxxTypeInitMap.(type)>;<endif>
+>>
+
 initField(type, name, init) ::= <<
-<if(init)>.<name> = <init>,<elseif(cxxTypeInitMap.(type))>.name = <cxxTypeInitMap.(type)>,<endif>
+<if(init)>.<name> = <init>,<elseif(cxxTypeInitMap.(type))>.<name> = <cxxTypeInitMap.(type)>,<endif>
 >>
 
 initLocalVar(type, name, init) ::= <<
-<type> <name><if(init)> = <init><elseif(cxxTypeInitMap.(type))> = <cxxTypeInitMap.(type)><endif>;
+<type> <name><if(init)> = <init><elseif(cxxTypeInitMap.(type))> = <cxxTypeInitMap.(type)><endif>;<\n>
 >>
 
 ruleLabelDefs() ::= <<
@@ -1752,6 +1756,11 @@ makeScopeSet() ::= <<
 struct <scopeType(sname=scope.name,...)>
 {
     <scope.attributes:{it |<it.decl>;}; separator="\n">
+
+    <scopeType(sname=scope.name,...)>()
+    {
+        <scope.attributes:{it |<initInCtor(it.type, it.name, it.initValue)>}; separator="\n">
+    }
 };
 >>
 

@@ -14,7 +14,7 @@ stat: expr NEWLINE -> expr
 	;
 
 expr
-    scope { int bazz; }
+    scope { int bazz; double foo; }
     : multExpr ( ('+'^ | '-'^) multExpr )*
     ;
 

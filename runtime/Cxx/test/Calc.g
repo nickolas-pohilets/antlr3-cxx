@@ -48,7 +48,7 @@ stat: expr NEWLINE
 	  }
 	;
 
-expr returns [int value=2, std::vector<Foo> bar]
+expr returns [int value=2, std::vector<Foo> bar = { Foo(), Foo() }]
     scope Foo;
     @init { $value = -1; $Foo::str = "expr"; }
 	: e1=multExpr
