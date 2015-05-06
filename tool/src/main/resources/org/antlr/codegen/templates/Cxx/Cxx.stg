@@ -381,13 +381,6 @@ const char * <name>::grammarFileName()
 <if(filterMode)>
     antlr3::BaseRecognizer::filteringMode_ = true;
 <endif>
-<if(memoize)>
-<if(grammar.grammarIsRoot)>
-    // Create a LIST for recording rule memos.
-    //
-    state_->ruleMemo = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */
-<endif>
-<endif>
 <if(grammar.delegators)>
 	// Install the pointers back to lexers that will delegate us to perform certain functions for them.
 	<grammar.delegators:
@@ -530,21 +523,13 @@ const char * <name>::grammarFileName()
 <endif>
 <actions.(actionScope).initializers>
 {
-    <@apifuncs>
+    <@ctor>
     <@end>
-<if(memoize)>
-<if(grammar.grammarIsRoot)>
-    /* Create a LIST for recording rule memos.
-     */
-     state_->ruleMemo    = antlr3IntTrieNew(15);	/* 16 bit depth is enough for 32768 rules! */<\n>
-<endif>
-<endif>
     /* Install the token table
      */
-    state_->tokenNames   = <grammar.composite.rootGrammar.recognizerName>TokenNames;
-
+    state_->tokenNames = <grammar.composite.rootGrammar.recognizerName>TokenNames;
     <@debugStuff()>
-<actions.(actionScope).ctor_body>
+<actions.(actionScope).ctor_body><\\>
 }
 
 void <name>::reset()
@@ -557,13 +542,8 @@ void <name>::reset()
 <endif>
 }
 
-/** Free the parser resources
- */
- <name>::~<name>()
- {
-    <@cleanup>
-    <@end>
-
+<name>::~<name>()
+{
     <actions.(actionScope).dtor_body>
 }
     <members>

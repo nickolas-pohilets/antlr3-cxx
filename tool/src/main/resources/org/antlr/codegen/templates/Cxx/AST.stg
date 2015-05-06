@@ -40,17 +40,9 @@ private:
 /** Install the tree adaptor interface pointer and anything else that
  *  tree parsers and producers require.
  */
-@genericParser.apifuncs() ::= <<
+@genericParser.ctor() ::= <<
 <if(PARSER)>
 	adaptor_.reset(new antlr3::CommonTreeAdaptor());<\n>
-<endif>
->>
-
-@genericParser.cleanup() ::= <<
-<if(PARSER)>
-/* We created the adaptor so we must free it
- */
-adaptor_.reset();
 <endif>
 >>
 

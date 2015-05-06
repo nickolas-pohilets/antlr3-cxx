@@ -3,6 +3,8 @@ grammar Calc;
 options
 {
     language=Cxx;
+    backtrack=true;
+    memoize=true;
 }
 
 scope Foo {
