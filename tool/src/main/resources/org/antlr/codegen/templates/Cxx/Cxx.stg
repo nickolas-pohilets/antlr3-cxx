@@ -97,7 +97,6 @@ outputFile( LEXER,
             trace,
             scopes,
             superClass,
-            literals,
             namespaceComponents
             ) ::=
 <<
@@ -118,17 +117,6 @@ outputFile( LEXER,
 using antlr3::isBetween;
 
 <actions.(actionScope).predefinitions>
-
-<if(literals)>
-/** String literals used by <name> that we must do things like matchs() with.
- *  C will normally just lay down 8 bit characters, and you can use L"xxx" to
- *  get wchar_t, but wchar_t is 16 bits on Windows, which is not UTF32 and so
- *  we perform this little trick of defining the literals as arrays of UINT32
- *  and passing in the address of these.
- */
-<literals:{it | static antlr3::Char	lit_<i>[]  = <it>;}; separator="\n">
-
-<endif>
 
 <recognizer>
 

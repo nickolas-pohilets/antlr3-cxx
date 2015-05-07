@@ -49,6 +49,8 @@ public class NFAFactory {
      */
 	NFA nfa = null;
 
+	TextEncoder textEncoder = null;
+
     public Rule getCurrentRule() {
         return currentRule;
     }
@@ -59,9 +61,10 @@ public class NFAFactory {
 
 	Rule currentRule = null;
 
-	public NFAFactory(NFA nfa) {
+	public NFAFactory(NFA nfa, TextEncoder textEncoder) {
         nfa.setFactory(this);
 		this.nfa = nfa;
+		this.textEncoder = textEncoder;
 	}
 
     public NFAState newState() {
@@ -201,13 +204,13 @@ public class NFAFactory {
             NFAState first = newState();
             NFAState last = null;
             NFAState prev = first;
-            for (int i=0; i<chars.length(); i++) {
-                int c = chars.charAt(i);
+			int[] codes = textEncoder.getCodes(chars);
+            for (int i=0; i<codes.length; i++) {
                 NFAState next = newState();
-                transitionBetweenStates(prev, next, c);
+                transitionBetweenStates(prev, next, codes[i]);
                 prev = last = next;
             }
-            return  new StateCluster(first, last);
+            return new StateCluster(first, last);
         }
 
         // a simple token reference in non-Lexers

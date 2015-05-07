@@ -113,6 +113,8 @@ tokens
 package org.antlr.grammar.v3;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.TextEncoder;
+import org.antlr.tool.UTF16TextEncoder;
 }
 
 @parser::header {
@@ -127,6 +129,7 @@ import org.antlr.tool.Rule;
 @lexer::members {
 public boolean hasASTOperator = false;
 private String fileName;
+private TextEncoder textEncoder = new UTF16TextEncoder();
 
 public String getFileName() {
     return fileName;
@@ -134,6 +137,14 @@ public String getFileName() {
 
 public void setFileName(String value) {
     fileName = value;
+}
+
+public TextEncoder getTextEncoder() {
+    return textEncoder;
+}
+
+public void setTextEncoder(TextEncoder textEncoder) {
+    this.textEncoder = textEncoder;
 }
 
 @Override
@@ -1176,7 +1187,7 @@ CHAR_LITERAL
 		'\''
 		{
 			StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($text);
-			if ( s.length() > 1 )
+			if (!textEncoder.isSingleCode(s))
 			{
 				$type = STRING_LITERAL;
 			}
@@ -1217,6 +1228,7 @@ ESC
 		|	'\\'
 		|	'>'
 		|	'u' XDIGIT XDIGIT XDIGIT XDIGIT
+		|   'U' XDIGIT XDIGIT XDIGIT XDIGIT XDIGIT XDIGIT XDIGIT XDIGIT
 		|*/	. // unknown, leave as it is
 		)
 	;

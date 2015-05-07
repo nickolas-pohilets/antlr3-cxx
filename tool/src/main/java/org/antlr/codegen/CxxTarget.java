@@ -29,6 +29,8 @@ package org.antlr.codegen;
 
 import org.antlr.Tool;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.Interp;
+import org.antlr.tool.TextEncoder;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.misc.Aggregate;
 
@@ -40,19 +42,12 @@ import java.util.Map;
 
 public class CxxTarget extends Target {
 
-    List<String> strings = new ArrayList<String>();
-
     @Override
     protected void genRecognizerFile(Tool tool,
             CodeGenerator generator,
             Grammar grammar,
             ST outputFileST)
             throws IOException {
-
-        // Before we write this, and cause it to generate its string,
-        // we need to add all the string literals that we are going to match
-        //
-        outputFileST.add("literals", strings);
         registerNamespaceAttributes(grammar, outputFileST);
         String fileName = generator.getRecognizerFileName(grammar.name, grammar.type);
         generator.write(outputFileST, fileName);
@@ -194,22 +189,54 @@ public class CxxTarget extends Target {
         return false;
     }
 
+    public boolean supportsEncoding(String encoding) {
+        return true;
+    }
+
+    private String stringLiteralPrefix() {
+        String encoding = getTextEncoder().getEncoding();
+        if (encoding.equals(TextEncoder.UTF8_ENCODING)) {
+            return "u8";
+        }
+        if (encoding.equals(TextEncoder.UTF16_ENCODING)) {
+            return "u";
+        }
+        if (encoding.equals(TextEncoder.UTF32_ENCODING)) {
+            return "U";
+        }
+        assert false;
+        return "";
+    }
+
     @Override
     public String getTargetCharLiteralFromANTLRCharLiteral(
             CodeGenerator generator,
             String literal) {
-
-        if (literal.startsWith("'\\u")) {
-            literal = "0x" + literal.substring(3, 7);
-        } else {
-            int c = literal.charAt(1);
-
-            if (c < 32 || c > 127) {
-                literal = "0x" + Integer.toHexString(c);
-            }
+        StringBuffer unescaped = Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
+        int c = Grammar.getCharValueFromUnescapedString(unescaped, literal);
+        if (c < 0 ) {
+            return "0";
         }
 
-        return literal;
+        if (c >= 0x80) {
+            int maxChar = getTextEncoder().getMaxCodeValue();
+            int padding = maxChar < 0x100 ? 2 : 4;
+            String retVal = Integer.toHexString(c).toUpperCase();
+            int leadingZeroes = retVal.length() < padding ? padding - retVal.length() : 0;
+            return "0x" + "00000000".substring(0, leadingZeroes) + retVal;
+        }
+
+        StringBuilder buf = new StringBuilder();
+        buf.append('\'');
+        if (c < targetCharValueEscape.length && targetCharValueEscape[c]!=null) {
+            buf.append(targetCharValueEscape[c]);
+        }
+        else {
+            // normal char
+            buf.append((char)c);
+        }
+        buf.append('\'');
+        return buf.toString();
     }
 
     /** Convert from an ANTLR string literal found in a grammar file to
@@ -224,84 +251,7 @@ public class CxxTarget extends Target {
     public String getTargetStringLiteralFromANTLRStringLiteral(
             CodeGenerator generator,
             String literal) {
-        int index;
-        String bytes;
-        StringBuilder buf = new StringBuilder();
-
-        buf.append("{ ");
-
-        // We need ot lose any escaped characters of the form \x and just
-        // replace them with their actual values as well as lose the surrounding
-        // quote marks.
-        //
-        for (int i = 1; i < literal.length() - 1; i++) {
-            buf.append("0x");
-
-            if (literal.charAt(i) == '\\') {
-                i++; // Assume that there is a next character, this will just yield
-                // invalid strings if not, which is what the input would be of course - invalid
-                switch (literal.charAt(i)) {
-                    case 'u':
-                    case 'U':
-                        buf.append(literal.substring(i + 1, i + 5));  // Already a hex string
-                        i = i + 5;                                // Move to next string/char/escape
-                        break;
-
-                    case 'n':
-                    case 'N':
-
-                        buf.append("0A");
-                        break;
-
-                    case 'r':
-                    case 'R':
-
-                        buf.append("0D");
-                        break;
-
-                    case 't':
-                    case 'T':
-
-                        buf.append("09");
-                        break;
-
-                    case 'b':
-                    case 'B':
-
-                        buf.append("08");
-                        break;
-
-                    case 'f':
-                    case 'F':
-
-                        buf.append("0C");
-                        break;
-
-                    default:
-
-                        // Anything else is what it is!
-                        //
-                        buf.append(Integer.toHexString((int) literal.charAt(i)).toUpperCase());
-                        break;
-                }
-            } else {
-                buf.append(Integer.toHexString((int) literal.charAt(i)).toUpperCase());
-            }
-            buf.append(", ");
-        }
-        buf.append(" antlr3::StringTerminator}");
-
-        bytes = buf.toString();
-        index = strings.indexOf(bytes);
-
-        if (index == -1) {
-            strings.add(bytes);
-            index = strings.indexOf(bytes);
-        }
-
-        String strref = "lit_" + String.valueOf(index + 1);
-
-        return strref;
+        return stringLiteralPrefix() + super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal);
     }
 
     /**

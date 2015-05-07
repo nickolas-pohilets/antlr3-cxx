@@ -119,11 +119,17 @@ public:
      */
     virtual void mTokens() = 0;
 
-    /** Pointer to a function that attempts to match and consume the specified string from the input
-     *  stream. Note that strings muse be passed as terminated arrays of Char. Strings are terminated
-     *  with 0xFFFFFFFF, which is an invalid UTF32 character
-     */
-    bool	matchs(Char * string);
+    /// Attempts to match and consume the specified string from the input stream.
+    bool matchs(char const * string, size_t len);
+    bool matchs(char16_t const * string, size_t len);
+    bool matchs(char32_t const * string, size_t len);
+    
+    template<class CharT, size_t N>
+    bool matchs(CharT const (&string)[N]) {
+        static_assert(N > 0, "Null-terminated literal cannot be empty");
+        assert(!string[N - 1]);
+        return matchs(string, N - 1);
+    }
 
     /** Pointer to a function that matches and consumes the specified character from the input stream.
      *  The input stream is required to provide characters via LA() as UTF32 characters. The default lexer
@@ -164,6 +170,9 @@ private:
     CommonTokenPtr nextTokenStr();
     CommonTokenPtr nextTokenNormal();
     CommonTokenPtr nextTokenFiltering();
+    
+    template<class T>
+    bool matchStr(T const * string, size_t len);
 };
 
 } // namespace antlr3

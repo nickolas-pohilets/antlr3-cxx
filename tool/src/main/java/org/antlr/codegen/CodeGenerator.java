@@ -155,6 +155,13 @@ public class CodeGenerator {
 		this.grammar = grammar;
 		this.language = language;
 		target = loadLanguageTarget(language);
+
+		TextEncoder encoder = grammar.getTextEncoder();
+		if (target.supportsEncoding(encoder.getEncoding())) {
+			target.setTextEncoder(grammar.getTextEncoder());
+		} else {
+			/// TODO: Emit error about unsupported encoding
+		}
 	}
 
 	public static Target loadLanguageTarget(String language) {
@@ -1072,6 +1079,7 @@ public class CodeGenerator {
 		//System.out.println("translate template: "+templateActionText);
 		ANTLRLexer lexer = new ANTLRLexer(new ANTLRStringStream(templateActionText));
 		lexer.setFileName(grammar.getFileName());
+		lexer.setTextEncoder(grammar.getTextEncoder());
 		ANTLRParser parser = ANTLRParser.createParser(new CommonTokenStream(lexer));
 		parser.setFileName(grammar.getFileName());
 		ANTLRParser.rewrite_template_return parseResult = null;

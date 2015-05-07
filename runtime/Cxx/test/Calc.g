@@ -5,6 +5,7 @@ options
     language=Cxx;
     backtrack=true;
     memoize=true;
+    encoding='UTF8';
 }
 
 scope Foo {
@@ -109,6 +110,8 @@ atom returns [int value]
 	  }
 	;
 
+INFINITE: '∞';
+WTF: '𤭢' ( ('\u0045' ('\u00B0'..'\u00B6')) | ('\u00D0' ('\u00BE'..'\u00BF')));
 ID: ('a'..'z'|'A'..'Z')+ ;
 INT: ('0'..'9')+ ;
 NEWLINE: '\r'? '\n';

@@ -54,6 +54,7 @@ public class GrammarSpelunker {
     protected String grammarName;
     protected String tokenVocab;
     protected String language = "Java"; // default
+    protected String encoding = TextEncoder.DEFAULT_ENCODING;
     protected String inputDirectory;
     protected List<String> importedGrammars;
 
@@ -122,6 +123,7 @@ public class GrammarSpelunker {
             match(";");
             if ( name.equals("tokenVocab") ) tokenVocab = value;
             if ( name.equals("language") ) language = value;
+            if ( name.equals("encoding") ) encoding = value;
         }
         match("}");
     }

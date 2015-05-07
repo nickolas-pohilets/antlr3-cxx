@@ -30,6 +30,7 @@ package org.antlr.codegen;
 import org.antlr.Tool;
 import org.antlr.analysis.Label;
 import org.antlr.runtime.Token;
+import org.antlr.tool.TextEncoder;
 import org.stringtemplate.v4.ST;
 import org.antlr.tool.Grammar;
 
@@ -71,6 +72,7 @@ public class Target {
 	 *  a different set in memory at same time.
 	 */
 	protected String[] targetCharValueEscape = new String[255];
+	private TextEncoder textEncoder = null;
 
 	public Target() {
 		targetCharValueEscape['\n'] = "\\n";
@@ -153,6 +155,26 @@ public class Target {
 		return name;
 	}
 
+	public String defaultEncoding() {
+		return TextEncoder.DEFAULT_ENCODING;
+	}
+
+	public boolean supportsEncoding(String encoding) {
+		return encoding.equals(defaultEncoding());
+	}
+
+	public TextEncoder getTextEncoder() {
+		if (textEncoder == null) {
+			textEncoder = TextEncoder.getEncoder(defaultEncoding());
+		}
+		return textEncoder;
+	}
+
+	public void setTextEncoder(TextEncoder textEncoder) {
+		assert supportsEncoding(textEncoder.getEncoding());
+		this.textEncoder = textEncoder;
+	}
+
 	/** Convert from an ANTLR char literal found in a grammar file to
 	 *  an equivalent char literal in the target language.  For most
 	 *  languages, this means leaving 'x' as 'x'.  Actually, we need
@@ -168,7 +190,8 @@ public class Target {
 	{
 		StringBuilder buf = new StringBuilder();
 		buf.append('\'');
-		int c = Grammar.getCharValueFromGrammarCharLiteral(literal);
+		StringBuffer unescaped = Grammar.getUnescapedStringFromGrammarStringLiteral(literal);
+		int c = Grammar.getCharValueFromUnescapedString(unescaped, literal);
 		if ( c<Label.MIN_CHAR_VALUE ) {
 			return "'\u0000'";
 		}
@@ -177,22 +200,24 @@ public class Target {
 		{
 			buf.append(targetCharValueEscape[c]);
 		}
-		else if ( Character.UnicodeBlock.of((char)c)==
+		else if ( Character.UnicodeBlock.of(c) ==
 				  Character.UnicodeBlock.BASIC_LATIN &&
-				  !Character.isISOControl((char)c) )
+				  !Character.isISOControl(c) )
 		{
 			// normal char
 			buf.append((char)c);
 		}
 		else {
 			// must be something unprintable...use \\uXXXX
-			// turn on the bit above max "\\uFFFF" value so that we pad with zeros
-			// then only take last 4 digits
-			String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-			buf.append("\\u");
-			buf.append(hex);
+			for (int i = 0; i < unescaped.length(); ++i) {
+				// turn on the bit above max "\\uFFFF" value so that we pad with zeros
+				// then only take last 4 digits
+				int cx = unescaped.charAt(i);
+				String hex = Integer.toHexString(cx|0x10000).toUpperCase().substring(1,5);
+				buf.append("\\u");
+				buf.append(hex);
+			}
 		}
-
 		buf.append('\'');
 		return buf.toString();
 	}

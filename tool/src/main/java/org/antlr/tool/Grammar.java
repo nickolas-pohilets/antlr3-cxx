@@ -249,6 +249,7 @@ public class Grammar {
 				add("k");
 				add("backtrack");
 				add("memoize");
+				add("encoding");
 				}
 			};
 
@@ -262,6 +263,7 @@ public class Grammar {
 				add("k");
 				add("backtrack");
 				add("memoize");
+				add("encoding");
 				}
 			};
 
@@ -290,7 +292,7 @@ public class Grammar {
 	public static final Map<String, String> defaultOptions =
 			new HashMap<String, String>() {
 				{
-					put("language","Java");
+					put("language", "Java");
 				}
 			};
 
@@ -299,10 +301,10 @@ public class Grammar {
 
 	/** What are the default options for a subrule? */
 	public static final Map<String, String> defaultBlockOptions =
-			new HashMap<String, String>() {{put("greedy","true");}};
+			new HashMap<String, String>() {{put("greedy", "true");}};
 
 	public static final Map<String, String> defaultLexerBlockOptions =
-			new HashMap<String, String>() {{put("greedy","true");}};
+			new HashMap<String, String>() {{put("greedy", "true");}};
 
 	// Token options are here to avoid contaminating Token object in runtime
 
@@ -555,6 +557,8 @@ public class Grammar {
 	/** Useful for asking questions about target during analysis */
 	Target target;
 
+	TextEncoder textEncoder;
+
 	/** Create a grammar from file name.  */
 	public Grammar(Tool tool, String fileName, CompositeGrammar composite) {
 		this.composite = composite;
@@ -580,7 +584,7 @@ public class Grammar {
 		composite = new CompositeGrammar(this);
 		STGroup lexerGrammarSTG = new STGroupString(lexerGrammarTemplate);
 		lexerGrammarST = lexerGrammarSTG.getInstanceOf("grammar");
-		target = CodeGenerator.loadLanguageTarget((String)getOption("language"));
+		target = CodeGenerator.loadLanguageTarget((String) getOption("language"));
 	}
 
 	/** Used for testing; only useful on noncomposite grammars.*/
@@ -614,6 +618,14 @@ public class Grammar {
 
 	public String getFileName() {
 		return fileName;
+	}
+
+	public TextEncoder getTextEncoder() {
+		if (textEncoder == null) {
+			String encoding = (String)composite.getOption("encoding");
+			textEncoder = TextEncoder.getEncoder(encoding);
+		}
+		return textEncoder;
 	}
 
 	public void setName(String name) {
@@ -680,6 +692,7 @@ public class Grammar {
 		}
 
 		lexer.setFileName(this.getFileName());
+		lexer.setTextEncoder(getTextEncoder());
 		tokenBuffer = new CommonTokenStream(lexer);
 		ANTLRParser parser = ANTLRParser.createParser(tokenBuffer);
 		parser.setFileName(this.getFileName());
@@ -1010,8 +1023,9 @@ public class Grammar {
 		if ( nfa!=null ) {
 			return;
 		}
+
 		nfa = new NFA(this);
-		factory = new NFAFactory(nfa);
+		factory = new NFAFactory(nfa, getTextEncoder());
 
 		Collection<Rule> rules = getRules();
 		for (Rule r : rules) {
@@ -2171,32 +2185,22 @@ outer:
 	 *  This routine still works though.
 	 */
 	public static int getCharValueFromGrammarCharLiteral(String literal) {
-		switch ( literal.length() ) {
-			case 3 :
-				// 'x'
-				return literal.charAt(1); // no escape char
-			case 4 :
-				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(literal.charAt(2)) ) {
-					ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-									   "invalid char literal: "+literal);
-					return -1;
-				}
-				int escChar = literal.charAt(2);
-				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) {
-					// Unnecessary escapes like '\{' should just yield {
-					return escChar;
-				}
-				return charVal;
-			case 8 :
-				// '\u1234'
-				String unicodeChars = literal.substring(3,literal.length()-1);
-				return Integer.parseInt(unicodeChars, 16);
-			default :
-				ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
-								   "invalid char literal: "+literal);
-				return -1;
+		StringBuffer buf = getUnescapedStringFromGrammarStringLiteral(literal);
+		return getCharValueFromUnescapedString(buf, literal);
+	}
+
+	/** Given a unescaped string containing one BMP code point or UTF-16 surrogate pair
+	 *  return the int value of the corresponding code unit.
+	 */
+	public static int getCharValueFromUnescapedString(StringBuffer buf, String literal) {
+		if (buf.length() == 1) {
+			return buf.charAt(0);
+		} else if (buf.length() == 2 && Character.isSurrogatePair(buf.charAt(0), buf.charAt(1))) {
+			return Character.toCodePoint(buf.charAt(0), buf.charAt(1));
+		} else {
+			ErrorManager.error(ErrorManager.MSG_SYNTAX_ERROR,
+					"invalid char literal: "+ literal);
+			return -1;
 		}
 	}
 
@@ -2528,9 +2532,6 @@ outer:
 									  key);
 			return null;
 		}
-		if ( !optionIsValid(key, value) ) {
-			return null;
-		}
         if ( key.equals("backtrack") && value.toString().equals("true") ) {
             composite.getRootGrammar().atLeastOneBacktrackOption = true;
         }
@@ -2626,10 +2627,6 @@ outer:
 			autoBacktrack = (String)nfa.grammar.getOption("backtrack");
 		}
 		return autoBacktrack!=null&&autoBacktrack.equals("true");
-	}
-
-	public boolean optionIsValid(String key, Object value) {
-		return true;
 	}
 
 	public boolean buildAST() {

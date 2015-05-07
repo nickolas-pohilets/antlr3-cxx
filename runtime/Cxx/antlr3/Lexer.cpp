@@ -504,23 +504,29 @@ CommonTokenPtr Lexer::emit()
     return  token;
 }
 
-/** Implementation of matchs for the lexer, overrides any
- *  base implementation in the base recognizer. 
- *
- *  \remark
- *  Note that the generated code lays down arrays of ints for constant
- *  strings so that they are int UTF32 form!
- */
-bool Lexer::matchs(Char * string)
+bool Lexer::matchs(char const * string, size_t len)
 {
-    while(*string != StringTerminator)
-    {
-        if (!matchc(*string))
-        {
+    // Default char may be both signed and unsigned.
+    // Cast it to unsigned to be sure.
+    return matchStr(reinterpret_cast<unsigned char const *>(string), len);
+}
+    
+bool Lexer::matchs(char16_t const * string, size_t len)
+{
+    return matchStr(string, len);
+}
+
+bool Lexer::matchs(char32_t const * string, size_t len)
+{
+    return matchStr(string, len);
+}
+    
+template<class T>
+bool Lexer::matchStr(T const * string, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
+        if (!matchc(string[i])) {
             return false;
         }
-
-        ++string;
     }
     return true;
 }
