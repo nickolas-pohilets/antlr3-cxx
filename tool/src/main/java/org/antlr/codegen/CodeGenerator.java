@@ -1079,7 +1079,6 @@ public class CodeGenerator {
 		//System.out.println("translate template: "+templateActionText);
 		ANTLRLexer lexer = new ANTLRLexer(new ANTLRStringStream(templateActionText));
 		lexer.setFileName(grammar.getFileName());
-		lexer.setTextEncoder(grammar.getTextEncoder());
 		ANTLRParser parser = ANTLRParser.createParser(new CommonTokenStream(lexer));
 		parser.setFileName(grammar.getFileName());
 		ANTLRParser.rewrite_template_return parseResult = null;

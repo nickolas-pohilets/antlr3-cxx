@@ -204,6 +204,7 @@ public class GrammarSpelunker {
 
         String STRING() throws IOException {
             StringBuilder buf = new StringBuilder();
+            buf.append((char)c);
             consume();
             while ( c!=EOF && c!='\'' ) {
                 if ( c=='\\' ) {
@@ -213,8 +214,9 @@ public class GrammarSpelunker {
                 buf.append((char)c);
                 consume();
             }
+            buf.append((char)c);
             consume(); // scan past '
-            return buf.toString();
+            return Grammar.getUnescapedStringFromGrammarStringLiteral(buf).toString();
         }
 
         void COMMENT() throws IOException {

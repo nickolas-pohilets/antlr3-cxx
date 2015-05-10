@@ -99,7 +99,6 @@ option
 optionValue
     :   id:ID
     |   s:STRING_LITERAL
-    |   c:CHAR_LITERAL
     |   i:INT
     ;
 
@@ -108,9 +107,9 @@ charSet
 	;
 
 charSetElement
-	:   c:CHAR_LITERAL
-	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
-	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
+	:   c:STRING_LITERL
+	|   #( OR c1:STRING_LITERL c2:STRING_LITERL )
+	|   #( RANGE c3:STRING_LITERL c4:STRING_LITERL )
 	;
 
 delegateGrammars
@@ -129,9 +128,7 @@ tokenSpec
 	:	t:TOKEN_REF
 	|	#( ASSIGN
 		   t2:TOKEN_REF
-		   ( s:STRING_LITERAL
-		   | c:CHAR_LITERAL
-		   )
+		   s:STRING_LITERAL
 		 )
 	;
 
@@ -226,7 +223,6 @@ tree:   #(TREE_BEGIN  element (element)*  )
 atom
     :   #( rr:RULE_REF (rarg:ARG_ACTION)? )     {out.ruleRef(#rr);}
     |   #( t:TOKEN_REF (targ:ARG_ACTION )? )    {out.token(#t);}
-    |   c:CHAR_LITERAL                          {out.charLiteral(#c);}
     |   s:STRING_LITERAL                        {out.charLiteral(#s);}
     |   WILDCARD                                {out.wildcard(#WILDCARD);}
     |   #(DOT ID atom) // scope override on rule

@@ -97,14 +97,13 @@ option
 optionValue
 	:	ID
 	|	STRING_LITERAL
-	|	CHAR_LITERAL
 	|	INT
 	;
 
 charSetElement
-	:	CHAR_LITERAL
-	|	^(OR CHAR_LITERAL CHAR_LITERAL)
-	|	^(RANGE CHAR_LITERAL CHAR_LITERAL)
+	:	STRING_LITERAL
+	|	^(OR STRING_LITERAL STRING_LITERAL)
+	|	^(RANGE STRING_LITERAL STRING_LITERAL)
 	;
 
 public
@@ -218,7 +217,6 @@ token returns [GrammarAST t=null]
 	|	^(PLUS_ASSIGN ID s=token {$t = $s.t;})
 	|	^(ROOT s=token {$t = $s.t;})
 	|	^(BANG s=token {$t = $s.t;})
-	|	a=CHAR_LITERAL      {$t = $a;}
 	|	b=STRING_LITERAL    {$t = $b;}
 	|	c=TOKEN_REF         {$t = $c;}
 	;
@@ -273,7 +271,6 @@ tree_
 atom
 	:	^(RULE_REF ARG_ACTION?)
 	|	^(TOKEN_REF ARG_ACTION?)
-	|	CHAR_LITERAL
 	|	STRING_LITERAL
 	|	WILDCARD
 	|	^(DOT ID atom) // scope override on rule

@@ -136,10 +136,7 @@ public class AssignTokenTypesBehavior extends AssignTokenTypesWalker {
 			}
 			// look for "<TOKEN> : <literal> ;" pattern
 			// (can have optional action last)
-			if ( block.hasSameTreeStructure(charAlias) ||
-				 block.hasSameTreeStructure(stringAlias) ||
-				 block.hasSameTreeStructure(charAlias2) ||
-				 block.hasSameTreeStructure(stringAlias2) )
+			if ( block.hasSameTreeStructure(stringAlias) || block.hasSameTreeStructure(stringAlias2) )
 			{
 				tokenRuleDefs.add(t.getText());
 				/*

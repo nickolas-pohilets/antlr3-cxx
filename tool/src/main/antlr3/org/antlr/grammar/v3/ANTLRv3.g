@@ -111,8 +111,8 @@ tokensSpec
 
 tokenSpec
 	:	TOKEN_REF
-		(	'=' (lit=STRING_LITERAL|lit=CHAR_LITERAL)	-> ^('=' TOKEN_REF $lit)
-		|												-> TOKEN_REF
+		(	'=' lit=STRING_LITERAL	-> ^('=' TOKEN_REF $lit)
+		|							-> TOKEN_REF
 		)
 		';'
 	;
@@ -146,7 +146,6 @@ option
 optionValue
     :   qid
     |   STRING_LITERAL
-    |   CHAR_LITERAL
     |   INT
     |	s='*' -> STRING_LITERAL[$s]  // used for k=*
     ;
@@ -276,8 +275,7 @@ notSet
 	;
 
 notTerminal
-	:   CHAR_LITERAL
-	|	TOKEN_REF
+	:   TOKEN_REF
 	|	STRING_LITERAL
 	;
 	
@@ -295,14 +293,12 @@ treeSpec
 	;
 
 range!
-	:	c1=CHAR_LITERAL RANGE c2=CHAR_LITERAL elementOptions?
+	:	c1=STRING_LITERAL RANGE c2=STRING_LITERAL elementOptions?
 		-> ^(CHAR_RANGE[$c1,".."] $c1 $c2 elementOptions?)
 	;
 
 terminal
-    :   (	CHAR_LITERAL elementOptions?    	  -> ^(CHAR_LITERAL elementOptions?)
-	    	// Args are only valid for lexer rules
-		|   TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
+    :   (	TOKEN_REF ARG_ACTION? elementOptions? -> ^(TOKEN_REF ARG_ACTION? elementOptions?)
 		|   STRING_LITERAL elementOptions?		  -> ^(STRING_LITERAL elementOptions?)
 		|   '.' elementOptions?		 			  -> ^('.' elementOptions?)
 		)
@@ -387,8 +383,7 @@ rewrite_tree_element
 	;
 
 rewrite_tree_atom
-    :   CHAR_LITERAL
-	|   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF ARG_ACTION?) // for imaginary nodes
+    :   TOKEN_REF ARG_ACTION? -> ^(TOKEN_REF ARG_ACTION?) // for imaginary nodes
     |   RULE_REF
 	|   STRING_LITERAL
 	|   d='$' id -> LABEL[$d,$id.text] // reference to a label in a rewrite rule
@@ -479,10 +474,6 @@ SL_COMMENT
 
 ML_COMMENT
 	:	'/*' {if (input.LA(1)=='*') $type=DOC_COMMENT; else $channel=HIDDEN;} .* '*/'
-	;
-
-CHAR_LITERAL
-	:	'\'' LITERAL_CHAR '\''
 	;
 
 STRING_LITERAL

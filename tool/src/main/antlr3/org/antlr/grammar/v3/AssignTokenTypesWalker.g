@@ -104,9 +104,7 @@ protected Grammar grammar;
 protected String currentRuleName;
 
 protected static GrammarAST stringAlias;
-protected static GrammarAST charAlias;
 protected static GrammarAST stringAlias2;
-protected static GrammarAST charAlias2;
 
 @Override
 public void reportError(RecognitionException ex)
@@ -143,18 +141,6 @@ protected void initASTPatterns()
     adaptor.addChild( stringAlias, adaptor.create( EOB, "EOB" ) );
 
     /*
-     * charAlias = ^(BLOCK[] ^(ALT[] CHAR_LITERAL[] EOA[]) EOB[])
-     */
-    charAlias = (GrammarAST)adaptor.create( BLOCK, "BLOCK" );
-    {
-        GrammarAST alt = (GrammarAST)adaptor.create( ALT, "ALT" );
-        adaptor.addChild( alt, adaptor.create( CHAR_LITERAL, "CHAR_LITERAL" ) );
-        adaptor.addChild( alt, adaptor.create( EOA, "EOA" ) );
-        adaptor.addChild( charAlias, alt );
-    }
-    adaptor.addChild( charAlias, adaptor.create( EOB, "EOB" ) );
-
-    /*
      * stringAlias2 = ^(BLOCK[] ^(ALT[] STRING_LITERAL[] ACTION[] EOA[]) EOB[])
      */
     stringAlias2 = (GrammarAST)adaptor.create( BLOCK, "BLOCK" );
@@ -166,19 +152,6 @@ protected void initASTPatterns()
         adaptor.addChild( stringAlias2, alt );
     }
     adaptor.addChild( stringAlias2, adaptor.create( EOB, "EOB" ) );
-
-    /*
-     * charAlias = ^(BLOCK[] ^(ALT[] CHAR_LITERAL[] ACTION[] EOA[]) EOB[])
-     */
-    charAlias2 = (GrammarAST)adaptor.create( BLOCK, "BLOCK" );
-    {
-        GrammarAST alt = (GrammarAST)adaptor.create( ALT, "ALT" );
-        adaptor.addChild( alt, adaptor.create( CHAR_LITERAL, "CHAR_LITERAL" ) );
-        adaptor.addChild( alt, adaptor.create( ACTION, "ACTION" ) );
-        adaptor.addChild( alt, adaptor.create( EOA, "EOA" ) );
-        adaptor.addChild( charAlias2, alt );
-    }
-    adaptor.addChild( charAlias2, adaptor.create( EOB, "EOB" ) );
 }
 
 // Behavior moved to AssignTokenTypesBehavior
@@ -249,7 +222,6 @@ optionValue returns [Object value=null]
 }
 	:	ID
 	|	STRING_LITERAL
-	|	CHAR_LITERAL
 	|	INT
 		{$value = Integer.parseInt($INT.text);}
 //  |   cs=charSet       {$value = $cs;} // return set AST in this case
@@ -260,9 +232,9 @@ charSet
 	;
 
 charSetElement
-	:	CHAR_LITERAL
-	|	^( OR CHAR_LITERAL CHAR_LITERAL )
-	|	^( RANGE CHAR_LITERAL CHAR_LITERAL )
+	:	STRING_LITERAL
+	|	^( OR STRING_LITERAL STRING_LITERAL )
+	|	^( RANGE STRING_LITERAL STRING_LITERAL )
 	;
 
 delegateGrammars
@@ -281,9 +253,7 @@ tokenSpec
 	:	t=TOKEN_REF            {trackToken($t);}
 	|	^(	ASSIGN
 			t2=TOKEN_REF       {trackToken($t2);}
-			( s=STRING_LITERAL {trackString($s); alias($t2,$s);}
-			| c=CHAR_LITERAL   {trackString($c); alias($t2,$c);}
-			)
+			s=STRING_LITERAL   {trackString($s); alias($t2,$s);}
 		)
 	;
 
@@ -391,7 +361,6 @@ tree_
 atom
 	:	^( RULE_REF (ARG_ACTION)? )
 	|	^( t=TOKEN_REF (ARG_ACTION )? ) {trackToken($t);}
-	|	c=CHAR_LITERAL   {trackString($c);}
 	|	s=STRING_LITERAL {trackString($s);}
 	|	WILDCARD
 	|	^(DOT ID atom) // scope override on rule

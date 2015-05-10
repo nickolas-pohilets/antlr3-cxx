@@ -355,7 +355,7 @@ element returns [StateCluster g=null]
 	|   ^(RANGE a=atom[null] b=atom[null])
 		{$g = factory.build_Range(grammar.getTokenType($a.text),
 								 grammar.getTokenType($b.text));}
-	|   ^(CHAR_RANGE c1=CHAR_LITERAL c2=CHAR_LITERAL)
+	|   ^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{
 		if ( grammar.type==Grammar.LEXER ) {
 			$g = factory.build_CharRange($c1.text, $c2.text);
@@ -485,7 +485,7 @@ tree_ returns [StateCluster g=null]
 atom_or_notatom returns [StateCluster g=null]
 	:	atom[null] {$g = $atom.g;}
 	|	^(	n=NOT
-			(	c=CHAR_LITERAL (ast1=ast_suffix)?
+			(	c=STRING_LITERAL (ast1=ast_suffix)?
 				{
 					int ttype=0;
 					if ( grammar.type==Grammar.LEXER )
@@ -606,19 +606,6 @@ atom[String scopeName] returns [StateCluster g=null]
 			}
 		}
 
-	|	^( c=CHAR_LITERAL  (as3=ast_suffix)? )
-		{
-			if ( grammar.type==Grammar.LEXER )
-			{
-				$g = factory.build_CharLiteralAtom(c);
-			}
-			else
-			{
-				$g = factory.build_Atom(c);
-				c.followingNFAState = $g.right;
-			}
-		}
-
 	|	^( s=STRING_LITERAL  (as4=ast_suffix)? )
 		{
 			if ( grammar.type==Grammar.LEXER )
@@ -695,27 +682,7 @@ setElement[IntSet elements]
 	int ttype;
 	IntSet ns=null;
 }
-	:	c=CHAR_LITERAL
-		{
-			if ( grammar.type==Grammar.LEXER )
-			{
-				ttype = Grammar.getCharValueFromGrammarCharLiteral($c.text);
-			}
-			else
-			{
-				ttype = grammar.getTokenType($c.text);
-			}
-			if ( elements.member(ttype) )
-			{
-				ErrorManager.grammarError(
-					ErrorManager.MSG_DUPLICATE_SET_ENTRY,
-					grammar,
-					$c.getToken(),
-					$c.text);
-			}
-			elements.add(ttype);
-		}
-	|	t=TOKEN_REF
+	:	t=TOKEN_REF
 		{
 			if ( grammar.type==Grammar.LEXER )
 			{
@@ -751,7 +718,14 @@ setElement[IntSet elements]
 
 	|	s=STRING_LITERAL
 		{
-			ttype = grammar.getTokenType($s.text);
+			if ( grammar.type==Grammar.LEXER )
+			{
+				ttype = Grammar.getCharValueFromGrammarCharLiteral($s.text);
+			}
+			else
+			{
+				ttype = grammar.getTokenType($s.text);
+			}
 			if ( elements.member(ttype) )
 			{
 				ErrorManager.grammarError(
@@ -762,7 +736,7 @@ setElement[IntSet elements]
 			}
 			elements.add(ttype);
 		}
-	|	^(CHAR_RANGE c1=CHAR_LITERAL c2=CHAR_LITERAL)
+	|	^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{
 			if ( grammar.type==Grammar.LEXER )
 			{
@@ -830,7 +804,7 @@ finally { inTest--; }
 
 /** Match just an element; no ast suffix etc.. */
 testSetElement returns [int alts=1]
-	:	c=CHAR_LITERAL {!hasElementOptions($c)}?
+	:	c=STRING_LITERAL {!hasElementOptions($c)}?
 	|	t=TOKEN_REF {!hasElementOptions($t)}?
 		{{
 			if ( grammar.type==Grammar.LEXER )
@@ -846,7 +820,7 @@ testSetElement returns [int alts=1]
 			}
 		}}
 	|   {grammar.type!=Grammar.LEXER}? => s=STRING_LITERAL
-	|	^(CHAR_RANGE c1=CHAR_LITERAL c2=CHAR_LITERAL)
+	|	^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{{ $alts = IntervalSet.of( Grammar.getCharValueFromGrammarCharLiteral($c1.text), Grammar.getCharValueFromGrammarCharLiteral($c2.text) ).size(); }}
 	|   testBlockAsSet
 		{{ $alts = $testBlockAsSet.alts; }}

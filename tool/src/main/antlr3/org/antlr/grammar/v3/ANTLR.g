@@ -113,8 +113,6 @@ tokens
 package org.antlr.grammar.v3;
 import org.antlr.tool.ErrorManager;
 import org.antlr.tool.Grammar;
-import org.antlr.tool.TextEncoder;
-import org.antlr.tool.UTF16TextEncoder;
 }
 
 @parser::header {
@@ -129,7 +127,6 @@ import org.antlr.tool.Rule;
 @lexer::members {
 public boolean hasASTOperator = false;
 private String fileName;
-private TextEncoder textEncoder = new UTF16TextEncoder();
 
 public String getFileName() {
     return fileName;
@@ -137,14 +134,6 @@ public String getFileName() {
 
 public void setFileName(String value) {
     fileName = value;
-}
-
-public TextEncoder getTextEncoder() {
-    return textEncoder;
-}
-
-public void setTextEncoder(TextEncoder textEncoder) {
-    this.textEncoder = textEncoder;
 }
 
 @Override
@@ -535,12 +524,7 @@ option[Map<String, Object> opts]
 
 optionValue returns [Object value = null]
 	:	x=id			 {$value = $x.text;}
-	|	s=STRING_LITERAL {String vs = $s.text;
-						  // remove the quotes:
-						  $value=vs.substring(1,vs.length()-1);}
-	|	c=CHAR_LITERAL   {String vs = $c.text;
-						  // remove the quotes:
-						  $value=vs.substring(1,vs.length()-1);}
+	|	s=STRING_LITERAL {$value = Grammar.getUnescapedStringFromGrammarStringLiteral($s.text);}
 	|	i=INT            {$value = Integer.parseInt($i.text);}
 	|	ss=STAR			 {$value = "*";} // used for k=*
 		-> STRING_LITERAL[$ss]
@@ -563,7 +547,7 @@ tokensSpec
 	;
 
 tokenSpec
-	:	TOKEN_REF ( ASSIGN^ (STRING_LITERAL|CHAR_LITERAL) )? SEMI!
+	:	TOKEN_REF ( ASSIGN^ STRING_LITERAL )? SEMI!
 	;
 
 attrScopes
@@ -828,12 +812,11 @@ ebnf
 
 range!
 	:	{Rule.getRuleType(currentRuleName) == Grammar.LEXER}? =>
-	 	c1=CHAR_LITERAL RANGE c2=CHAR_LITERAL
+	 	c1=STRING_LITERAL RANGE c2=STRING_LITERAL
 		-> ^(CHAR_RANGE[$c1,".."] $c1 $c2)
 	|	// range elsewhere is an error
 		(	t=TOKEN_REF r=RANGE TOKEN_REF
 		|	t=STRING_LITERAL r=RANGE STRING_LITERAL
-		|	t=CHAR_LITERAL r=RANGE CHAR_LITERAL
 		)
 		{
 		ErrorManager.syntaxError(
@@ -843,9 +826,7 @@ range!
 	;
 
 terminal
-	:	cl=CHAR_LITERAL^ ( elementOptions[$cl.tree]! )? (ROOT^|BANG^)?
-
-	|	tr=TOKEN_REF^
+	:	tr=TOKEN_REF^
 		( elementOptions[$tr.tree]! )?
 		( ARG_ACTION )? // Args are only valid for lexer rules
 		(ROOT^|BANG^)?
@@ -920,8 +901,7 @@ currentBlockAST = save;
 	;
 
 notTerminal
-	:	CHAR_LITERAL
-	|	TOKEN_REF
+	:	TOKEN_REF
 	|	STRING_LITERAL
 	;
 
@@ -988,7 +968,6 @@ rewrite_element
 rewrite_atom
 	:	tr=TOKEN_REF^ elementOptions[$tr.tree]!? ARG_ACTION? // for imaginary nodes
 	|	RULE_REF
-	|	cl=CHAR_LITERAL elementOptions[$cl.tree]!?
 	|	sl=STRING_LITERAL elementOptions[$sl.tree]!?
 	|	DOLLAR! label // reference to a label in a rewrite rule
 	|	ACTION
@@ -1083,7 +1062,6 @@ rewrite_template_arg
 // L E X E R
 
 // get rid of warnings:
-fragment STRING_LITERAL : ;
 fragment FORCED_ACTION : ;
 fragment DOC_COMMENT : ;
 fragment SEMPRED : ;
@@ -1179,19 +1157,12 @@ STRAY_BRACKET
 	:	']'
 	;
 
-CHAR_LITERAL
+STRING_LITERAL
 	:	'\''
 		(	ESC
 		|	~('\\'|'\'')
 		)*
 		'\''
-		{
-			StringBuffer s = Grammar.getUnescapedStringFromGrammarStringLiteral($text);
-			if (!textEncoder.isSingleCode(s))
-			{
-				$type = STRING_LITERAL;
-			}
-		}
 	;
 
 DOUBLE_QUOTE_STRING_LITERAL

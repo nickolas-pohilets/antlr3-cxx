@@ -303,7 +303,6 @@ public class GrammarSanity {
 		switch ( t.getType() ) {
 			case ANTLRParser.TREE_BEGIN :
 			case ANTLRParser.TOKEN_REF :
-			case ANTLRParser.CHAR_LITERAL :
 			case ANTLRParser.STRING_LITERAL :
 			case ANTLRParser.WILDCARD :
 				return true;

@@ -570,7 +570,6 @@ public class Grammar {
 		}
 		STGroup lexerGrammarSTG = new STGroupString(lexerGrammarTemplate);
 		lexerGrammarST = lexerGrammarSTG.getInstanceOf("grammar");
-		target = CodeGenerator.loadLanguageTarget((String) getOption("language"));
 	}
 
 	/** Useful for when you are sure that you are not part of a composite
@@ -584,7 +583,6 @@ public class Grammar {
 		composite = new CompositeGrammar(this);
 		STGroup lexerGrammarSTG = new STGroupString(lexerGrammarTemplate);
 		lexerGrammarST = lexerGrammarSTG.getInstanceOf("grammar");
-		target = CodeGenerator.loadLanguageTarget((String) getOption("language"));
 	}
 
 	/** Used for testing; only useful on noncomposite grammars.*/
@@ -620,9 +618,20 @@ public class Grammar {
 		return fileName;
 	}
 
+	public Target getTarget() {
+		if (target == null) {
+			target = CodeGenerator.loadLanguageTarget((String)getOption("language"));
+		}
+		return target;
+	}
+
 	public TextEncoder getTextEncoder() {
 		if (textEncoder == null) {
-			String encoding = (String)composite.getOption("encoding");
+			Target t = getTarget();
+			String encoding = (String) getOption("encoding");
+			if (encoding == null || !t.supportsEncoding(encoding)) {
+				encoding = t.defaultEncoding();
+			}
 			textEncoder = TextEncoder.getEncoder(encoding);
 		}
 		return textEncoder;
@@ -692,7 +701,6 @@ public class Grammar {
 		}
 
 		lexer.setFileName(this.getFileName());
-		lexer.setTextEncoder(getTextEncoder());
 		tokenBuffer = new CommonTokenStream(lexer);
 		ANTLRParser parser = ANTLRParser.createParser(tokenBuffer);
 		parser.setFileName(this.getFileName());
@@ -1573,7 +1581,7 @@ outer:
         if ( this==composite.getRootGrammar() && actionName.equals("header") ) {
             List<Grammar> allgrammars = composite.getRootGrammar().getDelegates();
             for (Grammar delegate : allgrammars) {
-				if ( target.isValidActionScope(delegate.type, scope) ) {
+				if (getTarget().isValidActionScope(delegate.type, scope) ) {
 					//System.out.println("propogate to "+delegate.name);
                 	delegate.defineNamedAction(ampersandAST, scope, nameAST, actionAST);
 				}
@@ -1825,7 +1833,7 @@ outer:
 		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
 			if ( type==LEXER &&
-				 (tokenRef.getType()==ANTLRParser.CHAR_LITERAL||
+				 (tokenRef.getType()==ANTLRParser.STRING_LITERAL||
 				  tokenRef.getType()==ANTLRParser.BLOCK||
 				  tokenRef.getType()==ANTLRParser.NOT||
 				  tokenRef.getType()==ANTLRParser.CHAR_RANGE||
@@ -2099,7 +2107,6 @@ outer:
 		BitSet nonEmptyTerminals = new BitSet();
 		nonEmptyTerminals.set(ANTLRParser.TOKEN_REF);
 		nonEmptyTerminals.set(ANTLRParser.STRING_LITERAL);
-		nonEmptyTerminals.set(ANTLRParser.CHAR_LITERAL);
 		nonEmptyTerminals.set(ANTLRParser.WILDCARD);
 		nonEmptyTerminals.set(ANTLRParser.RULE_REF);
 		return findFirstTypeOutsideRewrite(block, nonEmptyTerminals) == null;
@@ -2126,7 +2133,6 @@ outer:
 
 	public boolean isAtomTokenType(int ttype) {
 		return ttype == ANTLRParser.WILDCARD||
-			   ttype == ANTLRParser.CHAR_LITERAL||
 			   ttype == ANTLRParser.CHAR_RANGE||
 			   ttype == ANTLRParser.STRING_LITERAL||
 			   ttype == ANTLRParser.NOT||
@@ -2217,7 +2223,7 @@ outer:
 	 *
 	 *  The NFA construction routine must know the actual char values.
 	 */
-	public static StringBuffer getUnescapedStringFromGrammarStringLiteral(String literal) {
+	public static StringBuffer getUnescapedStringFromGrammarStringLiteral(CharSequence literal) {
 		//System.out.println("escape: ["+literal+"]");
 		StringBuffer buf = new StringBuffer();
 		int last = literal.length()-1; // skip quotes on outside
@@ -2229,7 +2235,7 @@ outer:
 				if ( Character.toUpperCase(c)=='U' ) {
 					// \u0000
 					i++;
-					String unicodeChars = literal.substring(i,i+4);
+					String unicodeChars = literal.subSequence(i, i+4).toString();
 					// parse the unicode 16 bit hex value
 					int val = Integer.parseInt(unicodeChars, 16);
 					i+=4-1; // loop will inc by 1; only jump 3 then

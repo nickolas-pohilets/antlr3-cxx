@@ -56,7 +56,6 @@ tokensSpec
 
 tokenSpec
 	:	^('=' TOKEN_REF STRING_LITERAL)
-	|	^('=' TOKEN_REF CHAR_LITERAL)
 	|	TOKEN_REF
 	;
 
@@ -81,7 +80,6 @@ option
 optionValue
     :   ID
     |   STRING_LITERAL
-    |   CHAR_LITERAL
     |   INT
     ;
 
@@ -150,13 +148,11 @@ element
 	;
 
 atom:   ^(('^'|'!') atom)
-	|	^(CHAR_RANGE CHAR_LITERAL CHAR_LITERAL optionsSpec?)
+	|	^(CHAR_RANGE STRING_LITERAL STRING_LITERAL optionsSpec?)
 	|	^('~' notTerminal optionsSpec?)
 	|	^('~' block optionsSpec?)
     |	^(RULE_REF ARG_ACTION)
     |	RULE_REF
-    |   CHAR_LITERAL
-    |   ^(CHAR_LITERAL optionsSpec)
     |	TOKEN_REF
     |	^(TOKEN_REF optionsSpec)
     |	^(TOKEN_REF ARG_ACTION optionsSpec)
@@ -178,8 +174,7 @@ ebnf
 	;
 
 notTerminal
-	:   CHAR_LITERAL
-	|	TOKEN_REF
+	:   TOKEN_REF
 	|	STRING_LITERAL
 	;
 		
@@ -212,8 +207,7 @@ rewrite_tree_element
 	;
 
 rewrite_tree_atom
-    :   CHAR_LITERAL
-	|   TOKEN_REF
+    :   TOKEN_REF
 	|   ^(TOKEN_REF ARG_ACTION) // for imaginary nodes
     |   RULE_REF
 	|   STRING_LITERAL

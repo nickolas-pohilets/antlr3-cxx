@@ -194,9 +194,7 @@ tokenSpec
 	:	t=TOKEN_REF
 	|	^(	ASSIGN
 			TOKEN_REF
-			(	STRING_LITERAL
-			|	CHAR_LITERAL
-			)
+			STRING_LITERAL
 		 )
 	;
 
@@ -521,16 +519,7 @@ atom[GrammarAST scope_]
 				grammar.altReferencesTokenID( currentRuleName, $t, this.outerAltNum );
 			}
 		}
-	|	c=CHAR_LITERAL
-		{
-			if ( grammar.type != Grammar.LEXER )
-			{
-				Rule rule = grammar.getRule(currentRuleName);
-				if ( rule != null )
-					rule.trackTokenReferenceInAlt($c, outerAltNum);
-			}
-		}
-	|	s=STRING_LITERAL 
+	|	s=STRING_LITERAL
 		{
 			if ( grammar.type != Grammar.LEXER )
 			{
@@ -636,7 +625,6 @@ rewrite_atom
 			 ($start.getType()==RULE_REF ||
 			  $start.getType()==LABEL ||
 			  $start.getType()==TOKEN_REF ||
-			  $start.getType()==CHAR_LITERAL ||
 			  $start.getType()==STRING_LITERAL) )
 		{
 			// track per block and for entire rewrite rule
@@ -660,7 +648,6 @@ rewrite_atom
 					}
 				)?
 			)
-		|	CHAR_LITERAL
 		|	STRING_LITERAL
 		)
 	|	LABEL

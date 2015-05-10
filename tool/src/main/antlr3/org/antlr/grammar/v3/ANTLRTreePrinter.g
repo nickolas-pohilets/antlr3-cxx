@@ -195,7 +195,6 @@ option
 optionValue
 	:	id=ID            {out($id.text);}
 	|	s=STRING_LITERAL {out($s.text);}
-	|	c=CHAR_LITERAL   {out($c.text);}
 	|	i=INT            {out($i.text);}
 //	|   charSet
 	;
@@ -206,9 +205,9 @@ charSet
 	;
 
 charSetElement
-	:   c:CHAR_LITERAL {out(#c.getText());}
-	|   #( OR c1:CHAR_LITERAL c2:CHAR_LITERAL )
-	|   #( RANGE c3:CHAR_LITERAL c4:CHAR_LITERAL )
+	:   c:STRING_LITERAL {out(#c.getText());}
+	|   #( OR c1:STRING_LITERAL c2:STRING_LITERAL )
+	|   #( RANGE c3:STRING_LITERAL c4:STRING_LITERAL )
 	;
 */
 
@@ -222,7 +221,7 @@ tokensSpec
 
 tokenSpec
 	:	TOKEN_REF
-	|	^( ASSIGN TOKEN_REF (STRING_LITERAL|CHAR_LITERAL) )
+	|	^( ASSIGN TOKEN_REF STRING_LITERAL)
 	;
 
 rules
@@ -436,9 +435,6 @@ atom
 			)
 		|	^(	TOKEN_REF		{out($start.toString());}
 				(targ=ARG_ACTION	{out("["+$targ.toString()+"]");} )?
-				(ast_suffix)?
-			)
-		|	^(	CHAR_LITERAL	{out($start.toString());}
 				(ast_suffix)?
 			)
 		|	^(	STRING_LITERAL	{out($start.toString());}

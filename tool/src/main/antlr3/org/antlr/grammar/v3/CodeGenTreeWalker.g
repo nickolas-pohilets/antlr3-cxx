@@ -734,7 +734,7 @@ options { k=1; }
 	|	^( PLUS_ASSIGN label2=ID e=element[$label2,$astSuffix] )
 		{ $code = $e.code; }
 
-	|	^(CHAR_RANGE a=CHAR_LITERAL b=CHAR_LITERAL)
+	|	^(CHAR_RANGE a=STRING_LITERAL b=STRING_LITERAL)
 		{
 			$code = templates.getInstanceOf("charRangeRef");
 			String low = generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,$a.text);
@@ -799,25 +799,13 @@ notElement[GrammarAST n, GrammarAST label, GrammarAST astSuffix] returns [ST cod
 		labelText = label.getText();
 	}
 }
-	:	(	assign_c=CHAR_LITERAL
+	:	(	assign_s=STRING_LITERAL
 			{
 				int ttype=0;
 				if ( grammar.type==Grammar.LEXER )
 				{
-					ttype = Grammar.getCharValueFromGrammarCharLiteral($assign_c.text);
-				}
-				else
-				{
-					ttype = grammar.getTokenType($assign_c.text);
-				}
-				elements = grammar.complement(ttype);
-			}
-		|	assign_s=STRING_LITERAL
-			{
-				int ttype=0;
-				if ( grammar.type==Grammar.LEXER )
-				{
-					// TODO: error!
+					// TODO: Verify that text make single token
+					ttype = Grammar.getCharValueFromGrammarCharLiteral($assign_s.text);
 				}
 				else
 				{
@@ -950,8 +938,7 @@ atom[GrammarAST scope, GrammarAST label, GrammarAST astSuffix]
 			labelText = label.getText();
 		}
 		if ( grammar.type!=Grammar.LEXER &&
-			 ($start.getType()==RULE_REF||$start.getType()==TOKEN_REF||
-			  $start.getType()==CHAR_LITERAL||$start.getType()==STRING_LITERAL) )
+			 ($start.getType()==RULE_REF||$start.getType()==TOKEN_REF||$start.getType()==STRING_LITERAL) )
 		{
 			Rule encRule = grammar.getRule($start.enclosingRuleName);
 			if ( encRule!=null && encRule.hasRewrite(outerAltNum) && astSuffix!=null )
@@ -1080,31 +1067,31 @@ atom[GrammarAST scope, GrammarAST label, GrammarAST astSuffix]
 			$t.code = $code;
 		}
 
-	|	c=CHAR_LITERAL
-		{
-			if ( grammar.type==Grammar.LEXER )
-			{
-				$code = templates.getInstanceOf("charRef");
-				$code.add("char",
-				   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,$c.text));
-				if ( label!=null )
-				{
-					$code.add("label", labelText);
-				}
-			}
-			else { // else it's a token type reference
-				$code = getTokenElementST("tokenRef", "char_literal", $c, astSuffix, labelText);
-				String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType($c.text));
-				$code.add("token",tokenLabel);
-				if ( $c.terminalOptions!=null ) {
-					$code.add("terminalOptions",$c.terminalOptions);
-				}
-				int i = ((CommonToken)$c.getToken()).getTokenIndex();
-				$code.add("elementIndex", i);
-				generator.generateLocalFOLLOW($c,tokenLabel,currentRuleName,i);
-			}
-		}
-
+//	|	c=CHAR_LITERAL
+//		{
+//			if ( grammar.type==Grammar.LEXER )
+//			{
+//				$code = templates.getInstanceOf("charRef");
+//				$code.add("char",
+//				   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,$c.text));
+//				if ( label!=null )
+//				{
+//					$code.add("label", labelText);
+//				}
+//			}
+//			else { // else it's a token type reference
+//				$code = getTokenElementST("tokenRef", "char_literal", $c, astSuffix, labelText);
+//				String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType($c.text));
+//				$code.add("token",tokenLabel);
+//				if ( $c.terminalOptions!=null ) {
+//					$code.add("terminalOptions",$c.terminalOptions);
+//				}
+//				int i = ((CommonToken)$c.getToken()).getTokenIndex();
+//				$code.add("elementIndex", i);
+//				generator.generateLocalFOLLOW($c,tokenLabel,currentRuleName,i);
+//			}
+//		}
+//
 	|	s=STRING_LITERAL
 		{
 			int i = ((CommonToken)$s.getToken()).getTokenIndex();
@@ -1176,10 +1163,9 @@ set[GrammarAST label, GrammarAST astSuffix] returns [ST code=null]
 	;
 
 setElement
-	:	CHAR_LITERAL
-	|	TOKEN_REF
+	:	TOKEN_REF
 	|	STRING_LITERAL
-	|	^(CHAR_RANGE CHAR_LITERAL CHAR_LITERAL)
+	|	^(CHAR_RANGE STRING_LITERAL STRING_LITERAL)
 	;
 
 // REWRITE stuff
@@ -1435,12 +1421,10 @@ rewrite_atom[boolean isRoot] returns [ST code=null]
 
 	|
 		(	^(tk=TOKEN_REF (arg=ARG_ACTION)?)
-		|	cl=CHAR_LITERAL
 		|	sl=STRING_LITERAL
 		)
 		{
 			GrammarAST term = $tk;
-			if (term == null) term = $cl;
 			if (term == null) term = $sl;
 			String tokenName = $start.getToken().getText();
 			String stName = "rewriteTokenRef";
