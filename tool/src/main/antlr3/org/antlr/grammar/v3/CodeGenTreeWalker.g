@@ -1066,59 +1066,58 @@ atom[GrammarAST scope, GrammarAST label, GrammarAST astSuffix]
 			}
 			$t.code = $code;
 		}
-
-//	|	c=CHAR_LITERAL
-//		{
-//			if ( grammar.type==Grammar.LEXER )
-//			{
-//				$code = templates.getInstanceOf("charRef");
-//				$code.add("char",
-//				   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,$c.text));
-//				if ( label!=null )
-//				{
-//					$code.add("label", labelText);
-//				}
-//			}
-//			else { // else it's a token type reference
-//				$code = getTokenElementST("tokenRef", "char_literal", $c, astSuffix, labelText);
-//				String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType($c.text));
-//				$code.add("token",tokenLabel);
-//				if ( $c.terminalOptions!=null ) {
-//					$code.add("terminalOptions",$c.terminalOptions);
-//				}
-//				int i = ((CommonToken)$c.getToken()).getTokenIndex();
-//				$code.add("elementIndex", i);
-//				generator.generateLocalFOLLOW($c,tokenLabel,currentRuleName,i);
-//			}
-//		}
-//
 	|	s=STRING_LITERAL
 		{
-			int i = ((CommonToken)$s.getToken()).getTokenIndex();
-			if ( grammar.type==Grammar.LEXER )
-			{
-				$code = templates.getInstanceOf("lexerStringRef");
-				$code.add("string",
-					generator.target.getTargetStringLiteralFromANTLRStringLiteral(generator,$s.text));
-				$code.add("elementIndex", i);
-				if ( label!=null )
+		    if (grammar.getTextEncoder().isSingleCode(Grammar.getUnescapedStringFromGrammarStringLiteral($s.text))) {
+				if ( grammar.type==Grammar.LEXER )
 				{
-					$code.add("label", labelText);
+					$code = templates.getInstanceOf("charRef");
+					$code.add("char",
+					   generator.target.getTargetCharLiteralFromANTLRCharLiteral(generator,$s.text));
+					if ( label!=null )
+					{
+						$code.add("label", labelText);
+					}
+				}
+				else { // else it's a token type reference
+					$code = getTokenElementST("tokenRef", "char_literal", $s, astSuffix, labelText);
+					String tokenLabel = generator.getTokenTypeAsTargetLabel(grammar.getTokenType($s.text));
+					$code.add("token",tokenLabel);
+					if ( $s.terminalOptions!=null ) {
+						$code.add("terminalOptions",$s.terminalOptions);
+					}
+					int i = ((CommonToken)$s.getToken()).getTokenIndex();
+					$code.add("elementIndex", i);
+					generator.generateLocalFOLLOW($s,tokenLabel,currentRuleName,i);
 				}
 			}
-			else
-			{
-				// else it's a token type reference
-				$code = getTokenElementST("tokenRef", "string_literal", $s, astSuffix, labelText);
-				String tokenLabel =
-					generator.getTokenTypeAsTargetLabel(grammar.getTokenType($s.text));
-				$code.add("token",tokenLabel);
-				if ( $s.terminalOptions!=null )
+			else {
+				int i = ((CommonToken)$s.getToken()).getTokenIndex();
+				if ( grammar.type==Grammar.LEXER )
 				{
-					$code.add("terminalOptions",$s.terminalOptions);
+					$code = templates.getInstanceOf("lexerStringRef");
+					$code.add("string",
+						generator.target.getTargetStringLiteralFromANTLRStringLiteral(generator,$s.text));
+					$code.add("elementIndex", i);
+					if ( label!=null )
+					{
+						$code.add("label", labelText);
+					}
 				}
-				$code.add("elementIndex", i);
-				generator.generateLocalFOLLOW($s,tokenLabel,currentRuleName,i);
+				else
+				{
+					// else it's a token type reference
+					$code = getTokenElementST("tokenRef", "string_literal", $s, astSuffix, labelText);
+					String tokenLabel =
+						generator.getTokenTypeAsTargetLabel(grammar.getTokenType($s.text));
+					$code.add("token",tokenLabel);
+					if ( $s.terminalOptions!=null )
+					{
+						$code.add("terminalOptions",$s.terminalOptions);
+					}
+					$code.add("elementIndex", i);
+					generator.generateLocalFOLLOW($s,tokenLabel,currentRuleName,i);
+				}
 			}
 		}
 
