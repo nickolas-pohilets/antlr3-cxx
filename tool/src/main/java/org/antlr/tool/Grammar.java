@@ -1832,18 +1832,31 @@ outer:
 	{
 		Rule r = getLocallyDefinedRule(ruleName);
 		if ( r!=null ) {
-			if ( type==LEXER &&
-				 (tokenRef.getType()==ANTLRParser.STRING_LITERAL||
-				  tokenRef.getType()==ANTLRParser.BLOCK||
-				  tokenRef.getType()==ANTLRParser.NOT||
-				  tokenRef.getType()==ANTLRParser.CHAR_RANGE||
-				  tokenRef.getType()==ANTLRParser.WILDCARD))
-			{
+			if (isCharLabel(tokenRef)) {
 				defineLabel(r, label, tokenRef, CHAR_LABEL);
 			}
             else {
 				defineLabel(r, label, tokenRef, TOKEN_LABEL);
 			}
+		}
+	}
+
+	private boolean isCharLabel(GrammarAST tokenRef) {
+		if (type == LEXER) {
+			switch (tokenRef.getType()) {
+				case ANTLRParser.STRING_LITERAL:
+					StringBuffer s = getUnescapedStringFromGrammarStringLiteral(tokenRef.getText());
+					return getTextEncoder().isSingleCode(s);
+				case ANTLRParser.BLOCK:
+				case ANTLRParser.NOT:
+				case ANTLRParser.CHAR_RANGE:
+				case ANTLRParser.WILDCARD:
+					return true;
+				default:
+					return false;
+			}
+		} else {
+			return false;
 		}
 	}
 
