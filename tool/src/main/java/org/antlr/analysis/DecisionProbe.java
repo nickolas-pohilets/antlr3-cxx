@@ -422,8 +422,13 @@ public class DecisionProbe {
 		Set<DFAState> resolvedStates = getNondeterministicStatesResolvedWithSemanticPredicate();
 		Set<DFAState> problemStates = getDFAStatesWithSyntacticallyAmbiguousAlts();
 		if ( problemStates.size()>0 ) {
-			Iterator<DFAState> it =
-				problemStates.iterator();
+			ArrayList<DFAState> sortedProblemStates = new ArrayList<DFAState>(problemStates);
+			sortedProblemStates.sort(new Comparator<DFAState>() {
+				public int compare(DFAState o1, DFAState o2) {
+					return Integer.compare(o1.stateNumber, o2.stateNumber);
+				}
+			});
+			Iterator<DFAState> it = sortedProblemStates.iterator();
 			while (	it.hasNext() && !dfa.nfa.grammar.NFAToDFAConversionExternallyAborted() ) {
 				DFAState d = it.next();
 				Map<Integer, Set<Token>> insufficientAltToLocations = getIncompletelyCoveredAlts(d);

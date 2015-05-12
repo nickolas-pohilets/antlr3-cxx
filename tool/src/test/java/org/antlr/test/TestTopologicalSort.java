@@ -36,6 +36,14 @@ import static org.junit.Assert.*;
 
 /** Test topo sort in GraphNode. */
 public class TestTopologicalSort extends BaseTest {
+    private static <T> void sortSubList(List<T> list, int fromIndex, int toIndex) {
+        Object[] v = list.subList(fromIndex, toIndex).toArray();
+        java.util.Arrays.sort(v);
+        for (int i = fromIndex; i < toIndex; ++i) {
+            list.set(i, (T)v[i - fromIndex]);
+        }
+    }
+
     @Test
     public void testFairlyLargeGraph() throws Exception {
         Graph<String> g = new Graph<String>();
@@ -51,8 +59,9 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("F", "H");
         g.addEdge("E", "F");
 
-        String expecting = "[H, F, E, D, G, A, B, C]";
+        String expecting = "[H, F, E, D, A, B, G, C]";
         List<String> nodes = g.sort();
+        sortSubList(nodes, 4, 7);
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
@@ -93,8 +102,9 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("Def.g", "Java.tokens");    // walkers feed off generated tokens
         g.addEdge("Ref.g", "Java.tokens");
 
-        String expecting = "[MyJava.tokens, Java.g, Java.tokens, Ref.g, Def.g]";
+        String expecting = "[MyJava.tokens, Java.g, Java.tokens, Def.g, Ref.g]";
         List<String> nodes = g.sort();
+        sortSubList(nodes, 3, 4);
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
@@ -107,8 +117,9 @@ public class TestTopologicalSort extends BaseTest {
         g.addEdge("Def.g", "JavaLexer.tokens");
         g.addEdge("Ref.g", "JavaLexer.tokens");
 
-        String expecting = "[JavaLexer.g, JavaLexer.tokens, JavaParser.g, Ref.g, Def.g]";
+        String expecting = "[JavaLexer.g, JavaLexer.tokens, Def.g, JavaParser.g, Ref.g]";
         List<String> nodes = g.sort();
+        sortSubList(nodes, 2, 4);
         String result = nodes.toString();
         assertEquals(expecting, result);
     }
