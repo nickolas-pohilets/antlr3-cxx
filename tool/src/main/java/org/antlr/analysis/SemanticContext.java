@@ -418,14 +418,23 @@ public abstract class SemanticContext {
 
 		@Override
 		public String toString() {
-			StringBuilder buf = new StringBuilder();
-			buf.append("(");
+			// Make rendering deterministic to simplify unit tests
+			String[] operandStrings = new String[operands.size()];
 			int i = 0;
 			for (SemanticContext semctx : operands) {
+				operandStrings[i] = semctx.toString();
+				i++;
+			}
+			Arrays.sort(operandStrings);
+
+			StringBuilder buf = new StringBuilder();
+			buf.append("(");
+			i = 0;
+			for (String s : operandStrings) {
 				if ( i>0 ) {
 					buf.append(getOperandString());
 				}
-				buf.append(semctx.toString());
+				buf.append(s);
 				i++;
 			}
 			buf.append(")");
