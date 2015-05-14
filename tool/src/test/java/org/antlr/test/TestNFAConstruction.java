@@ -689,9 +689,30 @@ public class TestNFAConstruction extends BaseTest {
 		assertEquals(expectingGrammarStr, g.toString());
 	}
 
-	@Test public void testNotCharSet() throws Exception {
+	@Test public void testNotCharSetUTF8() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar P;\n"+
+				"options { language=Cxx; encoding=UTF8; }\n" +
+				"A : ~'3' ;\n");
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{'\\u0000'..'2', '4'..'\\u00FF'}->.s3\n" +
+				".s3->:s4\n" +
+				":s4-<EOT>->.s5\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+				"1:7: lexer grammar P options {language=Cxx; encoding=UTF8; } ;\n" +
+				"A : ~ '3' ;\n"+
+				"Tokens : A ;";
+		assertEquals(expectingGrammarStr, g.toString());
+	}
+
+	@Test public void testNotCharSetUTF16() throws Exception {
 		Grammar g = new Grammar(
 			"lexer grammar P;\n"+
+			"options { language=Cxx; encoding=UTF16; }\n" +
 			"A : ~'3' ;\n");
 		String expecting =
 			".s0->.s1\n" +
@@ -702,9 +723,29 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "A", expecting);
 
 		String expectingGrammarStr =
-			"1:7: lexer grammar P;\n" +
+			"1:7: lexer grammar P options {language=Cxx; encoding=UTF16; } ;\n" +
 			"A : ~ '3' ;\n"+
 			"Tokens : A ;";
+		assertEquals(expectingGrammarStr, g.toString());
+	}
+
+	@Test public void testNotCharSetUTF32() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar P;\n"+
+				"options { language=Cxx; encoding=UTF32; }\n" +
+				"A : ~'3' ;\n");
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{'\\u0000'..'2', '4'..'\\uDBFF\\uDFFF'}->.s3\n" +
+				".s3->:s4\n" +
+				":s4-<EOT>->.s5\n";
+		checkRule(g, "A", expecting);
+
+		String expectingGrammarStr =
+				"1:7: lexer grammar P options {language=Cxx; encoding=UTF32; } ;\n" +
+				"A : ~ '3' ;\n"+
+				"Tokens : A ;";
 		assertEquals(expectingGrammarStr, g.toString());
 	}
 
