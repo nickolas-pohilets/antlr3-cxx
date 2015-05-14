@@ -174,17 +174,6 @@ public class NFAFactory {
 		return build_Atom(c, charLiteralAST);
 	}
 
-	/** From char 'c' build StateCluster o-intValue(c)-&gt;o
-	 *  can include unicode spec likes '\u0024' later.  Accepts
-	 *  actual unicode 16-bit now, of course, by default.
-     *  TODO not supplemental char clean!
-	 */
-	public StateCluster build_CharRange(String a, String b) {
-		int from = Grammar.getCharValueFromGrammarCharLiteral(a);
-		int to = Grammar.getCharValueFromGrammarCharLiteral(b);
-		return build_Range(from, to);
-	}
-
     /** For a non-lexer, just build a simple token reference atom.
      *  For a lexer, a string is a sequence of char to match.  That is,
      *  "fog" is treated as 'f' 'o' 'g' not as a single transition in

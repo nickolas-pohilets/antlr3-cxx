@@ -295,6 +295,10 @@ NONREGULAR_DECISION(ruleName,alts) ::= <<
 [fatal] rule <ruleName> has non-LL(*) decision due to recursive rule invocations reachable from alts <alts; separator=",">.  Resolve by left-factoring or using syntactic predicates or using backtrack=true option.
 >>
 
+CHARACTER_OUT_OF_RANGE(arg,arg2) ::= <<
+Character <arg> is out of range for <arg2> encoding
+>>
+
 /* l10n for message levels */
 warning() ::= "warning"
 error() ::= "error"

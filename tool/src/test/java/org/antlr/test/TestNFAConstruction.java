@@ -28,6 +28,7 @@
 package org.antlr.test;
 
 import org.antlr.analysis.State;
+import org.antlr.tool.ErrorManager;
 import org.antlr.tool.FASerializer;
 import org.antlr.tool.Grammar;
 import org.junit.Test;
@@ -1327,6 +1328,31 @@ public class TestNFAConstruction extends BaseTest {
 				".s9-'i'->.s10\n" +
 				":s5-<EOT>->.s6\n";
 		checkRule(g, "A", expecting);
+	}
+
+	@Test public void testInvalidCharRange() throws Exception {
+		ErrorQueue errorQueue = new ErrorQueue();
+		ErrorManager.setErrorListener(errorQueue);
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"options { language=Cxx; encoding=UTF8; }\n" +
+				//"A : 'lo'..'hi' ;"
+				"A : 'Ⓐ'..'Ⓩ' ;"
+		);
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s2-{}->.s3\n" +
+				".s3->:s4\n" +
+				":s4-<EOT>->.s5\n";
+		checkRule(g, "A", expecting);
+
+		assertEquals(
+			"["+
+			"error(212): <string>:3:5: Character 'Ⓐ' is out of range for UTF8 encoding, "+
+			"error(212): <string>:3:10: Character 'Ⓩ' is out of range for UTF8 encoding]",
+			errorQueue.errors.toString()
+		);
 	}
 
 	private void checkRule(Grammar g, String rule, String expecting)

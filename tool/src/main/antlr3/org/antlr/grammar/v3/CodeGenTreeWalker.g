@@ -804,14 +804,15 @@ notElement[GrammarAST n, GrammarAST label, GrammarAST astSuffix] returns [ST cod
 				int ttype=0;
 				if ( grammar.type==Grammar.LEXER )
 				{
-					// TODO: Verify that text make single token
-					ttype = Grammar.getCharValueFromGrammarCharLiteral($assign_s.text);
+					ttype = grammar.getVerifiedCharValueFromGrammarCharLiteral($assign_s.token);
 				}
 				else
 				{
 					ttype = grammar.getTokenType($assign_s.text);
 				}
-				elements = grammar.complement(ttype);
+				if (ttype >= 0) {
+					elements = grammar.complement(ttype);
+				}
 			}
 		|	assign_t=TOKEN_REF
 			{

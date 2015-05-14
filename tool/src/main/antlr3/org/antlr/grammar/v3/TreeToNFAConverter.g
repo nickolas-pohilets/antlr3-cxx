@@ -358,7 +358,11 @@ element returns [StateCluster g=null]
 	|   ^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{
 		if ( grammar.type==Grammar.LEXER ) {
-			$g = factory.build_CharRange($c1.text, $c2.text);
+			int v1 = grammar.getVerifiedCharValueFromGrammarCharLiteral($c1.token);
+			int v2 = grammar.getVerifiedCharValueFromGrammarCharLiteral($c2.token);
+			if (v1 >= 0 && v2 >= 0) {
+				$g = factory.build_Range(v1, v2);
+			}
 		}
 		}
 	|   atom_or_notatom {$g = $atom_or_notatom.g;}
@@ -490,22 +494,24 @@ atom_or_notatom returns [StateCluster g=null]
 					int ttype=0;
 					if ( grammar.type==Grammar.LEXER )
 					{
-						ttype = Grammar.getCharValueFromGrammarCharLiteral($c.text);
+						ttype = grammar.getVerifiedCharValueFromGrammarCharLiteral($c.token);
 					}
 					else
 					{
 						ttype = grammar.getTokenType($c.text);
 					}
-					IntSet notAtom = grammar.complement(ttype);
-					if ( notAtom.isNil() )
-					{
-						ErrorManager.grammarError(
-							ErrorManager.MSG_EMPTY_COMPLEMENT,
-							grammar,
-							$c.getToken(),
-							$c.text);
+					if (ttype >= 0) {
+						IntSet notAtom = grammar.complement(ttype);
+						if ( notAtom.isNil() )
+						{
+							ErrorManager.grammarError(
+								ErrorManager.MSG_EMPTY_COMPLEMENT,
+								grammar,
+								$c.getToken(),
+								$c.text);
+						}
+						$g=factory.build_Set(notAtom,$n);
 					}
-					$g=factory.build_Set(notAtom,$n);
 				}
 			|	t=TOKEN_REF (ast3=ast_suffix)?
 				{
@@ -720,29 +726,33 @@ setElement[IntSet elements]
 		{
 			if ( grammar.type==Grammar.LEXER )
 			{
-				ttype = Grammar.getCharValueFromGrammarCharLiteral($s.text);
+				ttype = grammar.getVerifiedCharValueFromGrammarCharLiteral($s.token);
 			}
 			else
 			{
 				ttype = grammar.getTokenType($s.text);
 			}
-			if ( elements.member(ttype) )
-			{
-				ErrorManager.grammarError(
-					ErrorManager.MSG_DUPLICATE_SET_ENTRY,
-					grammar,
-					$s.getToken(),
-					$s.text);
+			if (ttype >= 0) {
+				if ( elements.member(ttype) )
+				{
+					ErrorManager.grammarError(
+						ErrorManager.MSG_DUPLICATE_SET_ENTRY,
+						grammar,
+						$s.getToken(),
+						$s.text);
+				}
+				elements.add(ttype);
 			}
-			elements.add(ttype);
 		}
 	|	^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{
 			if ( grammar.type==Grammar.LEXER )
 			{
-				int a = Grammar.getCharValueFromGrammarCharLiteral($c1.text);
-				int b = Grammar.getCharValueFromGrammarCharLiteral($c2.text);
-				elements.addAll(IntervalSet.of(a,b));
+				int a = grammar.getVerifiedCharValueFromGrammarCharLiteral($c1.token);
+				int b = grammar.getVerifiedCharValueFromGrammarCharLiteral($c2.token);
+				if (a >= 0 && b >= 0) {
+					elements.addAll(IntervalSet.of(a,b));
+				}
 			}
 		}
 

@@ -204,13 +204,14 @@ public class ErrorManager {
 	public static final int MSG_TOKEN_NONDETERMINISM = 209; // alts of Tokens rule
 	public static final int MSG_LEFT_RECURSION_CYCLES = 210;
 	public static final int MSG_NONREGULAR_DECISION = 211;
+	public static final int MSG_CHARACTER_OUT_OF_RANGE = 212;
 
 
     // Dependency sorting errors
     //
-    public static final int MSG_CIRCULAR_DEPENDENCY = 212; // t1.g -> t2.g -> t3.g ->t1.g
+    public static final int MSG_CIRCULAR_DEPENDENCY = 213; // t1.g -> t2.g -> t3.g ->t1.g
 
-	public static final int MAX_MESSAGE_NUMBER = 212;
+	public static final int MAX_MESSAGE_NUMBER = 213;
 
 	/** Do not do perform analysis if one of these happens */
 	public static final BitSet ERRORS_FORCING_NO_ANALYSIS = new BitSet() {

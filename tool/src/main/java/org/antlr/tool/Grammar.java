@@ -2157,6 +2157,17 @@ outer:
 		return getTextEncoder().isSingleCode(buf);
 	}
 
+	public int getVerifiedCharValueFromGrammarCharLiteral(Token token) {
+		String literal = token.getText();
+		StringBuffer buf = getUnescapedStringFromGrammarStringLiteral(literal);
+		int val = getCharValueFromUnescapedString(buf, literal);
+		if (val > getTextEncoder().getMaxCodeValue()) {
+			ErrorManager.grammarError(ErrorManager.MSG_CHARACTER_OUT_OF_RANGE, this, token, literal, getTextEncoder().getEncoding());
+			return -1;
+		}
+		return val;
+	}
+
 	public int getTokenType(String tokenName) {
 		Integer I;
 		if ( tokenName.charAt(0)=='\'') {
