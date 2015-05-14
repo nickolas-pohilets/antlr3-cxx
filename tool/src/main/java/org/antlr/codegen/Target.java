@@ -372,13 +372,6 @@ public class Target {
 		return "\\u"+hex;
 	}
 
-	/** Some targets only support ASCII or 8-bit chars/strings.  For example,
-	 *  C++ will probably want to return 0xFF here.
-	 */
-	public int getMaxCharValue(CodeGenerator generator) {
-		return Label.MAX_CHAR_VALUE;
-	}
-
 	/** Give target a chance to do some postprocessing on actions.
 	 *  Python for example will have to fix the indention.
 	 */

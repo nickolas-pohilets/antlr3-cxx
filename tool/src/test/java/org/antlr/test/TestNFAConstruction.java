@@ -1192,6 +1192,102 @@ public class TestNFAConstruction extends BaseTest {
 		checkRule(g, "a", expecting);
 	}
 
+	// Text Encoding
+
+	@Test public void testUTF8String() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"options { language=Cxx; encoding=UTF8; }\n" +
+				"A : ( ( ( ( 'a' | '#') | '§') | '⚜' ) | '\\uD835\\uDFD9' ) | 'hi' ;"
+		);
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s1->.s28\n" +
+				".s10->:s11\n" +
+				".s13->.s14\n" +
+				".s14-'\\u00C2'->.s15\n" +
+				".s15-'\\u00A7'->.s16\n" +
+				".s16->.s7\n" +
+				".s17->.s18\n" +
+				".s18-'\\u00E2'->.s19\n" +
+				".s19-'\\u009A'->.s20\n" +
+				".s2->.s22\n" +
+				".s2->.s3\n" +
+				".s20-'\\u009C'->.s21\n" +
+				".s21->.s8\n" +
+				".s22->.s23\n" +
+				".s23-'\\u00F0'->.s24\n" +
+				".s24-'\\u009D'->.s25\n" +
+				".s25-'\\u009F'->.s26\n" +
+				".s26-'\\u0099'->.s27\n" +
+				".s27->.s9\n" +
+				".s28->.s29\n" +
+				".s29-'h'->.s30\n" +
+				".s3->.s17\n" +
+				".s3->.s4\n" +
+				".s30-'i'->.s31\n" +
+				".s31->.s10\n" +
+				".s4->.s13\n" +
+				".s4->.s5\n" +
+				".s5-{'#', 'a'}->.s6\n" +
+				".s6->.s7\n" +
+				".s7->.s8\n" +
+				".s8->.s9\n" +
+				".s9->.s10\n" +
+				":s11-<EOT>->.s12\n";
+		checkRule(g, "A", expecting);
+	}
+
+	@Test public void testUTF16String() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"options { language=Cxx; encoding=UTF16; }\n" +
+				"A : ( ( 'a' | '§' | '⚜' ) | '\\uD835\\uDFD9' ) | 'hi' ;"
+		);
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s13\n" +
+				".s1->.s2\n" +
+				".s10-'\\uD835'->.s11\n" +
+				".s11-'\\uDFD9'->.s12\n" +
+				".s12->.s5\n" +
+				".s13->.s14\n" +
+				".s14-'h'->.s15\n" +
+				".s15-'i'->.s16\n" +
+				".s16->.s6\n" +
+				".s2->.s3\n" +
+				".s2->.s9\n" +
+				".s3-{'a', '\\u00A7', '\\u269C'}->.s4\n" +
+				".s4->.s5\n" +
+				".s5->.s6\n" +
+				".s6->:s7\n" +
+				".s9->.s10\n" +
+				":s7-<EOT>->.s8\n";
+		checkRule(g, "A", expecting);
+	}
+
+	@Test public void testUTF32String() throws Exception {
+		Grammar g = new Grammar(
+				"lexer grammar t;\n"+
+				"options { language=Cxx; encoding=UTF32; }\n" +
+				"A : ( 'a' | '§' | '⚜' | '\\uD835\\uDFD9' ) | 'hi' ;"
+		);
+		String expecting =
+				".s0->.s1\n" +
+				".s1->.s2\n" +
+				".s1->.s7\n" +
+				".s10->.s4\n" +
+				".s2-{'a', '\\u00A7', '\\u269C', '\\uD835\\uDFD9'}->.s3\n" +
+				".s3->.s4\n" +
+				".s4->:s5\n" +
+				".s7->.s8\n" +
+				".s8-'h'->.s9\n" +
+				".s9-'i'->.s10\n" +
+				":s5-<EOT>->.s6\n";
+		checkRule(g, "A", expecting);
+	}
+
 	private void checkRule(Grammar g, String rule, String expecting)
 	{
 		g.buildNFA();

@@ -30,6 +30,7 @@ package org.antlr.codegen;
 
 import org.antlr.Tool;
 import org.antlr.tool.Grammar;
+import org.antlr.tool.TextEncoder;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -414,10 +415,10 @@ public class RubyTarget extends Target
     }
 
 	@Override
-    public int getMaxCharValue( CodeGenerator generator )
+    public String defaultEncoding()
     {
         // Versions before 1.9 do not support unicode
-        return 0xFF;
+        return TextEncoder.UTF8_ENCODING;
     }
 
 	@Override

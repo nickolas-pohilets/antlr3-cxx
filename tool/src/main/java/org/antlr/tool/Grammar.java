@@ -2152,6 +2152,11 @@ outer:
 			   (type != LEXER && ttype == ANTLRParser.TOKEN_REF);
 	}
 
+	public boolean isCharLiteral(String literal) {
+		StringBuffer buf = getUnescapedStringFromGrammarStringLiteral(literal);
+		return getTextEncoder().isSingleCode(buf);
+	}
+
 	public int getTokenType(String tokenName) {
 		Integer I;
 		if ( tokenName.charAt(0)=='\'') {
@@ -2972,12 +2977,7 @@ outer:
 	 *  unicode max if no target defined.
 	 */
 	public int getMaxCharValue() {
-		if ( generator!=null ) {
-			return generator.target.getMaxCharValue(generator);
-		}
-		else {
-			return Label.MAX_CHAR_VALUE;
-		}
+		return getTextEncoder().getMaxCodeValue();
 	}
 
 	/** Return a set of all possible token or char types for this grammar */
@@ -3009,7 +3009,7 @@ outer:
 	 *  12/09/2005: I changed so everything is single quotes
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c<Label.MIN_CHAR_VALUE ) {
+		if ( c<Label.MIN_CHAR_VALUE || c>Label.MAX_CHAR_VALUE) {
 			ErrorManager.internalError("invalid char value "+c);
 			return "'<INVALID>'";
 		}
@@ -3018,19 +3018,26 @@ outer:
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
 			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
-			}
-			if ( c=='\'') {
-				return "'\\''";
-			}
 			return '\''+Character.toString((char)c)+'\'';
 		}
+
+		StringBuilder b = new StringBuilder(4);
+		b.append('\'');
+		if (Character.isSupplementaryCodePoint(c)) {
+			appendUTF16AsHex(b, Character.highSurrogate(c));
+			appendUTF16AsHex(b, Character.lowSurrogate(c));
+		} else {
+			appendUTF16AsHex(b, (char)c);
+		}
+		b.append('\'');
+		return b.toString();
+	}
+
+	private static void appendUTF16AsHex(StringBuilder b, char c) {
+		b.append("\\u");
 		// turn on the bit above max "\uFFFF" value so that we pad with zeros
 		// then only take last 4 digits
-		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "'\\u"+hex+"'";
-		return unicodeStr;
+		b.append(Integer.toHexString(((int)c)|0x10000).toUpperCase().substring(1,5));
 	}
 
 	/** For lexer grammars, return everything in unicode not in set.

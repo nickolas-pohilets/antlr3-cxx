@@ -804,7 +804,7 @@ finally { inTest--; }
 
 /** Match just an element; no ast suffix etc.. */
 testSetElement returns [int alts=1]
-	:	c=STRING_LITERAL {!hasElementOptions($c)}?
+	:	c=STRING_LITERAL {grammar.type!=Grammar.LEXER || (grammar.isCharLiteral($c.text) && !hasElementOptions($c))}?
 	|	t=TOKEN_REF {!hasElementOptions($t)}?
 		{{
 			if ( grammar.type==Grammar.LEXER )
@@ -819,7 +819,6 @@ testSetElement returns [int alts=1]
 				$alts += testSetRule(rule.tree);
 			}
 		}}
-	|   {grammar.type!=Grammar.LEXER}? => s=STRING_LITERAL
 	|	^(CHAR_RANGE c1=STRING_LITERAL c2=STRING_LITERAL)
 		{{ $alts = IntervalSet.of( Grammar.getCharValueFromGrammarCharLiteral($c1.text), Grammar.getCharValueFromGrammarCharLiteral($c2.text) ).size(); }}
 	|   testBlockAsSet

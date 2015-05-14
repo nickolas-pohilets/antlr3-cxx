@@ -18,7 +18,7 @@ public class UTF8TextEncoder extends TextEncoder {
 
     @Override
     public boolean isSingleCode(CharSequence s) {
-        return s.length() == 1 && s.charAt(0) <= getMaxCodeValue();
+        return s.length() == 1 && s.charAt(0) <= 0x7F;
     }
 
     @Override

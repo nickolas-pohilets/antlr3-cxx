@@ -13,14 +13,14 @@ public class UTF32TextEncoder extends TextEncoder {
 
     @Override
     public int getMaxCodeValue() {
-        return 0x1FFFFF;
+        return 0x10FFFF;
     }
 
     @Override
     public boolean isSingleCode(CharSequence s) {
         if (s.length() == 1) return true;
         if (s.length() > 2) return false;
-        return Character.isHighSurrogate(s.charAt(0)) && Character.isLowSurrogate(s.charAt(0));
+        return Character.isSurrogatePair(s.charAt(0), s.charAt(1));
     }
 
     @Override

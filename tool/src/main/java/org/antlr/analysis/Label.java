@@ -86,9 +86,8 @@ public class Label implements Comparable<Label>, Cloneable {
      */
     public static final int MIN_ATOM_VALUE = EOT;
 
-    // TODO: is 0 a valid unicode char? max is FFFF -1, right?
-    public static final int MIN_CHAR_VALUE = '\u0000';
-    public static final int MAX_CHAR_VALUE = '\uFFFF';
+    public static final int MIN_CHAR_VALUE = Character.MIN_CODE_POINT;
+    public static final int MAX_CHAR_VALUE = Character.MAX_CODE_POINT;
 
 	/** End of rule token type; imaginary token type used only for
 	 *  local, partial FOLLOW sets to indicate that the local FOLLOW

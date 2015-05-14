@@ -164,13 +164,7 @@ public class NFAFactory {
 	 */
 
     public StateCluster build_Range(int a, int b) {
-        NFAState left = newState();
-        NFAState right = newState();
-		Label label = new Label(IntervalSet.of(a, b));
-		Transition e = new Transition(label,right);
-        left.addTransition(e);
-        StateCluster g = new StateCluster(left, right);
-        return g;
+		return build_Set(IntervalSet.of(a, b), null);
     }
 
 	/** From char 'c' build StateCluster o-intValue(c)-&gt;o
@@ -670,15 +664,7 @@ public class NFAFactory {
 
     /** Build an atom with all possible values in its label */
     public StateCluster build_Wildcard(GrammarAST associatedAST) {
-        NFAState left = newState();
-        NFAState right = newState();
-        left.associatedASTNode = associatedAST;
-        right.associatedASTNode = associatedAST;
-        Label label = new Label(nfa.grammar.getTokenTypes()); // char or tokens
-        Transition e = new Transition(label,right);
-        left.addTransition(e);
-        StateCluster g = new StateCluster(left, right);
-        return g;
+		return build_Set(nfa.grammar.getTokenTypes(), associatedAST);
     }
 
     /** Build a subrule matching ^(. .*) (any tree or node). Let's use
