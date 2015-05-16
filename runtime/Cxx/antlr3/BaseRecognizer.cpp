@@ -58,7 +58,7 @@ RecognizerSharedState::~RecognizerSharedState()
 }
 
 BaseRecognizer::BaseRecognizer(RecognizerSharedStatePtr state)
-: state_(state ? state : std::make_shared<RecognizerSharedState>())
+    : state_(state ? state : std::make_shared<RecognizerSharedState>())
     , debugger_()
     , input_()
     , filteringMode_(false)

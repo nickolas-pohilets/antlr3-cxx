@@ -228,6 +228,8 @@ class <name> : public antlr3::TreeParser
 {
 <actions.(actionScope).declarations>
 public:
+    static const char * grammarFileName();
+
     /// Symbolic definitions of all the tokens that the recognizer will work with.
     enum Tokens : std::uint32_t {
         <tokens:{it |<it.name> = <it.type>}; separator=",\n">
@@ -236,6 +238,8 @@ public:
     <name>(<inputType()> instream<recognizer.grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>);
     <name>(<inputType()> instream, antlr3::RecognizerSharedStatePtr state<recognizer.grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>);
     ~<name>();
+
+    void reset();
 
 <if(LEXER)>
     <rules:{r | <if(!r.ruleDescriptor.isSynPred)><headerReturnType(ruleDescriptor=r.ruleDescriptor)> m<r.ruleDescriptor.name>(<r.ruleDescriptor.parameterScope:parameterScope()>);<endif>}; separator="\n">
@@ -250,10 +254,6 @@ public:
     <headerReturnType(ruleDescriptor)> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
 <endif>
 <endif>
-
-    const char * grammarFileName();
-    void reset();
-
 private:
     <recognizer.grammar.delegates:{g|std::shared_ptr\<<g.recognizerName>\> <g:delegateName()>_;}; separator="\n">
     <recognizer.grammar.delegators:{g|<g.recognizerName> * <g:delegateName()>_;}; separator="\n">
@@ -326,29 +326,11 @@ lexer(  grammar,
 #endif
 #define EOF antlr3::TokenEof
 
-/* =========================================================================
- * Lexer matching rules end.
- * =========================================================================
- */
-<name>::~<name>()
-{
-<actions.(actionScope).dtor_body>
-}
-
-void <name>::reset()
-{
-    Lexer::reset();
-}
-
-/** \brief Name of the grammar file that generated this code
- */
-static const char fileName[] = "<fileName>";
-
 /** \brief Return the name of the grammar file that generated this code.
  */
 const char * <name>::grammarFileName()
 {
-	return fileName;
+	return "<fileName>";
 }
 
 <name>::<name>(<inputType()> instream<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
@@ -377,6 +359,16 @@ const char * <name>::grammarFileName()
 <actions.(actionScope).ctor_body>
 }
 
+<name>::~<name>()
+{
+<actions.(actionScope).dtor_body>
+}
+
+void <name>::reset()
+{
+    Lexer::reset();
+}
+
 <if(cyclicDFAs)>
 
 class <name>_SST_Func_Provider
@@ -385,42 +377,18 @@ public:
 <cyclicDFAs:dfa_sst_func()> <! Forward declare DFA specials !>
 };
 
-/* =========================================================================
- * DFA tables for the lexer
- */
+#pragma mark - DFA tables for the lexer
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
-/* =========================================================================
- * End of DFA tables for the lexer
- */
 <endif>
 
-/* =========================================================================
- * Functions to match the lexer grammar defined tokens from the input stream
- */
-
+#pragma mark - Functions to match the lexer grammar defined tokens from the input stream
 <rules; separator="\n\n">
 
-/* =========================================================================
- * Lexer matching rules end.
- * =========================================================================
- */
 <if(synpreds)>
 
-/* =========================================================================
- * Lexer syntactic predicates
- */
+#pragma mark - Lexer syntactic predicates
 <synpreds:{p | <lexerSynpred(predname=p)>}>
-/* =========================================================================
- * Lexer syntactic predicates end.
- * =========================================================================
- */
 <endif>
-
-/* End of Lexer code
- * ================================================
- * ================================================
- */
-
 >>
 
 actionGate() ::= "state_->backtracking == 0"
@@ -450,9 +418,7 @@ genericParser(  grammar,
 #define EOF antlr3::TokenEof
 
 <if(grammar.grammarIsRoot)>
-/** \brief Table of all token names in symbolic order, mainly used for
- *         error reporting.
- */
+//// Table of all token names in symbolic order, mainly used for error reporting.
 antlr3::ConstString const <name>TokenNames[<length(tokenNames)>+4] = {
     ANTLR3_T("\<invalid>"),  // String to print to indicate an invalid token
     ANTLR3_T("\<EOR>"),
@@ -464,33 +430,15 @@ antlr3::ConstString const <name>TokenNames[<length(tokenNames)>+4] = {
 
 <@members><@end>
 
-/** \brief Name of the grammar file that generated this code
- */
-static const char fileName[] = "<fileName>";
-
-/** \brief Return the name of the grammar file that generated this code.
- */
 const char * <name>::grammarFileName()
 {
-	return fileName;
+	return "<fileName>";
 }
-/** \brief Create a new <name> parser and return a context for it.
- *
- * \param[in] instream Pointer to an input stream interface.
- *
- * \return Pointer to new parser context upon success.
- */
 <name>::<name>(<inputStreamType> instream<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
     : <name>(instream, NULL<grammar.delegators:{g|, <g:delegateName()>}>)
 {
 }
 
-/** \brief Create a new <name> parser and return a context for it.
- *
- * \param[in] instream Pointer to an input stream interface.
- *
- * \return Pointer to new parser context upon success.
- */
 <name>::<name>(<inputStreamType> instream, antlr3::RecognizerSharedStatePtr state<grammar.delegators:{g|, <g.recognizerName> * <g:delegateName()>}>)
 <if(PARSER)>
     : Parser(instream, state)
@@ -513,11 +461,15 @@ const char * <name>::grammarFileName()
 {
     <@ctor>
     <@end>
-    /* Install the token table
-     */
+    // Install the token table
     state_->tokenNames = <grammar.composite.rootGrammar.recognizerName>TokenNames;
     <@debugStuff()>
 <actions.(actionScope).ctor_body><\\>
+}
+
+<name>::~<name>()
+{
+    <actions.(actionScope).dtor_body>
 }
 
 void <name>::reset()
@@ -530,36 +482,25 @@ void <name>::reset()
 <endif>
 }
 
-<name>::~<name>()
-{
-    <actions.(actionScope).dtor_body>
-}
-    <members>
+<members>
 
-// Declare bitsets defining follow sets for error recovery
-//
-<bitsets:{it | <bitsetDeclare(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>},
-                    words64=it.bits)>}>
+#pragma mark - Follow sets for error recovery
+
+<bitsets:{it | <bitsetDeclare(name={FOLLOW_<it.name>_in_<it.inName><it.tokenIndex>}, words64=it.bits)>}>
 
 
 <if(cyclicDFAs)>
+#pragma mark - DFA tables for the parser
 
-/* =========================================================================
- * DFA tables for the parser
- */
 <cyclicDFAs:cyclicDFA()> <! dump tables for all DFA !>
-/* =========================================================================
- * End of DFA tables for the parser
- */
 <endif>
 
-/* ==============================================
- * Parsing rules
- */
+#pragma mark - Parsing rules
+
 <rules; separator="\n\n">
 <if(grammar.delegatedRules)>
 
-// Delegated methods that appear to be a part of this parser
+#pragma mark - Delegated methods that appear to be a part of this parser
 
 <grammar.delegatedRules:{ruleDescriptor|
 <returnType()> <name>::<ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>)
@@ -568,21 +509,12 @@ void <name>::reset()
 \}}; separator="\n">
 
 <endif>
-/* End of parsing rules
- * ==============================================
- */
 
-/* ==============================================
- * Syntactic predicates
- */
+<if(synpreds)>
+#pragma mark - Syntactic predicates
+
 <synpreds:{p | <synpred(predname=p)>}>
-/* End of syntactic predicates
- * ==============================================
- */
-
-
-
-
+<endif>
 
 >>
 
@@ -1568,9 +1500,7 @@ static const std::int32_t dfa<dfa.decisionNumber>_T<i0>[] = {
 	<table; separator=", ", wrap="\n", null="-1">
 \};<\n>}; null = "">
 
-/* Transition tables are a table of sub tables, with some tables
- * reused for efficiency.
- */
+// Transition tables are a table of sub tables, with some tables reused for efficiency.
 static const std::int32_t * const dfa<dfa.decisionNumber>_transitions[] = {
     <dfa.transitionEdgeTables:{xref|dfa<dfa.decisionNumber>_T<xref>}; separator=", ", wrap="\n", null="NULL">
 };
@@ -1602,8 +1532,6 @@ std::int32_t <name>::dfa<dfa.decisionNumber>_sst(antlr3::BaseRecognizer * recogn
 
 <@errorMethod()>
 
-/* Declare tracking structure for Cyclic DFA <dfa.decisionNumber>
- */
 static antlr3::CyclicDfa const cdfa<dfa.decisionNumber> = {
     // Decision number of this dfa
     <dfa.decisionNumber>,
@@ -1630,9 +1558,6 @@ static antlr3::CyclicDfa const cdfa<dfa.decisionNumber> = {
     // Table of transition tables
     dfa<dfa.decisionNumber>_transitions
 };
-/* End of Cyclic DFA <dfa.decisionNumber>
- * ---------------------
- */
 >>
 
 declDFA_SST(dfa) ::= <<
