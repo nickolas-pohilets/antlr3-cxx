@@ -218,7 +218,10 @@ public class CxxTarget extends Target {
             return "0";
         }
 
-        if (c >= 0x80) {
+        String esc = null;
+        if (c < targetCharValueEscape.length && targetCharValueEscape[c]!=null) {
+            esc = targetCharValueEscape[c];
+        } else if (c < 0x20 || c >= 0x80) {
             int maxChar = getTextEncoder().getMaxCodeValue();
             int padding = maxChar < 0x100 ? 2 : 4;
             String retVal = Integer.toHexString(c).toUpperCase();
@@ -228,8 +231,8 @@ public class CxxTarget extends Target {
 
         StringBuilder buf = new StringBuilder();
         buf.append('\'');
-        if (c < targetCharValueEscape.length && targetCharValueEscape[c]!=null) {
-            buf.append(targetCharValueEscape[c]);
+        if (esc != null) {
+            buf.append(esc);
         }
         else {
             // normal char
