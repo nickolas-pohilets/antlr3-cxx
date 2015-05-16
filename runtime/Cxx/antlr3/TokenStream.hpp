@@ -7,6 +7,7 @@
 #define _ANTLR3_TOKENSTREAM_HPP
 
 // [The "BSD licence"]
+// Copyright (c) 20013-2015 Nickolas Pohilets
 // Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
 // http://www.temporal-wave.com
 // http://www.linkedin.com/in/jimidle
