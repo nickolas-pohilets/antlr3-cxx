@@ -167,14 +167,7 @@ public class NFAFactory {
 		return build_Set(IntervalSet.of(a, b), null);
     }
 
-	/** From char 'c' build StateCluster o-intValue(c)-&gt;o
-	 */
-	public StateCluster build_CharLiteralAtom(GrammarAST charLiteralAST) {
-        int c = Grammar.getCharValueFromGrammarCharLiteral(charLiteralAST.getText());
-		return build_Atom(c, charLiteralAST);
-	}
-
-    /** For a non-lexer, just build a simple token reference atom.
+	/** For a non-lexer, just build a simple token reference atom.
      *  For a lexer, a string is a sequence of char to match.  That is,
      *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
      *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
