@@ -96,7 +96,7 @@ String toString(long double val);
 
 String& appendEscape(String& dest, String const & src);
 String& appendEscape(String& dest, String::value_type src);
-String& appendEscape(String& dest, Char src);
+String& appendEscape(String& dest, std::uint32_t src);
 
 template<class T>
 String escape(T const & x) {

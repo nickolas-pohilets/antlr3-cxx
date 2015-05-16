@@ -137,13 +137,13 @@ public:
      *  implementation is source encoding agnostic and so input streams do not generally need to 
      *  override the default implmentation.
      */
-    bool	matchc(Char c);
+    bool	matchc(std::uint32_t c);
 
     /** Pointer to a function that matches any character in the supplied range (I suppose it could be a token range too
      *  but this would only be useful if the tokens were in tsome guaranteed order which is
      *  only going to happen with a hand crafted token set).
      */
-    bool	matchRange(Char low, Char high);
+    bool	matchRange(std::uint32_t low, std::uint32_t high);
 
     /** Pointer to a function that matches the next token/char in the input stream
      *  regardless of what it actaully is.

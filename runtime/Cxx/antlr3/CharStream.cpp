@@ -37,15 +37,15 @@
 
 namespace antlr3 {
 
-ItemPtr CharStream::itemFromChar(Char c) {
+ItemPtr CharStream::itemFromChar(std::uint32_t c) {
     size_t n = static_cast<size_t>(c);
     void* p = reinterpret_cast<void*>(n);
     return ItemPtr(p, [](void*){});
 }
 
-Char CharStream::charFromItem(ItemPtr const & item) {
+std::uint32_t CharStream::charFromItem(ItemPtr const & item) {
     size_t n = reinterpret_cast<size_t>(item.get());
-    return static_cast<Char>(n);
+    return static_cast<std::uint32_t>(n);
 }
 
 ItemPtr CharStream::LI(std::int32_t i)

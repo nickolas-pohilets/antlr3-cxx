@@ -207,13 +207,13 @@ String& appendEscape(String& dest, String::value_type src) {
     return dest;
 }
 
-String& appendEscape(String& dest, Char src) {
-    Char maxChar = Char(1) << (8 * sizeof(String::value_type));
-    if (src < maxChar) {
-        return appendEscape(dest, (String::value_type)src);
-    }
+String& appendEscape(String& dest, std::uint32_t src) {
     if (src == TokenEof) {
         return dest += ANTLR3_T("<EOF>");
+    }
+    std::uint32_t maxChar = std::uint32_t(1) << (CHAR_BIT * sizeof(String::value_type));
+    if (src < maxChar) {
+        return appendEscape(dest, (String::value_type)src);
     }
     dest += "\\u";
     char buffer[16];

@@ -316,14 +316,14 @@ std::uint32_t Lexer::itemToInt(ItemPtr item) {
     return CharStream::charFromItem(item);
 }
 
-static String getCharErrorDisplay(Char c)
+static String getCharErrorDisplay(std::uint32_t c)
 {
     return ANTLR3_T("\'") + escape(c) + ANTLR3_T("\'");
 }
 
 static String getCharSetErrorDisplay(Bitset const & set)
 {
-    return set.toString(escape<Char>);
+    return set.toString(escape<std::uint32_t>);
 }
 
 String Lexer::getErrorMessage(Exception const * e, ConstString const * tokenNames)
@@ -347,12 +347,12 @@ String Lexer::getErrorMessage(Exception const * e, ConstString const * tokenName
             // for development, can add "decision=<<"+nvae.grammarDecisionDescription+">>"
             // and "(decision="+nvae.decisionNumber+") and
             // "state "+nvae.stateNumber
-            Char c = (Char)reinterpret_cast<size_t>(e->item.get());
+            std::uint32_t c = CharStream::charFromItem(e->item);
             retVal = ANTLR3_T("no viable alternative at character ")+ getCharErrorDisplay(c);
         }
         virtual void visit(MismatchedSetException const * e) override
         {
-            Char c = (Char)reinterpret_cast<size_t>(e->item.get());
+            std::uint32_t c = CharStream::charFromItem(e->item);
             retVal = ANTLR3_T("mismatched character ") + getCharErrorDisplay(c) +
                      ANTLR3_T(", expecting set ") + getCharSetErrorDisplay(e->expectingSet);
         }
@@ -539,7 +539,7 @@ bool Lexer::matchStr(T const * string, size_t len) {
  *  Note that the generated code lays down arrays of ints for constant
  *  strings so that they are int UTF32 form!
  */
-bool Lexer::matchc(Char c)
+bool Lexer::matchc(std::uint32_t c)
 {
     return matchRange(c, c);
 }
@@ -551,10 +551,10 @@ bool Lexer::matchc(Char c)
  *  Note that the generated code lays down arrays of ints for constant
  *  strings so that they are int UTF32 form!
  */
-bool Lexer::matchRange(Char low, Char high)
+bool Lexer::matchRange(std::uint32_t low, std::uint32_t high)
 {
     // What is in the stream at the moment?
-    Char c	= input_->LA(1);
+    std::uint32_t c	= input_->LA(1);
     if( c >= low && c <= high)
     {
         // Matched correctly, consume it
@@ -612,7 +612,7 @@ void Lexer::setText(String s)
 }
 
 String Lexer::traceCurrentItem() {
-    Char c = charStream()->LA(1);
+    std::uint32_t c = charStream()->LA(1);
     Location loc = charStream()->location(charStream()->index());
     return getCharErrorDisplay(c) + ANTLR3_T(" at ") + toString(loc.line()) + ANTLR3_T(":") + toString(loc.charPositionInLine());
 }

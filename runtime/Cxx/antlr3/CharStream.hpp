@@ -51,8 +51,8 @@ namespace antlr3 {
 class CharStream : public IntStream, public LocationSource
 {
 public:
-    static ItemPtr itemFromChar(Char c);
-    static Char charFromItem(ItemPtr const & item);
+    static ItemPtr itemFromChar(std::uint32_t c);
+    static std::uint32_t charFromItem(ItemPtr const & item);
     
     virtual String sourceName() = 0;
     

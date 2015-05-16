@@ -58,12 +58,8 @@ enum class TextEncoding
     UTF32LE
 };
 
-typedef std::uint32_t Char;
 typedef std::uint64_t Bitword;
 typedef std::size_t	  Index;
-
-/// String terminator used in generated arrays representing string lierals.
-Char const StringTerminator = 0xFFFFFFFF;
 
 /// Indicates end of character stream and is an invalid Unicode code point.
 std::uint32_t const CharstreamEof = 0xFFFFFFFF;
