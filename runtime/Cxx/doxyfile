@@ -590,8 +590,7 @@ WARN_LOGFILE           = docwarn.txt
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = src \
-                         include \
+INPUT                  = antlr3 \
                          doxygen
 
 # This tag can be used to specify the character encoding of the source files 

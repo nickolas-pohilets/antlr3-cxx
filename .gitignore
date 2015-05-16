@@ -20,3 +20,4 @@ nb-configuration.xml
 *.py[co]
 .DS_Store
 runtime/Cxx/test/generated
+runtime/Cxx/api

@@ -2,16 +2,21 @@ The ANTLR recognizer generator tool was written by (with many contributions)
 
      Prof. Terence Parr at USF
 
-The C runtime and related C code generation elements were written by
+This C++ runtime and related C++ code generation elements were created by
+
+     Nickolas Pohilets
+
+and are based on C runtime and related C code generation elements were written by
 
     Jim Idle (jimi idle ws s/ /./g) with no contributions at all because
                                     nobody else was crazy enough to do it.
 
-The C runtime and the ANLTR tool itself are distributed under the BSD license
+The C++ runtime and the ANLTR tool itself are distributed under the BSD license
 which basically gives the right to so anythign with it, so long as you
 recognize the authors. See here:
 
  [The "BSD licence"]
+ Copyright (c) 20013-2015 Nickolas Pohilets
  Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
  http://www.temporal-wave.com
  http://www.linkedin.com/in/jimidle
