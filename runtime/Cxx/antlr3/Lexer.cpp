@@ -40,14 +40,14 @@
 
 #include <antlr3/Lexer.hpp>
 
-namespace antlr3 {
-
-Lexer::Lexer(RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::Lexer::Lexer(RecognizerSharedStatePtr state)
     : BaseRecognizer(state)
 {
 }
 
-Lexer::Lexer(CharStreamPtr input, RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::Lexer::Lexer(CharStreamPtr input, RecognizerSharedStatePtr state)
 : Lexer(state)
 {
     setCharStream(std::move(input));
@@ -58,7 +58,8 @@ Lexer::~Lexer()
 }
 
 
-void Lexer::reset()
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::reset()
 {
     state_->token			    = NULL;
     state_->type			    = TokenInvalid;
@@ -84,10 +85,12 @@ void Lexer::reset()
 /// 
 /// \see nextToken
 ///
-CommonTokenPtr Lexer::nextTokenStr() {
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenStr() {
     return filteringMode_ ? nextTokenFiltering() : nextTokenNormal();
 }
-CommonTokenPtr Lexer::nextTokenNormal()
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
 {
     /// Loop until we get a non skipped token or EOF
     ///
@@ -168,7 +171,8 @@ CommonTokenPtr Lexer::nextTokenNormal()
  *  Make rule memoization happen only at levels above 1 as we start mTokens
  *  at state_->backtracking==1.
  */
-CommonTokenPtr Lexer::nextTokenFiltering()
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenFiltering()
 {
     /* Get rid of any previous token (token factory takes care of
      * any deallocation when this token is finally used up.
@@ -243,7 +247,8 @@ CommonTokenPtr Lexer::nextTokenFiltering()
  * 
  * \see nextTokenStr
  */
-CommonTokenPtr Lexer::nextToken()
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::Lexer::nextToken()
 {
     // Find the next token in the current stream
     //
@@ -290,12 +295,14 @@ CommonTokenPtr Lexer::nextToken()
     return  tok;
 }
 
-LocationSourcePtr Lexer::source()
+template<class StringTraits>
+LocationSourcePtr antlr3<StringTraits>::Lexer::source()
 {
     return charStream();
 }
 
-void Lexer::reportError()
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::reportError()
 {
     // Indicate this recognizer had an error while processing.
     //
@@ -303,7 +310,8 @@ void Lexer::reportError()
     displayRecognitionError(state_->exception.get(), state_->tokenNames);
 }
 
-void Lexer::fillException(Exception* ex)
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::fillException(Exception* ex)
 {
     ex->input		= input_;
     ex->item		= input_->LI(1); // Current input character
@@ -326,7 +334,8 @@ static String getCharSetErrorDisplay(Bitset const & set)
     return set.toString(escape<std::uint32_t>);
 }
 
-String Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+template<class StringTraits>
+String antlr3<StringTraits>::Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     class Visitor : public Exception::Visitor
     {
@@ -389,12 +398,14 @@ String Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNa
     return v.retVal;
 }
 
-CharStreamPtr Lexer::charStream()
+template<class StringTraits>
+CharStreamPtr antlr3<StringTraits>::Lexer::charStream()
 {
     return std::static_pointer_cast<CharStream>(input_);
 }
 
-void Lexer::setCharStream(CharStreamPtr input)
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::setCharStream(CharStreamPtr input)
 {
     /* Install the input interface
      */
@@ -421,7 +432,8 @@ void Lexer::setCharStream(CharStreamPtr input)
  * a new one, saving the old one, which we will revert to at the end of this 
  * new one.
  */
-void Lexer::pushCharStream(CharStreamPtr input)
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::pushCharStream(CharStreamPtr input)
 {
     // We have a stack, so we can save the current input stream
     // into it.
@@ -448,7 +460,8 @@ void Lexer::pushCharStream(CharStreamPtr input)
  * \remark
  * The function fails silently if there are no prior input streams.
  */
-void Lexer::popCharStream()
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::popCharStream()
 {
     // If we do not have a stream stack or we are already at the
     // stack bottom, then do nothing.
@@ -471,12 +484,14 @@ void Lexer::popCharStream()
     }
 }
 
-void Lexer::emitNew(CommonTokenPtr token)
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::emitNew(CommonTokenPtr token)
 {
     state_->token    = token;
 }
 
-CommonTokenPtr Lexer::emit()
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::Lexer::emit()
 {
     /* We could check pointers to token factories and so on, but
     * we are in code that we want to run as fast as possible
@@ -505,25 +520,29 @@ CommonTokenPtr Lexer::emit()
     return  token;
 }
 
-bool Lexer::matchs(char const * string, size_t len)
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchs(char const * string, size_t len)
 {
     // Default char may be both signed and unsigned.
     // Cast it to unsigned to be sure.
     return matchStr(reinterpret_cast<unsigned char const *>(string), len);
 }
     
-bool Lexer::matchs(char16_t const * string, size_t len)
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchs(char16_t const * string, size_t len)
 {
     return matchStr(string, len);
 }
 
-bool Lexer::matchs(char32_t const * string, size_t len)
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchs(char32_t const * string, size_t len)
 {
     return matchStr(string, len);
 }
     
 template<class T>
-bool Lexer::matchStr(T const * string, size_t len) {
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchStr(T const * string, size_t len) {
     for (size_t i = 0; i < len; ++i) {
         if (!matchc(string[i])) {
             return false;
@@ -539,7 +558,8 @@ bool Lexer::matchStr(T const * string, size_t len) {
  *  Note that the generated code lays down arrays of ints for constant
  *  strings so that they are int UTF32 form!
  */
-bool Lexer::matchc(std::uint32_t c)
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchc(std::uint32_t c)
 {
     return matchRange(c, c);
 }
@@ -551,7 +571,8 @@ bool Lexer::matchc(std::uint32_t c)
  *  Note that the generated code lays down arrays of ints for constant
  *  strings so that they are int UTF32 form!
  */
-bool Lexer::matchRange(std::uint32_t low, std::uint32_t high)
+template<class StringTraits>
+bool antlr3<StringTraits>::Lexer::matchRange(std::uint32_t low, std::uint32_t high)
 {
     // What is in the stream at the moment?
     std::uint32_t c	= input_->LA(1);
@@ -581,22 +602,26 @@ bool Lexer::matchRange(std::uint32_t low, std::uint32_t high)
     return  false;
 }
 
-void Lexer::matchAny()
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::matchAny()
 {
     input_->consume();
 }
 
-void Lexer::recover()
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::recover()
 {
     input_->consume();
 }
 
-Index Lexer::charIndex()
+template<class StringTraits>
+Index antlr3<StringTraits>::Lexer::charIndex()
 {
     return input_->index();
 }
 
-String Lexer::text()
+template<class StringTraits>
+String antlr3<StringTraits>::Lexer::text()
 {
     if (!state_->text.empty())
     {
@@ -606,15 +631,16 @@ String Lexer::text()
     return charStream()->substr(state_->tokenStartCharIndex, charIndex());
 }
     
-void Lexer::setText(String s)
+template<class StringTraits>
+void antlr3<StringTraits>::Lexer::setText(String s)
 {
     state_->text = std::move(s);
 }
 
-String Lexer::traceCurrentItem() {
+template<class StringTraits>
+String antlr3<StringTraits>::Lexer::traceCurrentItem() {
     std::uint32_t c = charStream()->LA(1);
     Location loc = charStream()->location(charStream()->index());
     return getCharErrorDisplay(c) + ANTLR3_T(" at ") + toString(loc.line()) + ANTLR3_T(":") + toString(loc.charPositionInLine());
 }
 
-} // namespace antlr3

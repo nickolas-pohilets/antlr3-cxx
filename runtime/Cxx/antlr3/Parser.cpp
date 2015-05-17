@@ -34,20 +34,21 @@
 
 #include <antlr3/Parser.hpp>
 
-namespace antlr3 {
-
-Parser::Parser(RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::Parser::Parser(RecognizerSharedStatePtr state)
     : BaseRecognizer(state)
 {
 }
 
-Parser::Parser(TokenStreamPtr tstream, RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::Parser::Parser(TokenStreamPtr tstream, RecognizerSharedStatePtr state)
     : Parser(state)
 {
     setTokenStream(tstream);
 }
 
-Parser::Parser(TokenStreamPtr tstream, DebugEventListenerPtr dbg, RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::Parser::Parser(TokenStreamPtr tstream, DebugEventListenerPtr dbg, RecognizerSharedStatePtr state)
     : Parser(tstream, state)
 {
     setDebugListener(std::move(dbg));
@@ -57,7 +58,8 @@ Parser::~Parser()
 {
 }
 
-ItemPtr Parser::getMissingSymbol(
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::Parser::getMissingSymbol(
      ExceptionPtr e,
      std::uint32_t expectedTokenType,
      Bitset const & follow
@@ -100,7 +102,8 @@ ItemPtr Parser::getMissingSymbol(
     return token;
 }
 
-void Parser::fillException(Exception* ex)
+template<class StringTraits>
+void antlr3<StringTraits>::Parser::fillException(Exception* ex)
 {
     TokenStreamPtr cts = tokenStream();
     CommonTokenPtr token = cts->LT(1);
@@ -124,7 +127,8 @@ std::uint32_t Parser::itemToInt(ItemPtr item) {
     return std::static_pointer_cast<CommonToken>(item)->type();
 }
 
-void Parser::setDebugListener(DebugEventListenerPtr dbg)
+template<class StringTraits>
+void antlr3<StringTraits>::Parser::setDebugListener(DebugEventListenerPtr dbg)
 {
     // Set the debug listener. There are no methods to override
     // because currently the only ones that notify the debugger
@@ -146,20 +150,22 @@ void Parser::setDebugListener(DebugEventListenerPtr dbg)
     }
 }
 
-TokenStreamPtr Parser::tokenStream()
+template<class StringTraits>
+TokenStreamPtr antlr3<StringTraits>::Parser::tokenStream()
 {
     return std::static_pointer_cast<TokenStream>(input_);
 }
 
-void Parser::setTokenStream(TokenStreamPtr tstream)
+template<class StringTraits>
+void antlr3<StringTraits>::Parser::setTokenStream(TokenStreamPtr tstream)
 {
     input_ = tstream;
     reset();
 }
     
-String Parser::traceCurrentItem() {
+template<class StringTraits>
+String antlr3<StringTraits>::Parser::traceCurrentItem() {
     CommonTokenPtr t = tokenStream()->LT(1);
     return t->toString(state_->tokenNames);
 }
 
-} // namespace antlr3

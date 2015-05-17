@@ -42,8 +42,6 @@
 #include <antlr3/String.hpp>
 #include <stack>
 
-namespace antlr3 {
-
 /// Token buffer initial size settings ( will auto increase)
 ///
 #define DEFAULT_INITIAL_BUFFER_SIZE  100
@@ -271,7 +269,5 @@ public:
 
     void reset();
 };
-
-} // namespace antlr3
 
 #endif

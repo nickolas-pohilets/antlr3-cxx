@@ -32,9 +32,8 @@
 #include <RecognizerSharedState.hpp>
 #include <iostream>
 
-namespace antlr3 {
-
-RecognizerSharedState::RecognizerSharedState()
+template<class StringTraits>
+antlr3<StringTraits>::RecognizerSharedState::RecognizerSharedState()
     : error(false)
     , exception(nullptr)
     , following()
@@ -58,7 +57,8 @@ RecognizerSharedState::~RecognizerSharedState()
 {
 }
 
-BaseRecognizer::BaseRecognizer(RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::BaseRecognizer::BaseRecognizer(RecognizerSharedStatePtr state)
     : state_(state ? state : std::make_shared<RecognizerSharedState>())
     , debugger_()
     , input_()
@@ -71,29 +71,34 @@ BaseRecognizer::~BaseRecognizer()
 {
 }
 
-void BaseRecognizer::recordException(std::unique_ptr<Exception> ex)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::recordException(std::unique_ptr<Exception> ex)
 {
     fillException(ex.get());
     state_->exception = std::move(ex);
     state_->error = true;    // Exception is outstanding
 }
 
-void BaseRecognizer::recordException(Exception* ex)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::recordException(Exception* ex)
 {
     recordException(std::unique_ptr<Exception>(ex));
 }
 
-void BaseRecognizer::followPush(Bitset const * data)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::followPush(Bitset const * data)
 {
     state_->following.push_back(data);
 }
 
-void BaseRecognizer::followPop()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::followPop()
 {
     state_->following.pop_back();
 }
 
-bool BaseRecognizer::evalPredicate(bool result, const char * predicate)
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::evalPredicate(bool result, const char * predicate)
 {
     if (debugger_ != nullptr)
     {
@@ -111,7 +116,8 @@ bool BaseRecognizer::evalPredicate(bool result, const char * predicate)
 /// rule.  Rule would recover by resynchronizing to the set of
 /// symbols that can follow rule ref.
 ///
-ItemPtr BaseRecognizer::match(std::uint32_t ttype, Bitset const & follow)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::BaseRecognizer::match(std::uint32_t ttype, Bitset const & follow)
 {
     // Pick up the current input token/node for assignment to labels
     //
@@ -152,7 +158,8 @@ ItemPtr BaseRecognizer::match(std::uint32_t ttype, Bitset const & follow)
 /// \param recognizer
 /// Recognizer context pointer
 ///
-void BaseRecognizer::matchAny()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::matchAny()
 {
     state_->errorRecovery = false;
     state_->failed		  = false;
@@ -160,12 +167,14 @@ void BaseRecognizer::matchAny()
     return;
 }
 
-bool BaseRecognizer::mismatchIsUnwantedToken(std::uint32_t ttype)
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::mismatchIsUnwantedToken(std::uint32_t ttype)
 {
     return input_->LA(2) == ttype;
 }
 
-bool BaseRecognizer::mismatchIsMissingToken(Bitset const & follow)
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::mismatchIsMissingToken(Bitset const & follow)
 {
     // The C bitset maps are laid down at compile time by the
     // C code generation. Hence we cannot remove things from them
@@ -219,7 +228,8 @@ bool BaseRecognizer::mismatchIsMissingToken(Bitset const & follow)
 ///
 /// If you override, make sure to update errorCount if you care about that.
 ///
-void BaseRecognizer::reportError()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::reportError()
 {
     // Invoke the debugger event if there is a debugger listening to us
     //
@@ -248,7 +258,8 @@ void BaseRecognizer::reportError()
     displayRecognitionError(state_->exception.get(), state_->tokenNames);
 }
 
-void BaseRecognizer::beginBacktrack(std::uint32_t level)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::beginBacktrack(std::uint32_t level)
 {
     if	(debugger_ != NULL)
     {
@@ -256,14 +267,16 @@ void BaseRecognizer::beginBacktrack(std::uint32_t level)
     }
 }
 
-void BaseRecognizer::endBacktrack(std::uint32_t level, bool successful)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::endBacktrack(std::uint32_t level, bool successful)
 {
     if	(debugger_ != NULL)
     {
         debugger_->endBacktrack(level, successful);
     }
 }
-void BaseRecognizer::beginResync()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::beginResync()
 {
     if	(debugger_ != NULL)
     {
@@ -271,7 +284,8 @@ void BaseRecognizer::beginResync()
     }
 }
 
-void BaseRecognizer::endResync()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::endResync()
 {
     if	(debugger_ != NULL)
     {
@@ -372,7 +386,8 @@ void BaseRecognizer::endResync()
 /// Like Grosch I implemented local FOLLOW sets that are combined
 /// at run-time upon error to avoid overhead during parsing.
 ///
-Bitset BaseRecognizer::computeErrorRecoverySet()
+template<class StringTraits>
+Bitset antlr3<StringTraits>::BaseRecognizer::computeErrorRecoverySet()
 {
     return combineFollows(false);
 }
@@ -431,14 +446,16 @@ Bitset BaseRecognizer::computeErrorRecoverySet()
 /// a missing token in the input stream.  "Insert" one by just not
 /// throwing an exception.
 ///
-Bitset BaseRecognizer::computeCSRuleFollow()
+template<class StringTraits>
+Bitset antlr3<StringTraits>::BaseRecognizer::computeCSRuleFollow()
 {
     return combineFollows(false);
 }
 
 /// Compute the current followset for the input stream.
 ///
-Bitset BaseRecognizer::combineFollows(bool exact)
+template<class StringTraits>
+Bitset antlr3<StringTraits>::BaseRecognizer::combineFollows(bool exact)
 {
     std::size_t top = state_->following.size();
     
@@ -481,12 +498,14 @@ Bitset BaseRecognizer::combineFollows(bool exact)
 /// separate translation unit, rather than install them all as pointers to functions
 /// in the base recognizer.
 ///
-void BaseRecognizer::displayRecognitionError(Exception const * e, StringLiteral const * tokenNames)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::displayRecognitionError(Exception const * e, StringLiteral const * tokenNames)
 {
     emitErrorMessage(getErrorHeader(e, tokenNames) + ANTLR3_T(" ") + getErrorMessage(e, tokenNames));
 }
 
-void BaseRecognizer::emitErrorMessage(String msg)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::emitErrorMessage(String msg)
 {
     std::cerr << msg << std::endl;
 }
@@ -502,7 +521,8 @@ std::uint32_t BaseRecognizer::numberOfSyntaxErrors()
 /// NoViableAlt exceptions, but could be a mismatched token that
 /// the match() routine could not recover from.
 ///
-void BaseRecognizer::recover()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::recover()
 {
     // Are we about to repeat the same error?
     //
@@ -576,7 +596,8 @@ void BaseRecognizer::recover()
 /// sorted in the recognizer exception stack in the C version. To 'throw' it we set the
 /// error flag and rules cascade back when this is set.
 ///
-ItemPtr BaseRecognizer::recoverFromMismatchedToken(std::uint32_t ttype, Bitset const & follow)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedToken(std::uint32_t ttype, Bitset const & follow)
 {
     // If the next token after the one we are looking at in the input stream
     // is what we are looking for then we remove the one we have discovered
@@ -643,7 +664,8 @@ ItemPtr BaseRecognizer::recoverFromMismatchedToken(std::uint32_t ttype, Bitset c
     return nullptr;
 }
 
-ItemPtr BaseRecognizer::recoverFromMismatchedSet(Bitset const & follow)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedSet(Bitset const & follow)
 {
     if	(mismatchIsMissingToken(follow) == true)
     {
@@ -680,7 +702,8 @@ ItemPtr BaseRecognizer::recoverFromMismatchedSet(Bitset const & follow)
 /// both.  No tokens are consumed to recover from insertions.  Return
 /// true if recovery was possible else return false.
 ///
-bool BaseRecognizer::recoverFromMismatchedElement(Bitset const & followBits)
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedElement(Bitset const & followBits)
 {
     Bitset follow(followBits);
 
@@ -725,7 +748,8 @@ bool BaseRecognizer::recoverFromMismatchedElement(Bitset const & followBits)
 
 /// Eat tokens from the input stream until we get one of JUST the right type
 ///
-void BaseRecognizer::consumeUntil(std::uint32_t tokenType)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::consumeUntil(std::uint32_t tokenType)
 {
     // What do have at the moment?
     //
@@ -743,7 +767,8 @@ void BaseRecognizer::consumeUntil(std::uint32_t tokenType)
 /// Eat tokens from the input stream until we find one that
 /// belongs to the supplied set.
 ///
-void BaseRecognizer::consumeUntilSet(Bitset const & set)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::consumeUntilSet(Bitset const & set)
 {
     // What do have at the moment?
     //
@@ -768,7 +793,8 @@ void BaseRecognizer::consumeUntilSet(Bitset const & set)
  * issue (it probably won't, the hash tables are pretty quick) then we could make a special int only
  * version of the table.
  */
-Index BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
+template<class StringTraits>
+Index antlr3<StringTraits>::BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
 {
     /* The rule memos are an List of List.
      */
@@ -795,7 +821,8 @@ Index BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
  *  this rule and successfully parsed before, then seek ahead to
  *  1 past the stop token matched for this rule last time.
  */
-bool BaseRecognizer::alreadyParsedRule(Index ruleIndex)
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::alreadyParsedRule(Index ruleIndex)
 {
     if (!filteringMode_ || state_->backtracking > 1) {
         /* See if we have a memo marker for this.
@@ -827,7 +854,8 @@ bool BaseRecognizer::alreadyParsedRule(Index ruleIndex)
 /** Record whether or not this rule parsed the input at this position
  *  successfully.
  */
-void BaseRecognizer::memoize(Index ruleIndex, Index ruleParseStart)
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::memoize(Index ruleIndex, Index ruleParseStart)
 {
     if (!filteringMode_ || state_->backtracking > 1) {
         Index stopIndex = state_->failed == true ? MEMO_RULE_FAILED : input_->index();
@@ -840,7 +868,8 @@ void BaseRecognizer::memoize(Index ruleIndex, Index ruleParseStart)
  *  the specified grammar fragment matches the current input stream.
  *  This resets the failed instance var afterwards.
  */
-bool BaseRecognizer::synpred(void * ctx, void (*predicate)(void * ctx))
+template<class StringTraits>
+bool antlr3<StringTraits>::BaseRecognizer::synpred(void * ctx, void (*predicate)(void * ctx))
 {
     /* Begin backtracking so we can get back to where we started after trying out
      * the syntactic predicate.
@@ -873,7 +902,8 @@ bool BaseRecognizer::synpred(void * ctx, void (*predicate)(void * ctx))
     }
 }
 
-void BaseRecognizer::reset()
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::reset()
 {
 
     // Reset the state flags
@@ -887,7 +917,8 @@ void BaseRecognizer::reset()
     state_->ruleMemo.clear();
 }
 
-ItemPtr BaseRecognizer::currentInputSymbol()
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::BaseRecognizer::currentInputSymbol()
 {
     return input_->LI(1);
 }
@@ -895,7 +926,8 @@ ItemPtr BaseRecognizer::currentInputSymbol()
 // Default implementation is for parser and assumes a token stream as supplied by the runtime.
 // You MAY need override this function if the standard COMMON_TOKEN_STREAM is not what you are using.
 //
-ItemPtr BaseRecognizer::getMissingSymbol(
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::BaseRecognizer::getMissingSymbol(
     ExceptionPtr e,
     std::uint32_t expectedTokenType,
     Bitset const & follow
@@ -904,7 +936,8 @@ ItemPtr BaseRecognizer::getMissingSymbol(
     return ItemPtr();
 }
 
-String BaseRecognizer::getErrorHeader(Exception const * e, StringLiteral const *)
+template<class StringTraits>
+String antlr3<StringTraits>::BaseRecognizer::getErrorHeader(Exception const * e, StringLiteral const *)
 {
     String retVal;
 
@@ -960,7 +993,8 @@ static String getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * 
     );
 }
 
-String BaseRecognizer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+template<class StringTraits>
+String antlr3<StringTraits>::BaseRecognizer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     // Default implementation is provided for parser.
 
@@ -1032,7 +1066,8 @@ std::ostream& BaseRecognizer::traceStream() {
     return std::cout;
 }
     
-void BaseRecognizer::traceIn(StringLiteral ruleName, int ruleNo) {
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::traceIn(StringLiteral ruleName, int ruleNo) {
     auto itemStr = traceCurrentItem();
     auto & s = traceStream();
     s << "enter " << ruleName << " " << itemStr;
@@ -1042,7 +1077,8 @@ void BaseRecognizer::traceIn(StringLiteral ruleName, int ruleNo) {
     s << std::endl;
 }
 
-void BaseRecognizer::traceOut(StringLiteral ruleName, int ruleNo) {
+template<class StringTraits>
+void antlr3<StringTraits>::BaseRecognizer::traceOut(StringLiteral ruleName, int ruleNo) {
     auto itemStr = traceCurrentItem();
     auto & s = traceStream();
     s << "enter " << ruleName << " " << itemStr;
@@ -1052,4 +1088,3 @@ void BaseRecognizer::traceOut(StringLiteral ruleName, int ruleNo) {
     s << std::endl;
 }
 
-} // namespace antlr3

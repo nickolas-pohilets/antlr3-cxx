@@ -48,8 +48,6 @@
 #include <stack>
 #include <map>
 
-namespace antlr3 {
-
 /** All the data elements required to track the current state
  *  of any recognizer (lexer, parser, tree parser).
  * May be share between multiple recognizers such that 
@@ -158,7 +156,5 @@ struct RecognizerSharedState
     struct StreamState { MarkerPtr marker; CharStreamPtr stream; };
     std::stack<StreamState> streams;
 };
-
-} // namespace antlr3
 
 #endif

@@ -69,8 +69,6 @@
 #include <antlr3/TokenStream.hpp>
 #include <antlr3/BaseRecognizer.hpp>
 
-namespace antlr3 {
-
 class Lexer : public BaseRecognizer, public TokenSource
 {
     friend class BaseRecognizer;
@@ -175,7 +173,5 @@ private:
     template<class T>
     bool matchStr(T const * string, size_t len);
 };
-
-} // namespace antlr3
 
 #endif

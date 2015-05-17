@@ -35,8 +35,6 @@
 #include <antlr3/CommonTreeAdaptor.hpp>
 #include <antlr3/BaseRecognizer.hpp>
 
-namespace antlr3 {
-
 /// A generic list of elements tracked in an alternative to be used in
 /// a -> rewrite rule. 
 ///
@@ -211,7 +209,5 @@ public:
     ItemPtr nextNode() override;
     ItemPtr toTree(ItemPtr el) override;
 };
-
-} // namespace antlr3
 
 #endif

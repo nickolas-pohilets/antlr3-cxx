@@ -35,8 +35,6 @@
 #include <antlr3/BaseRecognizer.hpp>
 #include <antlr3/CommonTreeNodeStream.hpp>
 
-namespace antlr3 {
-
 /** Internal structure representing an element in a hash bucket.
  *  Stores the original key so that duplicate keys can be rejected
  *  if necessary, and contains function can be supported If the hash key
@@ -74,7 +72,5 @@ protected:
     virtual std::uint32_t itemToInt(ItemPtr item) override;
     virtual String traceCurrentItem() override;
 };
-
-} // namespace antlr3
 
 #endif

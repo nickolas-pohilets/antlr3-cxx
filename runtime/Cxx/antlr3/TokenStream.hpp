@@ -44,8 +44,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace antlr3 {
-
 /** Definition of a token source, which has a pointer to a function that 
  *  returns the next token (using a token factory if it is going to be
  *  efficient) and a pointer to an InputStream. This is slightly
@@ -298,7 +296,5 @@ public:
     virtual String toString(std::uint32_t start, std::uint32_t stop) override;
     virtual String toString(CommonTokenPtr start, CommonTokenPtr stop) override;
 };
-
-} // namespace antlr3
 
 #endif

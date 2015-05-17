@@ -35,13 +35,13 @@
 
 #include <antlr3/CommonTreeNodeStream.hpp>
 
-namespace antlr3 {
-
-CommonTreeNodeStream::CommonTreeNodeStream(ItemPtr tree)
+template<class StringTraits>
+antlr3<StringTraits>::CommonTreeNodeStream::CommonTreeNodeStream(ItemPtr tree)
     : CommonTreeNodeStream(TreeAdaptorPtr(new CommonTreeAdaptor()), std::move(tree))
 {}
 
-CommonTreeNodeStream::CommonTreeNodeStream(TreeAdaptorPtr adaptor, ItemPtr tree)
+template<class StringTraits>
+antlr3<StringTraits>::CommonTreeNodeStream::CommonTreeNodeStream(TreeAdaptorPtr adaptor, ItemPtr tree)
     : TreeNodeStream()
     , downNode_(std::make_shared<CommonTree>(
         std::make_shared<CommonToken>(TokenDown, ANTLR3_T("DOWN"))
@@ -65,7 +65,8 @@ CommonTreeNodeStream::CommonTreeNodeStream(TreeAdaptorPtr adaptor, ItemPtr tree)
 {
 }
 
-CommonTreeNodeStream::CommonTreeNodeStream(CommonTreeNodeStream const * inStream)
+template<class StringTraits>
+antlr3<StringTraits>::CommonTreeNodeStream::CommonTreeNodeStream(CommonTreeNodeStream const * inStream)
     : TreeNodeStream()
     , downNode_(std::make_shared<CommonTree>(inStream->downNode_->token()))
     , upNode_(std::make_shared<CommonTree>(inStream->upNode_->token()))
@@ -91,7 +92,8 @@ CommonTreeNodeStream::~CommonTreeNodeStream()
 
 /// Walk and fill the tree node buffer from the root tree
 ///
-void CommonTreeNodeStream::fillBufferRoot()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::fillBufferRoot()
 {
     // Call the generic buffer routine with the root as the
     // argument
@@ -104,7 +106,8 @@ void CommonTreeNodeStream::fillBufferRoot()
 /// Don't add in DOWN, UP nodes if the supplied tree is a list (t is isNilNode)
 // such as the root tree is.
 ///
-void CommonTreeNodeStream::fillBuffer(ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::fillBuffer(ItemPtr t)
 {
     bool nilNode = adaptor_->isNil(t);
 
@@ -149,7 +152,8 @@ void CommonTreeNodeStream::fillBuffer(ItemPtr t)
 
 /// Reset the input stream to the start of the input nodes.
 ///
-void CommonTreeNodeStream::reset()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::reset()
 {
     if	(p_ != NullIndex)
     {
@@ -169,7 +173,8 @@ void CommonTreeNodeStream::reset()
     }
 }
 
-ItemPtr CommonTreeNodeStream::LB(std::uint32_t k)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::LB(std::uint32_t k)
 {
     if (k==0)
     {
@@ -194,7 +199,8 @@ ItemPtr CommonTreeNodeStream::LB(std::uint32_t k)
 /// returns a tree node instead of a token.  Makes code gen identical
 /// for both parser and tree grammars. :)
 ///
-ItemPtr CommonTreeNodeStream::LT(std::int32_t k)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::LT(std::int32_t k)
 {
     if(p_ == NullIndex)
     {
@@ -223,12 +229,14 @@ ItemPtr CommonTreeNodeStream::LT(std::int32_t k)
 /// Where is this stream pulling nodes from?  This is not the name, but
 /// the object that provides node objects.
 ///
-ItemPtr CommonTreeNodeStream::treeSource()
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::treeSource()
 {
     return root_;
 }
 
-String CommonTreeNodeStream::sourceName()
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTreeNodeStream::sourceName()
 {
     assert(false);
     return String();
@@ -236,7 +244,8 @@ String CommonTreeNodeStream::sourceName()
 
 /// Consume the next node from the input stream
 ///
-void CommonTreeNodeStream::consume()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::consume()
 {
     if(p_ == NullIndex)
     {
@@ -263,7 +272,8 @@ std::uint32_t CommonTreeNodeStream::LA(std::int32_t i)
 /// Mark the state of the input stream so that we can come back to it
 /// after a syntactic predicate and so on.
 ///
-MarkerPtr CommonTreeNodeStream::mark()
+template<class StringTraits>
+MarkerPtr antlr3<StringTraits>::CommonTreeNodeStream::mark()
 {
     return std::make_shared<TreeNodeStreamMarker>(index(), shared_from_this());
 }
@@ -271,12 +281,14 @@ MarkerPtr CommonTreeNodeStream::mark()
 /// consume() ahead until we hit index.  Can't just jump ahead--must
 /// spit out the navigation nodes.
 ///
-void CommonTreeNodeStream::seek(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::seek(Index index)
 {
     p_ = index;
 }
 
-Index CommonTreeNodeStream::index()
+template<class StringTraits>
+Index antlr3<StringTraits>::CommonTreeNodeStream::index()
 {
     if	(p_ == NullIndex)
     {
@@ -303,7 +315,8 @@ Index CommonTreeNodeStream::index()
 /// the tree structure.  When debugging we need unique nodes
 /// so instantiate new ones when uniqueNavigationNodes is true.
 ///
-void CommonTreeNodeStream::addNavigationNode(std::uint32_t ttype)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::addNavigationNode(std::uint32_t ttype)
 {
     ItemPtr	    node;
 
@@ -338,17 +351,20 @@ void CommonTreeNodeStream::addNavigationNode(std::uint32_t ttype)
 }
 
 
-TreeAdaptorPtr CommonTreeNodeStream::treeAdaptor()
+template<class StringTraits>
+TreeAdaptorPtr antlr3<StringTraits>::CommonTreeNodeStream::treeAdaptor()
 {
     return adaptor_;
 }
 
-bool CommonTreeNodeStream::hasUniqueNavigationNodes()
+template<class StringTraits>
+bool antlr3<StringTraits>::CommonTreeNodeStream::hasUniqueNavigationNodes()
 {
     return uniqueNavigationNodes_;
 }
 
-void CommonTreeNodeStream::setUniqueNavigationNodes(bool uniqueNavigationNodes)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::setUniqueNavigationNodes(bool uniqueNavigationNodes)
 {
     uniqueNavigationNodes_ = uniqueNavigationNodes;
 }
@@ -358,19 +374,22 @@ void CommonTreeNodeStream::setUniqueNavigationNodes(bool uniqueNavigationNodes)
 /// a recursive walk.  Mostly useful for testing as it yields
 /// the token types not text.
 ///
-String CommonTreeNodeStream::toString()
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTreeNodeStream::toString()
 {
     return toString(root_, NULL);
 }
 
-String CommonTreeNodeStream::toString(ItemPtr start, ItemPtr stop)
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTreeNodeStream::toString(ItemPtr start, ItemPtr stop)
 {
     String  buf;
     toStringWork(start, stop, buf);
     return  buf;
 }
 
-void CommonTreeNodeStream::toStringWork(ItemPtr p, ItemPtr stop, String& buf)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::toStringWork(ItemPtr p, ItemPtr stop, String& buf)
 {
     if(adaptor_->isNil(p))
     {
@@ -409,13 +428,15 @@ void CommonTreeNodeStream::toStringWork(ItemPtr p, ItemPtr stop, String& buf)
     }
 }
 
-ItemPtr CommonTreeNodeStream::newDownNode()
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::newDownNode()
 {
     CommonTokenPtr token = std::make_shared<CommonToken>(TokenDown, ANTLR3_T("DOWN"));
     return std::make_shared<CommonTree>(token);
 }
 
-ItemPtr CommonTreeNodeStream::newUpNode()
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::newUpNode()
 {
     CommonTokenPtr token = std::make_shared<CommonToken>(TokenUp, ANTLR3_T("UP"));
     return std::make_shared<CommonTree>(token);
@@ -431,7 +452,8 @@ ItemPtr CommonTreeNodeStream::newUpNode()
 /// If parent is null, don't do anything; must be at root of overall tree.
 /// Can't replace whatever points to the parent externally.  Do nothing.
 ///
-void CommonTreeNodeStream::replaceChildren(ItemPtr parent, std::int32_t startChildIndex, std::int32_t stopChildIndex, ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::replaceChildren(ItemPtr parent, std::int32_t startChildIndex, std::int32_t stopChildIndex, ItemPtr t)
 {
     if	(parent != NULL)
     {
@@ -440,7 +462,8 @@ void CommonTreeNodeStream::replaceChildren(ItemPtr parent, std::int32_t startChi
     }
 }
 
-ItemPtr CommonTreeNodeStream::get(std::int32_t k)
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::CommonTreeNodeStream::get(std::int32_t k)
 {
     if(p_ == NullIndex)
     {
@@ -450,13 +473,15 @@ ItemPtr CommonTreeNodeStream::get(std::int32_t k)
     return nodes_.at(k);
 }
 
-void CommonTreeNodeStream::push(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTreeNodeStream::push(Index index)
 {
     nodeStack_->push(p_);	// Save current index
     seek(index);
 }
 
-Index CommonTreeNodeStream::pop()
+template<class StringTraits>
+Index antlr3<StringTraits>::CommonTreeNodeStream::pop()
 {
     Index retVal = nodeStack_->top();
     nodeStack_->pop();
@@ -464,4 +489,3 @@ Index CommonTreeNodeStream::pop()
     return retVal;
 }
 
-} // namespace antlr3

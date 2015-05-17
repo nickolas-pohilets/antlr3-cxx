@@ -40,8 +40,6 @@
 #include <antlr3/DebugEventListener.hpp>
 #include <antlr3/RecognizerSharedState.hpp>
 
-namespace antlr3 {
-
 /// A generic recognizer that can handle recognizers generated from
 /// lexer, parser, and tree grammars.  This is all the parsing
 /// support code essentially; most of it is error recovery stuff and
@@ -309,7 +307,5 @@ protected:
     void traceIn(StringLiteral ruleName, int ruleNo);
     void traceOut(StringLiteral ruleName, int ruleNo);
 };
-
-} // namespace antlr3
 
 #endif // _ANTLR3_BASERECOGNIZER_HPP

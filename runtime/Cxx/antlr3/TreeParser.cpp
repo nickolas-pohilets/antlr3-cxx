@@ -34,15 +34,15 @@
 
 #include <antlr3/TreeParser.hpp>
 
-namespace antlr3 {
-
-TreeParser::TreeParser(CommonTreeNodeStreamPtr ctnstream, RecognizerSharedStatePtr state)
+template<class StringTraits>
+antlr3<StringTraits>::TreeParser::TreeParser(CommonTreeNodeStreamPtr ctnstream, RecognizerSharedStatePtr state)
     : BaseRecognizer(state)
 {
     setTreeNodeStream(ctnstream);
 }
 
-void TreeParser::fillException(Exception* ex)
+template<class StringTraits>
+void antlr3<StringTraits>::TreeParser::fillException(Exception* ex)
 {
     CommonTreeNodeStreamPtr tns = treeNodeStream();
 
@@ -75,7 +75,8 @@ void TreeParser::fillException(Exception* ex)
     }
 }
 
-String TreeParser::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+template<class StringTraits>
+String antlr3<StringTraits>::TreeParser::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     if (!e->item)
     {
@@ -110,7 +111,8 @@ TreeParser::~TreeParser()
 
 /** Set the input stream and reset the parser
  */
-void TreeParser::setTreeNodeStream(CommonTreeNodeStreamPtr input)
+template<class StringTraits>
+void antlr3<StringTraits>::TreeParser::setTreeNodeStream(CommonTreeNodeStreamPtr input)
 {
     input_ = input;
     adaptor_ = input->treeAdaptor();
@@ -120,7 +122,8 @@ void TreeParser::setTreeNodeStream(CommonTreeNodeStreamPtr input)
 
 /** Return a pointer to the input stream
  */
-CommonTreeNodeStreamPtr TreeParser::treeNodeStream()
+template<class StringTraits>
+CommonTreeNodeStreamPtr antlr3<StringTraits>::TreeParser::treeNodeStream()
 {
     return std::static_pointer_cast<CommonTreeNodeStream>(input_);
 }
@@ -128,7 +131,8 @@ CommonTreeNodeStreamPtr TreeParser::treeNodeStream()
 // Default implementation is for parser and assumes a token stream as supplied by the runtime.
 // You MAY need override this function if the standard BASE_TREE is not what you are using.
 //
-ItemPtr TreeParser::getMissingSymbol(
+template<class StringTraits>
+ItemPtr antlr3<StringTraits>::TreeParser::getMissingSymbol(
     ExceptionPtr e,
     std::uint32_t expectedTokenType,
     Bitset const & follow
@@ -163,9 +167,9 @@ std::uint32_t TreeParser::itemToInt(ItemPtr item) {
     return adaptor_->getType(item);
 }
 
-String TreeParser::traceCurrentItem() {
+template<class StringTraits>
+String antlr3<StringTraits>::TreeParser::traceCurrentItem() {
     ItemPtr t = treeNodeStream()->LT(1);
     return adaptor_->toString(t, state_->tokenNames);
 }
 
-} // namespace antlr3

@@ -39,8 +39,6 @@
 #include <antlr3/Defs.hpp>
 #include <antlr3/BaseRecognizer.hpp>
 
-namespace antlr3 {
-
 /** This is the main interface for an ANTLR3 parser.
  */
 class Parser : public BaseRecognizer

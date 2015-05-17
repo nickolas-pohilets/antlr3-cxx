@@ -50,8 +50,6 @@
 #include <antlr3/Socket.hpp>
 #include <antlr3/CharStream.hpp>
 
-namespace antlr3 {
-
 /// The version of the debugging protocol supported by the DebugEventSocketProxy.
 /// ANTLR 3.1 is at protocol version 2
 static int const PROTOCOL_VERSION = 2;
@@ -92,12 +90,14 @@ template<class T, class... Arg> void freeOpaque(void*& store)
     }
 }
 
-DebugEventSocketProxy::DebugEventSocketProxy(TreeAdaptorPtr adaptor)
+template<class StringTraits>
+antlr3<StringTraits>::DebugEventSocketProxy::DebugEventSocketProxy(TreeAdaptorPtr adaptor)
     : DebugEventSocketProxy(DEFAULT_DEBUGGER_PORT, adaptor)
 {
 }
 
-DebugEventSocketProxy::DebugEventSocketProxy(std::uint32_t port, TreeAdaptorPtr adaptor)
+template<class StringTraits>
+antlr3<StringTraits>::DebugEventSocketProxy::DebugEventSocketProxy(std::uint32_t port, TreeAdaptorPtr adaptor)
     : port_(port)
     , socket_()
     , grammarFileName_()
@@ -125,7 +125,8 @@ String const & DebugEventSocketProxy::grammarFileName() const
     return grammarFileName_;
 }
 
-void DebugEventSocketProxy::setGrammarFileName(String grammarFileName)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::setGrammarFileName(String grammarFileName)
 {
     grammarFileName_ = std::move(grammarFileName);
 }
@@ -133,7 +134,8 @@ void DebugEventSocketProxy::setGrammarFileName(String grammarFileName)
 //--------------------------------------------------------------------------------
 // Support functions for sending stuff over the socket interface
 //
-bool DebugEventSocketProxy::sockSend(const char * ptr, int len)
+template<class StringTraits>
+bool antlr3<StringTraits>::DebugEventSocketProxy::sockSend(const char * ptr, int len)
 {
     SOCKET sock = getOpaque<SOCKET>(socket_);
     
@@ -160,7 +162,8 @@ bool DebugEventSocketProxy::sockSend(const char * ptr, int len)
     return true;
 }
 
-bool DebugEventSocketProxy::handshake()
+template<class StringTraits>
+bool antlr3<StringTraits>::DebugEventSocketProxy::handshake()
 {
     if(!initialized_)
     {
@@ -265,13 +268,15 @@ bool DebugEventSocketProxy::handshake()
 }
 
 // Send the supplied text and wait for an ack from the client
-void DebugEventSocketProxy::transmit(const char * ptr)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::transmit(const char * ptr)
 {
     sockSend(ptr, (int)strlen(ptr));
     ack();
 }
 
-void DebugEventSocketProxy::ack()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::ack()
 {
     // Local buffer to read the next character in to
     //
@@ -457,7 +462,8 @@ std::string DebugEventSocketProxy::serializeNode(ItemPtr node)
 //------------------------------------------------------------------------------------------------------------------
 // EVENTS
 //
-void DebugEventSocketProxy::enterRule(const char * grammarFileName, const char * ruleName)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::enterRule(const char * grammarFileName, const char * ruleName)
 {
     // Create the message (speed is not of the essence)
     //
@@ -466,7 +472,8 @@ void DebugEventSocketProxy::enterRule(const char * grammarFileName, const char *
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::enterAlt(int alt)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::enterAlt(int alt)
 {
     char	buffer[512];
 
@@ -476,7 +483,8 @@ void DebugEventSocketProxy::enterAlt(int alt)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::exitRule(const char * grammarFileName, const char * ruleName)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::exitRule(const char * grammarFileName, const char * ruleName)
 {
     char	buffer[512];
 
@@ -486,7 +494,8 @@ void DebugEventSocketProxy::exitRule(const char * grammarFileName, const char * 
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::enterSubRule(int decisionNumber)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::enterSubRule(int decisionNumber)
 {
     char	buffer[512];
 
@@ -496,7 +505,8 @@ void DebugEventSocketProxy::enterSubRule(int decisionNumber)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::exitSubRule(int decisionNumber)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::exitSubRule(int decisionNumber)
 {
     char	buffer[512];
 
@@ -506,7 +516,8 @@ void DebugEventSocketProxy::exitSubRule(int decisionNumber)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::enterDecision(int decisionNumber)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::enterDecision(int decisionNumber)
 {
     char	buffer[512];
 
@@ -517,7 +528,8 @@ void DebugEventSocketProxy::enterDecision(int decisionNumber)
 
 }
 
-void DebugEventSocketProxy::exitDecision(int decisionNumber)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::exitDecision(int decisionNumber)
 {
     char	buffer[512];
 
@@ -527,7 +539,8 @@ void DebugEventSocketProxy::exitDecision(int decisionNumber)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::consumeToken(CommonTokenPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::consumeToken(CommonTokenPtr t)
 {
     std::string msg;
 
@@ -546,7 +559,8 @@ void DebugEventSocketProxy::consumeToken(CommonTokenPtr t)
     transmit(msg.c_str());
 }
 
-void DebugEventSocketProxy::consumeHiddenToken(CommonTokenPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::consumeHiddenToken(CommonTokenPtr t)
 {
     std::string msg;
 
@@ -567,7 +581,8 @@ void DebugEventSocketProxy::consumeHiddenToken(CommonTokenPtr t)
 
 // Looking at the next token event.
 //
-void DebugEventSocketProxy::LT(int i, CommonTokenPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::LT(int i, CommonTokenPtr t)
 {
     std::string msg;
 
@@ -594,7 +609,8 @@ void DebugEventSocketProxy::LT(int i, CommonTokenPtr t)
     }
 }
 
-void DebugEventSocketProxy::mark(int marker)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::mark(int marker)
 {
     char buffer[128];
 
@@ -605,7 +621,8 @@ void DebugEventSocketProxy::mark(int marker)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::rewind(int marker)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::rewind(int marker)
 {
     char buffer[128];
 
@@ -617,7 +634,8 @@ void DebugEventSocketProxy::rewind(int marker)
 
 }
 
-void DebugEventSocketProxy::beginBacktrack(int level)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::beginBacktrack(int level)
 {
     char buffer[128];
 
@@ -628,7 +646,8 @@ void DebugEventSocketProxy::beginBacktrack(int level)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::endBacktrack(int level, bool successful)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::endBacktrack(int level, bool successful)
 {
     char buffer[128];
 
@@ -639,7 +658,8 @@ void DebugEventSocketProxy::endBacktrack(int level, bool successful)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::location(int line, int pos)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::location(int line, int pos)
 {
     char buffer[128];
 
@@ -650,7 +670,8 @@ void DebugEventSocketProxy::location(int line, int pos)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::recognitionException(ExceptionPtr e)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::recognitionException(ExceptionPtr e)
 {
     char buffer[256];
 
@@ -663,17 +684,20 @@ void DebugEventSocketProxy::recognitionException(ExceptionPtr e)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::beginResync()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::beginResync()
 {
     transmit("beginResync\n");
 }
 
-void DebugEventSocketProxy::endResync()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::endResync()
 {
     transmit("endResync\n");
 }
 
-void DebugEventSocketProxy::semanticPredicate(bool result, const char * predicate)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::semanticPredicate(bool result, const char * predicate)
 {
     if(predicate == NULL)
     {
@@ -718,13 +742,15 @@ void DebugEventSocketProxy::semanticPredicate(bool result, const char * predicat
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::commence()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::commence()
 {
     // Nothing to see here
     //
 }
 
-void DebugEventSocketProxy::terminate()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::terminate()
 {
     // Terminate sequence
     //
@@ -734,7 +760,8 @@ void DebugEventSocketProxy::terminate()
 //----------------------------------------------------------------
 // Tree parsing events
 //
-void DebugEventSocketProxy::consumeNode(ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::consumeNode(ItemPtr t)
 {
     std::string	buffer = serializeNode(t);
 
@@ -748,7 +775,8 @@ void DebugEventSocketProxy::consumeNode(ItemPtr t)
     transmit(tokenString_.c_str());
 }
 
-void DebugEventSocketProxy::LTT(int i, ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::LTT(int i, ItemPtr t)
 {
     std::string	buffer = serializeNode(t);
 
@@ -764,14 +792,16 @@ void DebugEventSocketProxy::LTT(int i, ItemPtr t)
     transmit(tokenString_.c_str());
 }
 
-void DebugEventSocketProxy::nilNode(ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::nilNode(ItemPtr t)
 {
     char buffer[128];
     sprintf(buffer, "nilNode\t%d\n", adaptor_->getUniqueID(t));
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::createNode(ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::createNode(ItemPtr t)
 {
     // Empty string
     //
@@ -802,7 +832,8 @@ void DebugEventSocketProxy::createNode(ItemPtr t)
     transmit(tokenString_.c_str());
 }
 
-void DebugEventSocketProxy::errorNode(ItemPtr t)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::errorNode(ItemPtr t)
 {
     // Empty string
     //
@@ -833,7 +864,8 @@ void DebugEventSocketProxy::errorNode(ItemPtr t)
     transmit(tokenString_.c_str());
 }
 
-void DebugEventSocketProxy::createNodeTok(ItemPtr node, CommonTokenPtr token)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::createNodeTok(ItemPtr node, CommonTokenPtr token)
 {
     char	buffer[128];
 
@@ -842,7 +874,8 @@ void DebugEventSocketProxy::createNodeTok(ItemPtr node, CommonTokenPtr token)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::becomeRoot(ItemPtr newRoot, ItemPtr oldRoot)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::becomeRoot(ItemPtr newRoot, ItemPtr oldRoot)
 {
     char	buffer[128];
 
@@ -853,7 +886,8 @@ void DebugEventSocketProxy::becomeRoot(ItemPtr newRoot, ItemPtr oldRoot)
 }
 
 
-void DebugEventSocketProxy::addChild(ItemPtr root, ItemPtr child)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::addChild(ItemPtr root, ItemPtr child)
 {
     char	buffer[128];
 
@@ -863,7 +897,8 @@ void DebugEventSocketProxy::addChild(ItemPtr root, ItemPtr child)
     transmit(buffer);
 }
 
-void DebugEventSocketProxy::setTokenBoundaries(ItemPtr t, Index tokenStartIndex, Index tokenStopIndex)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::setTokenBoundaries(ItemPtr t, Index tokenStartIndex, Index tokenStopIndex)
 {
     char	buffer[128];
 
@@ -873,8 +908,6 @@ void DebugEventSocketProxy::setTokenBoundaries(ItemPtr t, Index tokenStartIndex,
                                             );
     transmit(buffer);
 }
-
-} // namespace antlr3
 
 #endif // ANTLR3_NODEBUGGER
 

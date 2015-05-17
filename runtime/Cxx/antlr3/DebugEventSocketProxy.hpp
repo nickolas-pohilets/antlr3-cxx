@@ -33,8 +33,6 @@
 
 #include <antlr3/DebugEventListener.hpp>
 
-namespace antlr3 {
-
 /// A proxy debug event listener that forwards events over a socket to a debugger (or any other listener) using a simple text-based protocol; one event per line.
 class DebugEventSocketProxy : public DebugEventListener
 {
@@ -126,7 +124,5 @@ public:
     virtual void addChild(ItemPtr root, ItemPtr child) override;
     virtual void setTokenBoundaries(ItemPtr t, Index tokenStartIndex, Index tokenStopIndex) override;
 };
-
-} // namespace antlr3
 
 #endif // DebugEventSocketProxy_H

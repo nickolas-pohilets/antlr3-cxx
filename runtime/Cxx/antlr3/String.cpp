@@ -36,8 +36,6 @@
 #include <antlr3/ConvertUTF.hpp>
 #include <antlr3/CommonToken.hpp>
 
-namespace antlr3 {
-
 #if ANTLR3_UTF16
 
 namespace {
@@ -152,4 +150,3 @@ std::ostream& operator<<(std::ostream& s, StringLiteral str) { return s << toUTF
 
 #endif
 
-} // namespace antlr3

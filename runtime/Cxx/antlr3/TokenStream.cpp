@@ -34,9 +34,8 @@
 
 #include <antlr3/TokenStream.hpp>
 
-namespace antlr3 {
-
-CommonTokenStream::CommonTokenStream(TokenSourcePtr source)
+template<class StringTraits>
+antlr3<StringTraits>::CommonTokenStream::CommonTokenStream(TokenSourcePtr source)
     : TokenStream()
     , tokenSource_(source)
     , tokens_()
@@ -52,7 +51,8 @@ CommonTokenStream::~CommonTokenStream()
 {
 }
 
-String CommonTokenStream::sourceName()
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTokenStream::sourceName()
 {
     // Slightly convoluted as we must trace back to the lexer's input source
     // via the token source. The streamName that is here is not initialized
@@ -69,7 +69,8 @@ String CommonTokenStream::sourceName()
  *
  *  Walk past any token not on the channel the parser is listening to.
  */
-void CommonTokenStream::consume()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::consume()
 {
     if(p_ < tokens_.size())
     {
@@ -92,24 +93,28 @@ std::uint32_t CommonTokenStream::LA(std::int32_t i)
     }
 }
 
-MarkerPtr CommonTokenStream::mark()
+template<class StringTraits>
+MarkerPtr antlr3<StringTraits>::CommonTokenStream::mark()
 {
     return std::make_shared<TokenStreamMarker>(index(), shared_from_this());
 }
 
-Index CommonTokenStream::index()
+template<class StringTraits>
+Index antlr3<StringTraits>::CommonTokenStream::index()
 {
     fillBufferIfNeeded();
     return p_;
 }
 
-void CommonTokenStream::seek(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::seek(Index index)
 {
     p_ = index;
 }
 
 
-CommonTokenPtr CommonTokenStream::LT(std::int32_t k)
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::CommonTokenStream::LT(std::int32_t k)
 {
     if(k <= 0)
     {
@@ -151,23 +156,27 @@ CommonTokenPtr CommonTokenStream::LT(std::int32_t k)
     return tokens_.at(i);
 }
 
-CommonTokenPtr CommonTokenStream::get(Index i)
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::CommonTokenStream::get(Index i)
 {
     return tokens_.at(i);
 }
 
-TokenSourcePtr CommonTokenStream::tokenSource()
+template<class StringTraits>
+TokenSourcePtr antlr3<StringTraits>::CommonTokenStream::tokenSource()
 {
     return tokenSource_;
 }
 
-String CommonTokenStream::toString()
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTokenStream::toString()
 {
     fillBufferIfNeeded();
     return  toString(0, (std::uint32_t)tokens_.size());
 }
 
-String CommonTokenStream::toString(std::uint32_t start, std::uint32_t stop)
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTokenStream::toString(std::uint32_t start, std::uint32_t stop)
 {
     fillBufferIfNeeded();
 
@@ -190,7 +199,8 @@ String CommonTokenStream::toString(std::uint32_t start, std::uint32_t stop)
     return string;
 }
 
-String CommonTokenStream::toString(CommonTokenPtr start, CommonTokenPtr stop)
+template<class StringTraits>
+String antlr3<StringTraits>::CommonTokenStream::toString(CommonTokenPtr start, CommonTokenPtr stop)
 {
     if(start != NULL && stop != NULL)
     {
@@ -208,7 +218,8 @@ String CommonTokenStream::toString(CommonTokenPtr start, CommonTokenPtr stop)
  *  the stream to force all WS and NEWLINE to be a different, ignored,
  *  channel.
  */
-void CommonTokenStream::setTokenTypeChannel(std::uint32_t ttype, std::uint32_t channel)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::setTokenTypeChannel(std::uint32_t ttype, std::uint32_t channel)
 {
     /* We add one to the channel so we can distinguish NULL as being no entry in the
      * table for a particular token type.
@@ -216,7 +227,8 @@ void CommonTokenStream::setTokenTypeChannel(std::uint32_t ttype, std::uint32_t c
     channelOverrides_[ttype] = channel + 1;
 }
 
-void CommonTokenStream::discardTokenType(std::uint32_t ttype)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::discardTokenType(std::uint32_t ttype)
 {
     /* We add one to the channel so we can distinguish NULL as being no entry in the
      * table for a particular token type. We could use bitsets for this I suppose too.
@@ -224,7 +236,8 @@ void CommonTokenStream::discardTokenType(std::uint32_t ttype)
     discardSet_.insert(ttype);
 }
 
-void CommonTokenStream::discardOffChannelToks(bool discard)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::discardOffChannelToks(bool discard)
 {
     discardOffChannel_ = discard;
 }
@@ -282,7 +295,8 @@ std::vector<CommonTokenPtr> CommonTokenStream::getTokensType(std::uint32_t start
 // Reset a token stream so it can be used again and can reuse it's
 // resources.
 //
-void CommonTokenStream::reset()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::reset()
 {
     // Free any resources that ar most like specifc to the
     // run we just did.
@@ -306,7 +320,8 @@ void CommonTokenStream::reset()
     p_	            = -1;
 }
     
-bool CommonTokenStream::shouldDiscard(CommonTokenPtr token) const
+template<class StringTraits>
+bool antlr3<StringTraits>::CommonTokenStream::shouldDiscard(CommonTokenPtr token) const
 {
     if(discardSet_.count(token->type()) > 0)
     {
@@ -321,7 +336,8 @@ bool CommonTokenStream::shouldDiscard(CommonTokenPtr token) const
     return false;
 }
 
-void CommonTokenStream::fillBufferIfNeeded()
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTokenStream::fillBufferIfNeeded()
 {
     if (p_ != NullIndex) {
         return;
@@ -359,7 +375,8 @@ void CommonTokenStream::fillBufferIfNeeded()
     p_ = skipOffTokenChannels(p_);
 }
 
-CommonTokenPtr CommonTokenStream::LB(std::uint32_t k)
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::CommonTokenStream::LB(std::uint32_t k)
 {
     fillBufferIfNeeded();
     
@@ -400,7 +417,8 @@ CommonTokenPtr CommonTokenStream::LB(std::uint32_t k)
 /// Given a starting index, return the index of the first on-channel
 ///  token.
 ///
-Index CommonTokenStream::skipOffTokenChannels(Index i)
+template<class StringTraits>
+Index antlr3<StringTraits>::CommonTokenStream::skipOffTokenChannels(Index i)
 {
     Index n = tokens_.size();
 
@@ -420,7 +438,8 @@ Index CommonTokenStream::skipOffTokenChannels(Index i)
     return i;
 }
 
-Index CommonTokenStream::skipOffTokenChannelsReverse(Index x)
+template<class StringTraits>
+Index antlr3<StringTraits>::CommonTokenStream::skipOffTokenChannelsReverse(Index x)
 {
     while(x != NullIndex)
     {
@@ -438,7 +457,8 @@ Index CommonTokenStream::skipOffTokenChannelsReverse(Index x)
     return x;
 }
     
-CommonTokenPtr CommonTokenStream::eofToken() {
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::CommonTokenStream::eofToken() {
     fillBufferIfNeeded();
     assert(!tokens_.empty() && tokens_.back()->type() == TokenEof);
     return tokens_.back();
@@ -446,7 +466,8 @@ CommonTokenPtr CommonTokenStream::eofToken() {
 
 #pragma mark -
 
-DebugTokenStream::DebugTokenStream(TokenStreamPtr input, DebugEventListenerPtr dbg)
+template<class StringTraits>
+antlr3<StringTraits>::DebugTokenStream::DebugTokenStream(TokenStreamPtr input, DebugEventListenerPtr dbg)
     : TokenStream()
     , input_(input)
     , debugger_(std::move(dbg))
@@ -460,12 +481,14 @@ DebugTokenStream::~DebugTokenStream()
 
 }
 
-String DebugTokenStream::sourceName()
+template<class StringTraits>
+String antlr3<StringTraits>::DebugTokenStream::sourceName()
 {
     return input_->sourceName();
 }
 
-void DebugTokenStream::consume()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugTokenStream::consume()
 {
     consumeInitialHiddenTokens();
     
@@ -493,57 +516,67 @@ std::uint32_t DebugTokenStream::LA(std::int32_t i)
     return input_->LA(i);
 }
 
-MarkerPtr DebugTokenStream::mark()
+template<class StringTraits>
+MarkerPtr antlr3<StringTraits>::DebugTokenStream::mark()
 {
     Index index = input_->index();
     debugger_->mark((int)index);
     return std::make_shared<DebugTokenStreamMarker>(input_->mark(), (int)index, debugger_);
 }
 
-Index DebugTokenStream::index()
+template<class StringTraits>
+Index antlr3<StringTraits>::DebugTokenStream::index()
 {
     return input_->index();
 }
 
-void DebugTokenStream::seek(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugTokenStream::seek(Index index)
 {
     // TODO: Implement seek in debugger when Ter adds it to Java
     //
     input_->seek(index);
 }
 
-CommonTokenPtr DebugTokenStream::LT(std::int32_t k)
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::DebugTokenStream::LT(std::int32_t k)
 {
     consumeInitialHiddenTokens();
     return input_->LT(k);
 }
 
-CommonTokenPtr DebugTokenStream::get(Index i)
+template<class StringTraits>
+CommonTokenPtr antlr3<StringTraits>::DebugTokenStream::get(Index i)
 {
     return input_->get(i);
 }
 
-TokenSourcePtr DebugTokenStream::tokenSource()
+template<class StringTraits>
+TokenSourcePtr antlr3<StringTraits>::DebugTokenStream::tokenSource()
 {
     return input_->tokenSource();
 }
 
-String DebugTokenStream::toString()
+template<class StringTraits>
+String antlr3<StringTraits>::DebugTokenStream::toString()
 {
     return input_->toString();
 }
 
-String DebugTokenStream::toString(std::uint32_t start, std::uint32_t stop)
+template<class StringTraits>
+String antlr3<StringTraits>::DebugTokenStream::toString(std::uint32_t start, std::uint32_t stop)
 {
     return input_->toString(start, stop);
 }
 
-String DebugTokenStream::toString(CommonTokenPtr start, CommonTokenPtr stop)
+template<class StringTraits>
+String antlr3<StringTraits>::DebugTokenStream::toString(CommonTokenPtr start, CommonTokenPtr stop)
 {
     return input_->toString(start, stop);
 }
 
-void DebugTokenStream::consumeInitialHiddenTokens()
+template<class StringTraits>
+void antlr3<StringTraits>::DebugTokenStream::consumeInitialHiddenTokens()
 {
     if(initialStreamState_)
     {
@@ -557,4 +590,3 @@ void DebugTokenStream::consumeInitialHiddenTokens()
     }
 }
 
-} // namespace antlr3

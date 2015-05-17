@@ -46,13 +46,12 @@
 #include <antlr3/Defs.hpp>
 #include <antlr3/CyclicDFA.hpp>
 
-namespace antlr3 {
-
 #ifdef	Windows
 #pragma warning( disable : 4100 )
 #endif
 
-void CyclicDfa::noViableAlt(BaseRecognizer * rec, std::uint32_t	s) const
+template<class StringTraits>
+void antlr3<StringTraits>::CyclicDfa::noViableAlt(BaseRecognizer * rec, std::uint32_t	s) const
 {
 	// In backtracking mode, we just set the failed flag so that the
 	// alt can just exit right now. If we are parsing though, then 
@@ -193,4 +192,3 @@ std::int32_t CyclicDfa::specialStateTransition(void * ctx, BaseRecognizer * reco
     }
 }
 
-} // namespace antlr3

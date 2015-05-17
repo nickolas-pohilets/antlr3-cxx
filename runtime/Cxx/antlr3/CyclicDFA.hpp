@@ -39,8 +39,6 @@
 #include <antlr3/BaseRecognizer.hpp>
 #include <antlr3/IntStream.hpp>
 
-namespace antlr3 {
-
 // If this header file is included as part of a generated recognizer that
 // is being compiled as if it were C++, and this is Windows, then the const elements
 // of the structure cause the C++ compiler to (rightly) point out that
@@ -96,7 +94,5 @@ private:
 #ifdef Windows
 #pragma warning	(pop)
 #endif
-
-} // namespace antlr3
 
 #endif
