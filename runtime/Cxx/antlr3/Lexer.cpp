@@ -53,7 +53,8 @@ antlr3<StringTraits>::Lexer::Lexer(CharStreamPtr input, RecognizerSharedStatePtr
     setCharStream(std::move(input));
 }
 
-Lexer::~Lexer()
+template<class StringTraits>
+antlr3<StringTraits>::Lexer::~Lexer()
 {
 }
 
@@ -61,11 +62,11 @@ Lexer::~Lexer()
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::reset()
 {
-    state_->token			    = NULL;
-    state_->type			    = TokenInvalid;
-    state_->channel			    = TokenDefaultChannel;
-    state_->tokenStartCharIndex	= -1;
-    state_->text	            = ANTLR3_T("");
+    this->state_->token			    = NULL;
+    this->state_->type			    = TokenInvalid;
+    this->state_->channel			    = TokenDefaultChannel;
+    this->state_->tokenStartCharIndex	= -1;
+    this->state_->text	            = ANTLR3_T("");
 }
 
 ///
@@ -86,11 +87,14 @@ void antlr3<StringTraits>::Lexer::reset()
 /// \see nextToken
 ///
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenStr() {
-    return filteringMode_ ? nextTokenFiltering() : nextTokenNormal();
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::Lexer::nextTokenStr() {
+    return this->filteringMode_ ? nextTokenFiltering() : nextTokenNormal();
 }
+
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::Lexer::nextTokenNormal()
 {
     /// Loop until we get a non skipped token or EOF
     ///
@@ -99,9 +103,9 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
         // Get rid of any previous token (token factory takes care of
         // any de-allocation when this token is finally used up.
         //
-        state_->token		    = NULL;
-        state_->error		    = false;	    // Start out without an exception
-        state_->failed		    = false;
+        this->state_->token		    = NULL;
+        this->state_->error		    = false;	    // Start out without an exception
+        this->state_->failed		    = false;
 
         // Now call the matching rules and see if we can generate a new token
         //
@@ -109,11 +113,11 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
         {
             // Record the start of the token in our input stream.
             //
-            state_->channel = TokenDefaultChannel;
-            state_->tokenStartCharIndex	= charStream()->index();
-            state_->text = ANTLR3_T("");
+            this->state_->channel = TokenDefaultChannel;
+            this->state_->tokenStartCharIndex	= charStream()->index();
+            this->state_->text = ANTLR3_T("");
 
-            if  (input_->LA(1) == CharstreamEof)
+            if  (this->input_->LA(1) == CharstreamEof)
             {
                 // Reached the end of the current stream, nothing more to do if this is
                 // the last in the stack.
@@ -125,31 +129,31 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
                 return teof;
             }
 
-            state_->token		= NULL;
-            state_->error		= false;	    // Start out without an exception
-            state_->failed		= false;
+            this->state_->token		= NULL;
+            this->state_->error		= false;	    // Start out without an exception
+            this->state_->failed		= false;
 
             // Call the generated lexer, see if it can get a new token together.
             //
             mTokens();
 
-            if  (state_->error  == true)
+            if  (this->state_->error  == true)
             {
                 // Recognition exception, report it and try to recover.
                 //
-                state_->failed	    = true;
+                this->state_->failed	    = true;
                 reportError();
                 recover(); 
             }
             else
             {
-                if (state_->token == NULL)
+                if (this->state_->token == NULL)
                 {
                     // Emit the real token, which adds it in to the token stream basically
                     //
                     emit();
                 }
-                else if	(state_->token->type() == TokenInvalid)
+                else if	(this->state_->token->type() == TokenInvalid)
                 {
                     // A real token could have been generated, but "Computer say's naaaaah" and it
                     // it is just something we need to skip altogether.
@@ -159,7 +163,7 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
 
                 // Good token, not skipped, not EOF token
                 //
-                return  state_->token;
+                return this->state_->token;
             }
         }
     }
@@ -172,23 +176,24 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenNormal()
  *  at state_->backtracking==1.
  */
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenFiltering()
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::Lexer::nextTokenFiltering()
 {
     /* Get rid of any previous token (token factory takes care of
      * any deallocation when this token is finally used up.
      */
-    state_->token = nullptr;
-    state_->error = false;	 // Start out without an exception
-    state_->failed = false;
+    this->state_->token = nullptr;
+    this->state_->error = false;	 // Start out without an exception
+    this->state_->failed = false;
 
     // Record the start of the token in our input stream.
-    state_->tokenStartCharIndex = input_->index();
-    state_->text = antlr3::String();
+    this->state_->tokenStartCharIndex = this->input_->index();
+    this->state_->text = antlr3::String();
 
     // Now call the matching rules and see if we can generate a new token
     for	(;;)
     {
-		if (input_->LA(1) == antlr3::CharstreamEof)
+		if (this->input_->LA(1) == antlr3::CharstreamEof)
 		{
 			/* Reached the end of the stream, nothing more to do.
 			 */
@@ -199,31 +204,31 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenFiltering()
             return teof;
 		}
 
-		state_->token = nullptr;
-		state_->error = false; // Start out without an exception
+		this->state_->token = nullptr;
+		this->state_->error = false; // Start out without an exception
 
-        antlr3::MarkerPtr m = input_->mark();
-        state_->backtracking = 1; // No exceptions
-        state_->failed = false;
+        antlr3::MarkerPtr m = this->input_->mark();
+        this->state_->backtracking = 1; // No exceptions
+        this->state_->failed = false;
 
         // Call the generated lexer, see if it can get a new token together.
         mTokens();
-        state_->backtracking = 0;
+        this->state_->backtracking = 0;
 
         // mTokens backtracks with synpred at state_->backtracking==2
         // and we set the synpredgate to allow actions at level 1.
 
-        if (state_->failed)
+        if (this->state_->failed)
         {
             // Advance one char and try again
             m->rewind();
-            input_->consume();
+            this->input_->consume();
         }
         else
         {
             // Assemble the token and emit it to the stream
             emit();
-            return state_->token;
+            return this->state_->token;
         }
     }
 }
@@ -248,7 +253,8 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextTokenFiltering()
  * \see nextTokenStr
  */
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::Lexer::nextToken()
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::Lexer::nextToken()
 {
     // Find the next token in the current stream
     //
@@ -269,7 +275,7 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextToken()
     //
     while(tok->type() == TokenEof)
     {
-        if  (!state_->streams.empty())
+        if  (!this->state_->streams.empty())
         {
             // We have another input stream in the stack so we
             // need to revert to it, then resume the loop to check
@@ -296,7 +302,7 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::nextToken()
 }
 
 template<class StringTraits>
-LocationSourcePtr antlr3<StringTraits>::Lexer::source()
+typename antlr3<StringTraits>::LocationSourcePtr antlr3<StringTraits>::Lexer::source()
 {
     return charStream();
 }
@@ -306,36 +312,42 @@ void antlr3<StringTraits>::Lexer::reportError()
 {
     // Indicate this recognizer had an error while processing.
     //
-    state_->errorCount++;
-    displayRecognitionError(state_->exception.get(), state_->tokenNames);
+    this->state_->errorCount++;
+    displayRecognitionError(this->state_->exception.get(), this->state_->tokenNames);
 }
 
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::fillException(Exception* ex)
 {
-    ex->input		= input_;
-    ex->item		= input_->LI(1); // Current input character
-    ex->index		= input_->index();
+    ex->input		= this->input_;
+    ex->item		= this->input_->LI(1); // Current input character
+    ex->index		= this->input_->index();
     ex->location    = charStream()->location(ex->index);
-    ex->streamName	= input_->sourceName();
-}
-
-std::uint32_t Lexer::itemToInt(ItemPtr item) {
-    return CharStream::charFromItem(item);
-}
-
-static String getCharErrorDisplay(std::uint32_t c)
-{
-    return ANTLR3_T("\'") + escape(c) + ANTLR3_T("\'");
-}
-
-static String getCharSetErrorDisplay(Bitset const & set)
-{
-    return set.toString(escape<std::uint32_t>);
+    ex->streamName	= this->input_->sourceName();
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+std::uint32_t  antlr3<StringTraits>::Lexer::itemToInt(ItemPtr item) {
+    return CharStream::charFromItem(item);
+}
+
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::getCharErrorDisplay(std::uint32_t c)
+{
+    return ANTLR3_T("\'") + StringUtils::escape(c) + ANTLR3_T("\'");
+}
+
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::getCharSetErrorDisplay(Bitset const & set)
+{
+    return set.toString(StringUtils::template escape<std::uint32_t>);
+}
+
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     class Visitor : public Exception::Visitor
     {
@@ -399,9 +411,10 @@ String antlr3<StringTraits>::Lexer::getErrorMessage(Exception const * e, StringL
 }
 
 template<class StringTraits>
-CharStreamPtr antlr3<StringTraits>::Lexer::charStream()
+typename antlr3<StringTraits>::CharStreamPtr
+    antlr3<StringTraits>::Lexer::charStream()
 {
-    return std::static_pointer_cast<CharStream>(input_);
+    return std::static_pointer_cast<CharStream>(this->input_);
 }
 
 template<class StringTraits>
@@ -409,13 +422,13 @@ void antlr3<StringTraits>::Lexer::setCharStream(CharStreamPtr input)
 {
     /* Install the input interface
      */
-    input_	= std::move(input);
+    this->input_ = std::move(input);
 
     /* Set the current token to nothing
      */
-    state_->token = NULL;
-    state_->text = ANTLR3_T("");
-    state_->tokenStartCharIndex	= -1;
+    this->state_->token = NULL;
+    this->state_->text = ANTLR3_T("");
+    this->state_->tokenStartCharIndex	= -1;
 }
 
 /*!
@@ -438,8 +451,8 @@ void antlr3<StringTraits>::Lexer::pushCharStream(CharStreamPtr input)
     // We have a stack, so we can save the current input stream
     // into it.
     //
-    RecognizerSharedState::StreamState save = { input_->mark(), charStream() };
-    state_->streams.push(save);
+    typename RecognizerSharedState::StreamState save = { this->input_->mark(), charStream() };
+    this->state_->streams.push(save);
 
     // And now we can install this new one
     //
@@ -466,7 +479,7 @@ void antlr3<StringTraits>::Lexer::popCharStream()
     // If we do not have a stream stack or we are already at the
     // stack bottom, then do nothing.
     //
-    if	(!state_->streams.empty())
+    if	(!this->state_->streams.empty())
     {
         // We just leave the current stream to its fate, we do not close
         // it or anything as we do not know what the programmer intended
@@ -474,8 +487,8 @@ void antlr3<StringTraits>::Lexer::popCharStream()
         // So just find out what was currently saved on the stack and use
         // that now, then pop it from the stack.
         //
-        auto save = state_->streams.top();
-        state_->streams.pop();
+        auto save = this->state_->streams.top();
+        this->state_->streams.pop();
 
         // Now install the stream as the current one.
         //
@@ -487,11 +500,12 @@ void antlr3<StringTraits>::Lexer::popCharStream()
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::emitNew(CommonTokenPtr token)
 {
-    state_->token    = token;
+    this->state_->token    = token;
 }
 
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::Lexer::emit()
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::Lexer::emit()
 {
     /* We could check pointers to token factories and so on, but
     * we are in code that we want to run as fast as possible
@@ -504,18 +518,18 @@ CommonTokenPtr antlr3<StringTraits>::Lexer::emit()
     * get added automatically, such as the input stream it is associated with
     * (though it can all be overridden of course)
     */
-    token->setType(state_->type);
-    token->setChannel(state_->channel);
-    token->setStartIndex(state_->tokenStartCharIndex);
+    token->setType(this->state_->type);
+    token->setChannel(this->state_->channel);
+    token->setStartIndex(this->state_->tokenStartCharIndex);
     token->setStopIndex(charIndex());
     token->setInputStream(charStream());
 
-    if(!state_->text.empty())
+    if(!this->state_->text.empty())
     {
-        token->setText(state_->text);
+        token->setText(this->state_->text);
     }
 
-    state_->token	    = token;
+    this->state_->token = token;
 
     return  token;
 }
@@ -539,9 +553,9 @@ bool antlr3<StringTraits>::Lexer::matchs(char32_t const * string, size_t len)
 {
     return matchStr(string, len);
 }
-    
-template<class T>
+
 template<class StringTraits>
+template<class T>
 bool antlr3<StringTraits>::Lexer::matchStr(T const * string, size_t len) {
     for (size_t i = 0; i < len; ++i) {
         if (!matchc(string[i])) {
@@ -575,23 +589,23 @@ template<class StringTraits>
 bool antlr3<StringTraits>::Lexer::matchRange(std::uint32_t low, std::uint32_t high)
 {
     // What is in the stream at the moment?
-    std::uint32_t c	= input_->LA(1);
+    std::uint32_t c	= this->input_->LA(1);
     if( c >= low && c <= high)
     {
         // Matched correctly, consume it
-        input_->consume();
+        this->input_->consume();
 
         // Reset any failed indicator
-        state_->failed = false;
+        this->state_->failed = false;
 
         return	true;
     }
     
     // Failed to match, execption and recovery time.
-    if	(state_->backtracking > 0)
+    if	(this->state_->backtracking > 0)
     {
-        state_->failed  = true;
-        return	false;
+        this->state_->failed  = true;
+        return false;
     }
 
     this->recordException(new MismatchedRangeException(low, high));
@@ -605,42 +619,45 @@ bool antlr3<StringTraits>::Lexer::matchRange(std::uint32_t low, std::uint32_t hi
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::matchAny()
 {
-    input_->consume();
+    this->input_->consume();
 }
 
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::recover()
 {
-    input_->consume();
+    this->input_->consume();
 }
 
 template<class StringTraits>
-Index antlr3<StringTraits>::Lexer::charIndex()
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::Lexer::charIndex()
 {
-    return input_->index();
+    return this->input_->index();
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::Lexer::text()
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::Lexer::text()
 {
-    if (!state_->text.empty())
+    if (!this->state_->text.empty())
     {
-        return state_->text;
+        return this->state_->text;
     }
 
-    return charStream()->substr(state_->tokenStartCharIndex, charIndex());
+    return charStream()->substr(this->state_->tokenStartCharIndex, charIndex());
 }
     
 template<class StringTraits>
 void antlr3<StringTraits>::Lexer::setText(String s)
 {
-    state_->text = std::move(s);
+    this->state_->text = std::move(s);
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::Lexer::traceCurrentItem() {
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::Lexer::traceCurrentItem() {
     std::uint32_t c = charStream()->LA(1);
     Location loc = charStream()->location(charStream()->index());
-    return getCharErrorDisplay(c) + ANTLR3_T(" at ") + toString(loc.line()) + ANTLR3_T(":") + toString(loc.charPositionInLine());
+    return getCharErrorDisplay(c) + ANTLR3_T(" at ") + StringTraits::toString(loc.line()) + ANTLR3_T(":") + StringTraits::toString(loc.charPositionInLine());
 }
 

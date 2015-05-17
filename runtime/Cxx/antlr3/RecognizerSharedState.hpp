@@ -53,7 +53,8 @@
  * May be share between multiple recognizers such that 
  * grammar inheritance is easily supported.
  */
-struct RecognizerSharedState
+template <class StringTraits>
+class antlr3<StringTraits>::RecognizerSharedState
 {
     RecognizerSharedState();
     ~RecognizerSharedState();

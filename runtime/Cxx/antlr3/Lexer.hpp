@@ -69,7 +69,8 @@
 #include <antlr3/TokenStream.hpp>
 #include <antlr3/BaseRecognizer.hpp>
 
-class Lexer : public BaseRecognizer, public TokenSource
+template<class StringTraits>
+class antlr3<StringTraits>::Lexer : public BaseRecognizer, public TokenSource
 {
     friend class BaseRecognizer;
 public:

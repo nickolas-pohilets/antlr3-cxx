@@ -61,7 +61,8 @@ antlr3<StringTraits>::RewriteRuleElementStream::RewriteRuleElementStream(TreeAda
 	elements_ = std::move(vector);
 }
 
-RewriteRuleElementStream::~RewriteRuleElementStream()
+template<class StringTraits>
+antlr3<StringTraits>::RewriteRuleElementStream::~RewriteRuleElementStream()
 {
 }
 
@@ -104,7 +105,8 @@ void antlr3<StringTraits>::RewriteRuleElementStream::add(ItemPtr el)
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::next()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleElementStream::next()
 {
 	std::uint32_t s = size();
 	if (cursor_ >= s && s == 1)
@@ -115,7 +117,8 @@ ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::next()
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::nextTree() 
+typename antlr3<StringTraits>::ItemPtr
+   antlr3<StringTraits>::RewriteRuleElementStream::nextTree()
 {
 	std::uint32_t n = size();
 
@@ -139,7 +142,8 @@ bool antlr3<StringTraits>::RewriteRuleElementStream::hasNext()
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::nextNode()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleElementStream::nextNode()
 {
 	ItemPtr el = _next();
 
@@ -157,7 +161,8 @@ ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::nextNode()
 	return el;
 }
 
-std::uint32_t RewriteRuleElementStream::size()
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::RewriteRuleElementStream::size()
 {
 	if (singleElement_)
 	{
@@ -168,13 +173,15 @@ std::uint32_t RewriteRuleElementStream::size()
 }
 
 template<class StringTraits>
-StringLiteral antlr3<StringTraits>::RewriteRuleElementStream::description()
+typename antlr3<StringTraits>::StringLiteral
+    antlr3<StringTraits>::RewriteRuleElementStream::description()
 {
     return elementDescription_ ? elementDescription_ : ANTLR3_T("<unknown source>");
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::toTree(ItemPtr element)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleElementStream::toTree(ItemPtr element)
 {
     /// We don't explicitly convert to a tree unless the call goes to
     /// nextTree, which means rewrites are heterogeneous 
@@ -183,7 +190,8 @@ ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::toTree(ItemPtr element)
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleElementStream::_next()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleElementStream::_next()
 {
 	std::uint32_t n = size();
 	if (n == 0)
@@ -242,23 +250,26 @@ antlr3<StringTraits>::RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptor
 {}
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleTokenStream::dup(ItemPtr)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleTokenStream::dup(ItemPtr)
 {
     assert(false && ANTLR3_T("dup() cannot be called on a token rewrite stream!!"));
 	return nullptr;
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleTokenStream::nextNode()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleTokenStream::nextNode()
 {
-    CommonTokenPtr token = std::static_pointer_cast<CommonToken>(_next());
-    return adaptor_->create(token);
+    CommonTokenPtr token = std::static_pointer_cast<CommonToken>(this->_next());
+    return this->adaptor_->create(token);
 }
 
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::RewriteRuleTokenStream::nextToken()
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::RewriteRuleTokenStream::nextToken()
 {
-	return pointer_cast<CommonTokenPtr>(_next());
+	return pointer_cast<CommonTokenPtr>(this->_next());
 }
 
 #pragma mark RewriteRuleSubtreeStream
@@ -279,13 +290,15 @@ antlr3<StringTraits>::RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAda
 {}
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleSubtreeStream::dup(ItemPtr element)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleSubtreeStream::dup(ItemPtr element)
 {
-	return adaptor_->dupNode(std::move(element));
+	return this->adaptor_->dupNode(std::move(element));
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleSubtreeStream::nextNode()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleSubtreeStream::nextNode()
 {
     return RewriteRuleElementStream::nextNode();
 }
@@ -308,21 +321,24 @@ antlr3<StringTraits>::RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPt
 {}
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleNodeStream::dup(ItemPtr element)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleNodeStream::dup(ItemPtr element)
 {
 	assert(false && ANTLR3_T("dup() cannot be called on a node rewrite stream!!!"));
 	return nullptr;
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleNodeStream::toTree(ItemPtr element)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleNodeStream::toTree(ItemPtr element)
 {
-    return adaptor_->dupNode(std::move(element));
+    return this->adaptor_->dupNode(std::move(element));
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::RewriteRuleNodeStream::nextNode()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::RewriteRuleNodeStream::nextNode()
 {
-    return _next();
+    return this->_next();
 }
 

@@ -54,12 +54,14 @@ antlr3<StringTraits>::Parser::Parser(TokenStreamPtr tstream, DebugEventListenerP
     setDebugListener(std::move(dbg));
 }
 
-Parser::~Parser()
+template<class StringTraits>
+antlr3<StringTraits>::Parser::~Parser()
 {
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::Parser::getMissingSymbol(
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::Parser::getMissingSymbol(
      ExceptionPtr e,
      std::uint32_t expectedTokenType,
      Bitset const & follow
@@ -93,7 +95,7 @@ ItemPtr antlr3<StringTraits>::Parser::getMissingSymbol(
     // Create the token text that shows it has been inserted
     //
     String text = ANTLR3_T("<missing ");
-    text += expectedTokenType == TokenEof ? "EOF" : state_->tokenNames[expectedTokenType];
+    text += expectedTokenType == TokenEof ? "EOF" : this->state_->tokenNames[expectedTokenType];
     text += ANTLR3_T(">");
     token->setText(text);
 
@@ -108,7 +110,7 @@ void antlr3<StringTraits>::Parser::fillException(Exception* ex)
     TokenStreamPtr cts = tokenStream();
     CommonTokenPtr token = cts->LT(1);
 
-    ex->input = input_;
+    ex->input = this->input_;
     ex->item  = token;
     ex->location = token->startLocation();
     ex->index = cts->index();
@@ -123,7 +125,8 @@ void antlr3<StringTraits>::Parser::fillException(Exception* ex)
     }
 }
 
-std::uint32_t Parser::itemToInt(ItemPtr item) {
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::Parser::itemToInt(ItemPtr item) {
     return std::static_pointer_cast<CommonToken>(item)->type();
 }
 
@@ -139,33 +142,35 @@ void antlr3<StringTraits>::Parser::setDebugListener(DebugEventListenerPtr dbg)
     // a replacement function for debug mode should be supplied
     // and installed here.
     //
-    debugger_ = std::move(dbg);
+    this->debugger_ = std::move(dbg);
 
     // If there was a tokenstream installed already
     // then we need to tell it about the debug interface
     //
-    if	(input_ != NULL)
+    if	(this->input_ != NULL)
     {
-        setTokenStream(std::make_shared<DebugTokenStream>(tokenStream(), debugger_));
+        setTokenStream(std::make_shared<DebugTokenStream>(tokenStream(), this->debugger_));
     }
 }
 
 template<class StringTraits>
-TokenStreamPtr antlr3<StringTraits>::Parser::tokenStream()
+typename antlr3<StringTraits>::TokenStreamPtr
+    antlr3<StringTraits>::Parser::tokenStream()
 {
-    return std::static_pointer_cast<TokenStream>(input_);
+    return std::static_pointer_cast<TokenStream>(this->input_);
 }
 
 template<class StringTraits>
 void antlr3<StringTraits>::Parser::setTokenStream(TokenStreamPtr tstream)
 {
-    input_ = tstream;
-    reset();
+    this->input_ = tstream;
+    this->reset();
 }
     
 template<class StringTraits>
-String antlr3<StringTraits>::Parser::traceCurrentItem() {
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::Parser::traceCurrentItem() {
     CommonTokenPtr t = tokenStream()->LT(1);
-    return t->toString(state_->tokenNames);
+    return t->toString(this->state_->tokenNames);
 }
 

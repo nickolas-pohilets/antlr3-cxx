@@ -40,7 +40,8 @@
  *  if necessary, and contains function can be supported If the hash key
  *  could be unique I would have invented the perfect compression algorithm ;-)
  */
-class TreeParser : public BaseRecognizer
+template<class StringTraits>
+class antlr3<StringTraits>::TreeParser : public BaseRecognizer
 {
     friend class BaseRecognizer;
 protected:

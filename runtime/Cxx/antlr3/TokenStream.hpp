@@ -51,7 +51,8 @@
  *  multiple interfaces without defining them in the interface structure
  *  or casting (void *), which is too convoluted.
  */
-class TokenSource
+template<class StringTraits>
+class antlr3<StringTraits>::TokenSource
 {
 public:
     virtual ~TokenSource() {}
@@ -68,7 +69,8 @@ public:
     virtual LocationSourcePtr source() = 0;
 };
 
-class TokenStream : public IntStream
+template<class StringTraits>
+class antlr3<StringTraits>::TokenStream : public IntStream
 {
 public:
     /** Get Token at current input pointer + i ahead where i=1 is next Token.
@@ -120,7 +122,8 @@ public:
  *  parsers and recognizers. You may of course build your own implementation if
  *  you are so inclined.
  */
-class CommonTokenStream : public TokenStream, public std::enable_shared_from_this<CommonTokenStream>
+template<class StringTraits>
+class antlr3<StringTraits>::CommonTokenStream : public TokenStream, public std::enable_shared_from_this<CommonTokenStream>
 {
     class TokenStreamMarker : public Marker
     {
@@ -239,7 +242,8 @@ public:
     void reset();
 };
 
-class DebugTokenStream : public TokenStream
+template<class StringTraits>
+class antlr3<StringTraits>::DebugTokenStream : public TokenStream
 {
     class DebugTokenStreamMarker : public Marker
     {

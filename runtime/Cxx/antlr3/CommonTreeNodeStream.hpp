@@ -47,7 +47,8 @@
 #define DEFAULT_INITIAL_BUFFER_SIZE  100
 #define INITIAL_CALL_STACK_SIZE   10
 
-class TreeNodeStream : public IntStream
+template<class StringTraits>
+class antlr3<StringTraits>::TreeNodeStream : public IntStream
 {
 public:
     virtual ItemPtr LI(std::int32_t i) override { return LT(i); }
@@ -125,7 +126,8 @@ public:
 
 };
 
-class CommonTreeNodeStream : public TreeNodeStream, public std::enable_shared_from_this<CommonTreeNodeStream>
+template<class StringTraits>
+class antlr3<StringTraits>::CommonTreeNodeStream : public TreeNodeStream, public std::enable_shared_from_this<CommonTreeNodeStream>
 {
     class TreeNodeStreamMarker : public Marker
     {

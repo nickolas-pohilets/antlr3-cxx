@@ -34,7 +34,8 @@
 #include <antlr3/DebugEventListener.hpp>
 
 /// A proxy debug event listener that forwards events over a socket to a debugger (or any other listener) using a simple text-based protocol; one event per line.
-class DebugEventSocketProxy : public DebugEventListener
+template<class StringTraits>
+class antlr3<StringTraits>::DebugEventSocketProxy : public DebugEventListener
 {
     /// The port number which the debug listener should listen on for a connection
     ///
@@ -123,6 +124,8 @@ public:
     virtual void becomeRoot(ItemPtr newRoot, ItemPtr oldRoot) override;
     virtual void addChild(ItemPtr root, ItemPtr child) override;
     virtual void setTokenBoundaries(ItemPtr t, Index tokenStartIndex, Index tokenStopIndex) override;
+private:
+    static void serializeText(std::string& buffer, String text);
 };
 
 #endif // DebugEventSocketProxy_H

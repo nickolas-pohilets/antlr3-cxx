@@ -53,7 +53,8 @@ antlr3<StringTraits>::RecognizerSharedState::RecognizerSharedState()
 {
 }
 
-RecognizerSharedState::~RecognizerSharedState()
+template<class StringTraits>
+antlr3<StringTraits>::RecognizerSharedState::~RecognizerSharedState()
 {
 }
 
@@ -67,7 +68,8 @@ antlr3<StringTraits>::BaseRecognizer::BaseRecognizer(RecognizerSharedStatePtr st
     assert(state_ != nullptr);
 }
 
-BaseRecognizer::~BaseRecognizer()
+template<class StringTraits>
+antlr3<StringTraits>::BaseRecognizer::~BaseRecognizer()
 {
 }
 
@@ -117,7 +119,8 @@ bool antlr3<StringTraits>::BaseRecognizer::evalPredicate(bool result, const char
 /// symbols that can follow rule ref.
 ///
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::BaseRecognizer::match(std::uint32_t ttype, Bitset const & follow)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::BaseRecognizer::match(std::uint32_t ttype, Bitset const & follow)
 {
     // Pick up the current input token/node for assignment to labels
     //
@@ -387,7 +390,7 @@ void antlr3<StringTraits>::BaseRecognizer::endResync()
 /// at run-time upon error to avoid overhead during parsing.
 ///
 template<class StringTraits>
-Bitset antlr3<StringTraits>::BaseRecognizer::computeErrorRecoverySet()
+typename antlr3<StringTraits>::Bitset antlr3<StringTraits>::BaseRecognizer::computeErrorRecoverySet()
 {
     return combineFollows(false);
 }
@@ -447,7 +450,7 @@ Bitset antlr3<StringTraits>::BaseRecognizer::computeErrorRecoverySet()
 /// throwing an exception.
 ///
 template<class StringTraits>
-Bitset antlr3<StringTraits>::BaseRecognizer::computeCSRuleFollow()
+typename antlr3<StringTraits>::Bitset antlr3<StringTraits>::BaseRecognizer::computeCSRuleFollow()
 {
     return combineFollows(false);
 }
@@ -455,7 +458,8 @@ Bitset antlr3<StringTraits>::BaseRecognizer::computeCSRuleFollow()
 /// Compute the current followset for the input stream.
 ///
 template<class StringTraits>
-Bitset antlr3<StringTraits>::BaseRecognizer::combineFollows(bool exact)
+typename antlr3<StringTraits>::Bitset
+    antlr3<StringTraits>::BaseRecognizer::combineFollows(bool exact)
 {
     std::size_t top = state_->following.size();
     
@@ -512,7 +516,8 @@ void antlr3<StringTraits>::BaseRecognizer::emitErrorMessage(String msg)
 
 /// Return how many syntax errors were detected by this recognizer
 ///
-std::uint32_t BaseRecognizer::numberOfSyntaxErrors()
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::BaseRecognizer::numberOfSyntaxErrors()
 {
     return state_->errorCount;
 }
@@ -597,7 +602,8 @@ void antlr3<StringTraits>::BaseRecognizer::recover()
 /// error flag and rules cascade back when this is set.
 ///
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedToken(std::uint32_t ttype, Bitset const & follow)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedToken(std::uint32_t ttype, Bitset const & follow)
 {
     // If the next token after the one we are looking at in the input stream
     // is what we are looking for then we remove the one we have discovered
@@ -665,7 +671,8 @@ ItemPtr antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedToken(std::ui
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedSet(Bitset const & follow)
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::BaseRecognizer::recoverFromMismatchedSet(Bitset const & follow)
 {
     if	(mismatchIsMissingToken(follow) == true)
     {
@@ -794,7 +801,8 @@ void antlr3<StringTraits>::BaseRecognizer::consumeUntilSet(Bitset const & set)
  * version of the table.
  */
 template<class StringTraits>
-Index antlr3<StringTraits>::BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::BaseRecognizer::getRuleMemoization(Index ruleIndex, Index ruleParseStart)
 {
     /* The rule memos are an List of List.
      */
@@ -918,7 +926,8 @@ void antlr3<StringTraits>::BaseRecognizer::reset()
 }
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::BaseRecognizer::currentInputSymbol()
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::BaseRecognizer::currentInputSymbol()
 {
     return input_->LI(1);
 }
@@ -927,7 +936,8 @@ ItemPtr antlr3<StringTraits>::BaseRecognizer::currentInputSymbol()
 // You MAY need override this function if the standard COMMON_TOKEN_STREAM is not what you are using.
 //
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::BaseRecognizer::getMissingSymbol(
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::BaseRecognizer::getMissingSymbol(
     ExceptionPtr e,
     std::uint32_t expectedTokenType,
     Bitset const & follow
@@ -937,7 +947,8 @@ ItemPtr antlr3<StringTraits>::BaseRecognizer::getMissingSymbol(
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::BaseRecognizer::getErrorHeader(Exception const * e, StringLiteral const *)
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::BaseRecognizer::getErrorHeader(Exception const * e, StringLiteral const *)
 {
     String retVal;
 
@@ -960,12 +971,16 @@ String antlr3<StringTraits>::BaseRecognizer::getErrorHeader(Exception const * e,
     return retVal;
 }
 
-static String getTokenErrorDisplay(std::uint32_t type, StringLiteral const * tokenNames)
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::getTokenErrorDisplay(std::uint32_t type, StringLiteral const * tokenNames)
 {
-    return String(ANTLR3_T("<")) + getTokenName(type, tokenNames) + ANTLR3_T(">");
+    return ANTLR3_T("<") + getTokenName(type, tokenNames) + ANTLR3_T(">");
 }
 
-static String getTokenErrorDisplay(ItemPtr item, StringLiteral const * tokenNames)
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::getTokenErrorDisplay(ItemPtr item, StringLiteral const * tokenNames)
 {
     CommonTokenPtr t = std::static_pointer_cast<CommonToken>(item);
     if (t == nullptr)
@@ -984,7 +999,9 @@ static String getTokenErrorDisplay(ItemPtr item, StringLiteral const * tokenName
     return getTokenErrorDisplay(t->type(), tokenNames);
 }
 
-static String getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * tokenNames)
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * tokenNames)
 {
     return set.toString(
         [=](std::uint32_t ttype) -> String {
@@ -994,7 +1011,8 @@ static String getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * 
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::BaseRecognizer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::BaseRecognizer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     // Default implementation is provided for parser.
 
@@ -1061,8 +1079,9 @@ String antlr3<StringTraits>::BaseRecognizer::getErrorMessage(Exception const * e
     e->accept(v);
     return v.retVal;
 }
-    
-std::ostream& BaseRecognizer::traceStream() {
+
+template<class StringTraits>
+std::ostream& antlr3<StringTraits>::BaseRecognizer::traceStream() {
     return std::cout;
 }
     

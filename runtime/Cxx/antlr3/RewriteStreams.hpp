@@ -55,7 +55,8 @@
 ///
 /// TODO: add mechanism to detect/puke on modification after reading from stream
 ///
-class RewriteRuleElementStream
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteRuleElementStream
 {
 public:
     RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
@@ -166,7 +167,8 @@ private:
 /// This is an implementation of a token stream, which is basically an element
 /// stream that deals with tokens only.
 ///
-class RewriteRuleTokenStream : public RewriteRuleElementStream
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteRuleTokenStream : public RewriteRuleElementStream
 {
 public:
     RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
@@ -184,7 +186,8 @@ public:
 /// This is an implementation of a subtree stream which is a set of trees
 /// modelled as an element stream.
 ///
-class RewriteRuleSubtreeStream : public RewriteRuleElementStream
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteRuleSubtreeStream : public RewriteRuleElementStream
 {
 public:
     RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
@@ -198,7 +201,8 @@ public:
 /// This is an implementation of a node stream, which is basically an element
 /// stream that deals with tree nodes only.
 ///
-class RewriteRuleNodeStream : public RewriteRuleElementStream
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteRuleNodeStream : public RewriteRuleElementStream
 {
 public:
     RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);

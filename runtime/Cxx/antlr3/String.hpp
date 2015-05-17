@@ -100,6 +100,8 @@ public:
     static String toString(float val)              { return fromLatin1(std::to_string(val)); }
     static String toString(double val)             { return fromLatin1(std::to_string(val)); }
     static String toString(long double val)        { return fromLatin1(std::to_string(val)); }
+    
+    std::string toUTF8(String const & s);
 private:
     static String fromLatin1(std::string const & s)
     {
@@ -133,6 +135,8 @@ public:
     static String toString(float val)              { return std::to_string(val); }
     static String toString(double val)             { return std::to_string(val); }
     static String toString(long double val)        { return std::to_string(val); }
+    
+    std::string toUTF8(String s) { return std::move(s); }
 };
 
 #define ANTLR3_T(X) StringTraits::literal(X, u##X, U##X)

@@ -41,15 +41,18 @@
 #include <antlr3/CommonTree.hpp>
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::create(CommonTokenPtr payload) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::create(CommonTokenPtr payload) {
     return std::make_shared<CommonTree>(std::move(payload));
 }
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::dupNode(ItemPtr treeNode) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::dupNode(ItemPtr treeNode) {
     return std::static_pointer_cast<CommonTree>(treeNode)->dupNode();
 }
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::errorNode(
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::errorNode(
     TokenStreamPtr input,
     CommonTokenPtr start,
     CommonTokenPtr stop,
@@ -66,39 +69,45 @@ bool antlr3<StringTraits>::CommonTreeAdaptor::isNil(ItemPtr t) {
 // R e w r i t e  R u l e s
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, CommonTokenPtr fromToken) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, CommonTokenPtr fromToken) {
     auto tok = fromToken ? std::make_shared<CommonToken>(*fromToken) : std::make_shared<CommonToken>();
     tok->setType(tokenType);
     return create(tok);
 }
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, CommonTokenPtr fromToken, String text) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, CommonTokenPtr fromToken, String text) {
     auto tok = fromToken ? std::make_shared<CommonToken>(*fromToken) : std::make_shared<CommonToken>();
     tok->setType(tokenType);
     tok->setText(std::move(text));
     return create(tok);
 }
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, String text) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::create(std::uint32_t tokenType, String text) {
     auto tok = std::make_shared<CommonToken>(tokenType, std::move(text));
     return create(tok);
 }
 
 // C o n t e n t
 
-std::uint32_t CommonTreeAdaptor::getType(ItemPtr t) {
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::CommonTreeAdaptor::getType(ItemPtr t) {
     if (!t) return TokenInvalid;
     return std::static_pointer_cast<CommonTree>(t)->type();
 }
 //    void setType(ItemPtr t, std::uint32_t type);
 template<class StringTraits>
-String antlr3<StringTraits>::CommonTreeAdaptor::getText(ItemPtr t) {
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonTreeAdaptor::getText(ItemPtr t) {
     if (!t) return String();
     return std::static_pointer_cast<CommonTree>(t)->text();
 }
 //    void setText(ItemPtr t, String text);
 template<class StringTraits>
-CommonTokenPtr antlr3<StringTraits>::CommonTreeAdaptor::getToken(ItemPtr t) {
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::getToken(ItemPtr t) {
     if (!t) return nullptr;
     return std::static_pointer_cast<CommonTree>(t)->token();
 }
@@ -123,13 +132,15 @@ void antlr3<StringTraits>::CommonTreeAdaptor::setTokenBoundaries(ItemPtr t, Comm
 }
 
 template<class StringTraits>
-Index antlr3<StringTraits>::CommonTreeAdaptor::getTokenStartIndex(ItemPtr t) {
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::CommonTreeAdaptor::getTokenStartIndex(ItemPtr t) {
     if (!t) return NullIndex;
     return std::static_pointer_cast<CommonTree>(t)->tokenStartIndex();
 }
 
 template<class StringTraits>
-Index antlr3<StringTraits>::CommonTreeAdaptor::getTokenStopIndex(ItemPtr t) {
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::CommonTreeAdaptor::getTokenStopIndex(ItemPtr t) {
     if (!t) return NullIndex;
     return std::static_pointer_cast<CommonTree>(t)->tokenStopIndex();
 }
@@ -137,7 +148,8 @@ Index antlr3<StringTraits>::CommonTreeAdaptor::getTokenStopIndex(ItemPtr t) {
 // N a v i g a t i o n  /  T r e e  P a r s i n g
 
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::CommonTreeAdaptor::getParent(ItemPtr child) {
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::CommonTreeAdaptor::getParent(ItemPtr child) {
     if (!child) return nullptr;
     return std::static_pointer_cast<CommonTree>(child)->parent();
 }
@@ -156,19 +168,22 @@ void antlr3<StringTraits>::CommonTreeAdaptor::setChildIndex(ItemPtr child, std::
     std::static_pointer_cast<CommonTree>(child)->setChildIndex(i);
 }
 
-std::int32_t CommonTreeAdaptor::getChildIndex(ItemPtr child) {
+template<class StringTraits>
+std::int32_t antlr3<StringTraits>::CommonTreeAdaptor::getChildIndex(ItemPtr child) {
     if (!child) return 0;
     return std::static_pointer_cast<CommonTree>(child)->childIndex();
 }
 
 template<class StringTraits>
-Location antlr3<StringTraits>::CommonTreeAdaptor::getLocation(ItemPtr t) {
+typename antlr3<StringTraits>::Location
+    antlr3<StringTraits>::CommonTreeAdaptor::getLocation(ItemPtr t) {
     if (!t) return Location();
     return std::static_pointer_cast<CommonTree>(t)->location();
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::CommonTreeAdaptor::toString(ItemPtr t, StringLiteral const * tokenNames) {
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonTreeAdaptor::toString(ItemPtr t, StringLiteral const * tokenNames) {
     if (!t) return String();
     return std::static_pointer_cast<CommonTree>(t)->toString(tokenNames);
 }

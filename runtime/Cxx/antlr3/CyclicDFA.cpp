@@ -72,7 +72,8 @@ void antlr3<StringTraits>::CyclicDfa::noViableAlt(BaseRecognizer * rec, std::uin
  *  to the underlying CFL).  Return an alternative number 1..n.  Throw
  *  an exception upon error.
  */
-std::int32_t CyclicDfa::predict(void * ctx, BaseRecognizer * rec, IntStream * is) const
+template<class StringTraits>
+std::int32_t antlr3<StringTraits>::CyclicDfa::predict(void * ctx, BaseRecognizer * rec, IntStream * is) const
 {
     MarkerPtr mark = is->mark();	    /* Store where we are right now	*/
     std::int32_t s		= 0;		    /* Always start with state 0	*/
@@ -180,7 +181,14 @@ std::int32_t CyclicDfa::predict(void * ctx, BaseRecognizer * rec, IntStream * is
 
 /** Default special state implementation
  */
-std::int32_t CyclicDfa::specialStateTransition(void * ctx, BaseRecognizer * recognizer, IntStream * is, std::int32_t s, MarkerPtr marker) const
+template<class StringTraits>
+std::int32_t antlr3<StringTraits>::CyclicDfa::specialStateTransition(
+    void * ctx,
+    BaseRecognizer * recognizer,
+    IntStream * is,
+    std::int32_t s,
+    MarkerPtr marker
+) const
 {
     if (specialStateTransitionFunc == NULL)
     {

@@ -44,7 +44,8 @@
 /// lexer, parser, and tree grammars.  This is all the parsing
 /// support code essentially; most of it is error recovery stuff and
 /// backtracking.
-class BaseRecognizer
+template<class StringTraits>
+class antlr3<StringTraits>::BaseRecognizer
 {
     friend class CyclicDfa;
 public:

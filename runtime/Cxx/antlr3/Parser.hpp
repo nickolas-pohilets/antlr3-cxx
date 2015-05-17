@@ -41,7 +41,8 @@
 
 /** This is the main interface for an ANTLR3 parser.
  */
-class Parser : public BaseRecognizer
+template<class StringTraits>
+class antlr3<StringTraits>::Parser : public BaseRecognizer
 {
     friend class BaseRecognizer;
 public:
@@ -76,7 +77,5 @@ protected:
     virtual std::uint32_t itemToInt(ItemPtr item) override;
     virtual String traceCurrentItem() override;
 };
-
-} // namespace
 
 #endif

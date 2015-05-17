@@ -153,6 +153,7 @@ ANTLR3_DECL_PTR(ByteCharStream);
 ANTLR3_DECL_PTR(UnicodeCharStream);
 ANTLR3_DECL_PTR(TokenStream);
 ANTLR3_DECL_PTR(CommonTokenStream);
+ANTLR3_DECL_PTR(DebugTokenStream);
 ANTLR3_DECL_PTR(TreeNodeStream);
 ANTLR3_DECL_PTR(CommonTreeNodeStream);
 ANTLR3_DECL_PTR(RecognizerSharedState);
@@ -174,14 +175,21 @@ ANTLR3_DECL_PTR(RewriteEarlyExitException);
 ANTLR3_DECL_PTR(TokenSource);
 ANTLR3_DECL_PTR(TreeAdaptor);
 ANTLR3_DECL_PTR(CommonTreeAdaptor);
+ANTLR3_DECL_PTR(RewriteRuleElementStream);
 ANTLR3_DECL_PTR(RewriteRuleTokenStream);
 ANTLR3_DECL_PTR(RewriteRuleSubtreeStream);
 ANTLR3_DECL_PTR(RewriteRuleNodeStream);
 ANTLR3_DECL_PTR(DebugEventListener);
+ANTLR3_DECL_PTR(DebugEventSocketProxy);
 ANTLR3_DECL_PTR(Bitset);
 ANTLR3_DECL_PTR(CyclicDfa);
 
 static StringLiteral getTokenName(std::uint32_t tokenType, StringLiteral const * tokenNames);
+static String getCharErrorDisplay(std::uint32_t c);
+static String getCharSetErrorDisplay(Bitset const & set);
+static String getTokenErrorDisplay(std::uint32_t type, StringLiteral const * tokenNames);
+static String getTokenErrorDisplay(ItemPtr item, StringLiteral const * tokenNames);
+static String getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * tokenNames);
 
 /// Produce a DOT specification for graphviz freeware suite from a base tree
 static String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree);

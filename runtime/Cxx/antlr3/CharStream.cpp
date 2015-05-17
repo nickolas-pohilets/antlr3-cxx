@@ -135,7 +135,8 @@ antlr3_defs::MarkerPtr antlr3<StringTraits>::BasicCharStream<CodeUnit>::mark()
 
 template<class StringTraits>
 template<class CodeUnit>
-antlr3_defs::Index antlr3<StringTraits>::BasicCharStream<CodeUnit>::index()
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::BasicCharStream<CodeUnit>::index()
 {
     return currentPos_ - data_.begin();
 }

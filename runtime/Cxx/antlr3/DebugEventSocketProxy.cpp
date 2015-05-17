@@ -108,7 +108,8 @@ antlr3<StringTraits>::DebugEventSocketProxy::DebugEventSocketProxy(std::uint32_t
     initOpaque<SOCKET>(socket_, INVALID_SOCKET);
 }
 
-DebugEventSocketProxy::~DebugEventSocketProxy()
+template<class StringTraits>
+antlr3<StringTraits>::DebugEventSocketProxy::~DebugEventSocketProxy()
 {
     SOCKET& s = getOpaque<SOCKET>(socket_);
     if(s != INVALID_SOCKET)
@@ -120,7 +121,9 @@ DebugEventSocketProxy::~DebugEventSocketProxy()
     freeOpaque<SOCKET>(socket_);
 }
 
-String const & DebugEventSocketProxy::grammarFileName() const
+template<class StringTraits>
+typename antlr3<StringTraits>::String const &
+    antlr3<StringTraits>::DebugEventSocketProxy::grammarFileName() const
 {
     return grammarFileName_;
 }
@@ -311,9 +314,10 @@ void antlr3<StringTraits>::DebugEventSocketProxy::ack()
 // text, escaping any newlines and linefeeds. We have no need
 // for speed here, this is the debugger.
 //
-void serializeText(std::string& buffer, String const & text)
+template<class StringTraits>
+void antlr3<StringTraits>::DebugEventSocketProxy::serializeText(std::string& buffer, String text)
 {
-    std::string text8 = toUTF8(text);
+    std::string text8 = StringTraits::toUTF8(text);
 
     // strings lead in with a "
     //
@@ -337,8 +341,8 @@ void serializeText(std::string& buffer, String const & text)
                 buffer += "%0D";
                 break;
 
-            case '\\':
-
+            case '%':
+            
                 buffer += "%25";
                 break;
 
@@ -357,7 +361,8 @@ void serializeText(std::string& buffer, String const & text)
 // is not one there already, and then reuse it here if asked to do this
 // again.
 //
-std::string DebugEventSocketProxy::serializeToken(CommonTokenPtr t)
+template<class StringTraits>
+std::string antlr3<StringTraits>::DebugEventSocketProxy::serializeToken(CommonTokenPtr t)
 {
     // Empty string
     //
@@ -392,7 +397,8 @@ std::string DebugEventSocketProxy::serializeToken(CommonTokenPtr t)
 // Given a tree node, create a stringified version of it in the supplied
 // buffer.
 //
-std::string DebugEventSocketProxy::serializeNode(ItemPtr node)
+template<class StringTraits>
+std::string antlr3<StringTraits>::DebugEventSocketProxy::serializeNode(ItemPtr node)
 {
     // Empty string
     //

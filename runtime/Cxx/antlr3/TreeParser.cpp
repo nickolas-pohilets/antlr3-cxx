@@ -76,7 +76,8 @@ void antlr3<StringTraits>::TreeParser::fillException(Exception* ex)
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::TreeParser::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::TreeParser::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     if (!e->item)
     {
@@ -105,7 +106,8 @@ String antlr3<StringTraits>::TreeParser::getErrorMessage(Exception const * e, St
     return BaseRecognizer::getErrorMessage(ex.get(), tokenNames);
 }
 
-TreeParser::~TreeParser()
+template<class StringTraits>
+antlr3<StringTraits>::TreeParser::~TreeParser()
 {
 }
 
@@ -114,25 +116,27 @@ TreeParser::~TreeParser()
 template<class StringTraits>
 void antlr3<StringTraits>::TreeParser::setTreeNodeStream(CommonTreeNodeStreamPtr input)
 {
-    input_ = input;
-    adaptor_ = input->treeAdaptor();
-    reset();
+    this->input_ = input;
+    this->adaptor_ = input->treeAdaptor();
+    this->reset();
     input->reset();
 }
 
 /** Return a pointer to the input stream
  */
 template<class StringTraits>
-CommonTreeNodeStreamPtr antlr3<StringTraits>::TreeParser::treeNodeStream()
+typename antlr3<StringTraits>::CommonTreeNodeStreamPtr
+    antlr3<StringTraits>::TreeParser::treeNodeStream()
 {
-    return std::static_pointer_cast<CommonTreeNodeStream>(input_);
+    return std::static_pointer_cast<CommonTreeNodeStream>(this->input_);
 }
 
 // Default implementation is for parser and assumes a token stream as supplied by the runtime.
 // You MAY need override this function if the standard BASE_TREE is not what you are using.
 //
 template<class StringTraits>
-ItemPtr antlr3<StringTraits>::TreeParser::getMissingSymbol(
+typename antlr3<StringTraits>::ItemPtr
+    antlr3<StringTraits>::TreeParser::getMissingSymbol(
     ExceptionPtr e,
     std::uint32_t expectedTokenType,
     Bitset const & follow
@@ -156,20 +160,22 @@ ItemPtr antlr3<StringTraits>::TreeParser::getMissingSymbol(
 
     // Create the token text that shows it has been inserted
     String text = ANTLR3_T("<missing ");
-    text += expectedTokenType == TokenEof ? ANTLR3_T("EOF") : state_->tokenNames[expectedTokenType];
+    text += expectedTokenType == TokenEof ? ANTLR3_T("EOF") : this->state_->tokenNames[expectedTokenType];
     text += ANTLR3_T(">");
     token->setText(std::move(text));
     
     return node;
 }
 
-std::uint32_t TreeParser::itemToInt(ItemPtr item) {
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::TreeParser::itemToInt(ItemPtr item) {
     return adaptor_->getType(item);
 }
 
 template<class StringTraits>
-String antlr3<StringTraits>::TreeParser::traceCurrentItem() {
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::TreeParser::traceCurrentItem() {
     ItemPtr t = treeNodeStream()->LT(1);
-    return adaptor_->toString(t, state_->tokenNames);
+    return adaptor_->toString(t, this->state_->tokenNames);
 }
 

@@ -54,7 +54,8 @@
 #pragma warning (disable : 4610)
 #endif
 
-class CyclicDfa
+template<class StringTraits>
+class antlr3<StringTraits>::CyclicDfa
 {
     // Instance variables are intentionally public to allow struct-style initialization.
 public:
