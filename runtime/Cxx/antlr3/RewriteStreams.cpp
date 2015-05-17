@@ -38,7 +38,7 @@
 
 namespace antlr3 {
 
-RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description)
+RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description)
     : cursor_(0)
     , singleElement_()
     , elements_()
@@ -48,13 +48,13 @@ RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseR
 {
 }
 
-RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement)
+RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement)
     : RewriteRuleElementStream(std::move(adaptor), rec, description)
 {
     add(std::move(oneElement));
 }
 
-RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector)
+RewriteRuleElementStream::RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector)
     : RewriteRuleElementStream(std::move(adaptor), rec, description)
 {
 	elements_ = std::move(vector);
@@ -160,7 +160,7 @@ std::uint32_t RewriteRuleElementStream::size()
     return (std::uint32_t)elements_.size();
 }
 
-ConstString RewriteRuleElementStream::description()
+StringLiteral RewriteRuleElementStream::description()
 {
     return elementDescription_ ? elementDescription_ : ANTLR3_T("<unknown source>");
 }
@@ -216,15 +216,15 @@ ItemPtr RewriteRuleElementStream::_next()
 
 #pragma mark RewriteRuleTokenStream
 
-RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description)
+RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description)
     : RewriteRuleElementStream(std::move(adaptor), rec, description)
 {}
 
-RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, CommonTokenPtr oneElement)
+RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, CommonTokenPtr oneElement)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::move(oneElement))
 {}
 
-RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<CommonTokenPtr> const & vector)
+RewriteRuleTokenStream::RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<CommonTokenPtr> const & vector)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::vector<ItemPtr>(vector.begin(), vector.end()))
 {}
 
@@ -247,15 +247,15 @@ CommonTokenPtr RewriteRuleTokenStream::nextToken()
 
 #pragma mark RewriteRuleSubtreeStream
 
-RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description)
+RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description)
     : RewriteRuleElementStream(std::move(adaptor), rec, description)
 {}
 
-RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement)
+RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::move(oneElement))
 {}
 
-RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector)
+RewriteRuleSubtreeStream::RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::move(vector))
 {}
 
@@ -271,15 +271,15 @@ ItemPtr RewriteRuleSubtreeStream::nextNode()
 
 #pragma mark RewriteRuleNodeStream
 
-RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description)
+RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description)
     : RewriteRuleElementStream(std::move(adaptor), rec, description)
 {}
 
-RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement)
+RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::move(oneElement))
 {}
 
-RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector)
+RewriteRuleNodeStream::RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector)
     : RewriteRuleElementStream(std::move(adaptor), rec, description, std::move(vector))
 {}
 

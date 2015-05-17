@@ -1,7 +1,3 @@
-/// \file
-///Defines the basic structure to support recognizing by either a lexer,
-///parser, or tree parser.
-///
 #ifndef _ANTLR3_BASERECOGNIZER_HPP
 #define _ANTLR3_BASERECOGNIZER_HPP
 
@@ -46,15 +42,29 @@
 
 namespace antlr3 {
 
-/// \brief Base tracking context structure for all types of
-///recognizers.
-///
+/// A generic recognizer that can handle recognizers generated from
+/// lexer, parser, and tree grammars.  This is all the parsing
+/// support code essentially; most of it is error recovery stuff and
+/// backtracking.
 class BaseRecognizer
 {
     friend class CyclicDfa;
 public:
     BaseRecognizer(RecognizerSharedStatePtr state);
     virtual ~BaseRecognizer();
+    
+    /** Match current input symbol against ttype.  Attempt
+     *  single token insertion or deletion error recovery.  If
+     *  that fails, throw MismatchedTokenException.
+     *
+     *  To turn off single token insertion or deletion error
+     *  recovery, override recoverFromMismatchedToken() and have it
+     *  throw an exception. See TreeParser.recoverFromMismatchedToken().
+     *  This way any error in a rule will cause an exception and
+     *  immediate exit from rule.  Rule would recover by resynchronizing
+     *  to the set of symbols that can follow rule ref.
+     */
+    
 
     /// Function that matches the current input symbol
     /// against the supplied type. the function causes an error if a
@@ -278,9 +288,9 @@ protected:
     /// override this function independently of reportError() above as that function calls
     /// this one to do the actual exception printing.
     ///
-    virtual void displayRecognitionError(Exception const *e, ConstString const * tokenNames);
-    virtual String getErrorHeader(Exception const * e, ConstString const * tokenNames);
-    virtual String getErrorMessage(Exception const * e, ConstString const * tokenNames);
+    virtual void displayRecognitionError(Exception const *e, StringLiteral const * tokenNames);
+    virtual String getErrorHeader(Exception const * e, StringLiteral const * tokenNames);
+    virtual String getErrorMessage(Exception const * e, StringLiteral const * tokenNames);
     virtual void emitErrorMessage(String msg);
 
     virtual void fillException(Exception* ex) = 0;
@@ -296,8 +306,8 @@ protected:
     
     virtual std::ostream& traceStream();
     virtual String traceCurrentItem() = 0;
-    void traceIn(ConstString ruleName, int ruleNo);
-    void traceOut(ConstString ruleName, int ruleNo);
+    void traceIn(StringLiteral ruleName, int ruleNo);
+    void traceOut(StringLiteral ruleName, int ruleNo);
 };
 
 } // namespace antlr3

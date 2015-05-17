@@ -64,11 +64,9 @@
 #include <antlr3/Defs.hpp>
 #include <antlr3/String.hpp>
 
-namespace antlr3 {
-
 /// Opaque marker object.
 /// @sa IntStream::mark().
-class Marker
+class antlr3_defs::Marker
 {
 public:
     virtual ~Marker() {}
@@ -78,7 +76,8 @@ public:
     virtual void rewind() = 0;
 };
 
-class IntStream
+template<class StringTraits>
+class antlr3<StringTraits>::IntStream
 {
 public:
     virtual ~IntStream() {}
@@ -134,8 +133,6 @@ public:
      */
     virtual void seek(Index index) = 0;
 };
-
-} // namespace antlr3
 
 #endif
 

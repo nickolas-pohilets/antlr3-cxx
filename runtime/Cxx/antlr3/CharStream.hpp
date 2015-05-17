@@ -46,9 +46,8 @@
 #include <type_traits>
 #include <cstring>
 
-namespace antlr3 {
-
-class CharStream : public IntStream, public LocationSource
+template<class StringTraits>
+class antlr3<StringTraits>::CharStream : public IntStream, public LocationSource
 {
 public:
     static ItemPtr itemFromChar(std::uint32_t c);
@@ -60,11 +59,12 @@ public:
 
     /// Returns the line number of the current position in the input stream.
     /// Interpretation of line number is determined by the stream itself.
-    virtual Location currentLocation() { return location(index()); }
+    virtual Location currentLocation() { return location(this->index()); }
 };
 
+template<class StringTraits>
 template<class CodeUnit>
-class BasicCharStream : public CharStream, public std::enable_shared_from_this<BasicCharStream<CodeUnit>>
+class antlr3<StringTraits>::BasicCharStream : public CharStream, public std::enable_shared_from_this<BasicCharStream<CodeUnit>>
 {
 public:
     typedef std::function<void(CodeUnit const *)> Deleter;
@@ -174,29 +174,37 @@ private:
     }
 };
 
-class ByteCharStream : public BasicCharStream<std::uint8_t>
+template<class StringTraits>
+class antlr3<StringTraits>::ByteCharStream : public BasicCharStream<std::uint8_t>
 {
 public:
+    typedef BasicCharStream<std::uint8_t> Base;
+    typedef typename Base::DataRef DataRef;
+    typedef typename Base::Deleter Deleter;
+    
     ByteCharStream(DataRef data, String name);
     ByteCharStream(void const * data, std::uint32_t size, String name);
     ByteCharStream(void const * data, std::uint32_t size, Deleter deleter, String name);
     ~ByteCharStream();
 };
 
-class UnicodeCharStream : public BasicCharStream<String::value_type>
+template<class StringTraits>
+class antlr3<StringTraits>::UnicodeCharStream : public BasicCharStream<Char>
 {
-    typedef String::value_type CharType;
+public:
+    typedef BasicCharStream<Char> Base;
+    typedef typename Base::DataRef DataRef;
+    typedef typename Base::Deleter Deleter;
     
     static DataRef decodeData(void const * data, std::uint32_t size, TextEncoding encoding);
+
+    UnicodeCharStream(void const * data, std::uint32_t size, String name, TextEncoding encoding);
+    ~UnicodeCharStream();
+private:
     template<class UTF, class ByteOrder>
     static DataRef decode(void const * data, std::uint32_t size);
     template<class UTF, class ByteOrder, class OutIterator>
     static void decode(void const * data, std::uint32_t size, OutIterator& begin, OutIterator end);
-public:
-    UnicodeCharStream(void const * data, std::uint32_t size, String name, TextEncoding encoding);
-    ~UnicodeCharStream();
 };
-
-} // namespace antlr3
 
 #endif // _ANTLR3_INPUT_HPP

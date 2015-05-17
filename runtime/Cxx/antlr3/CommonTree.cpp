@@ -38,10 +38,9 @@
 
 #include <antlr3/CommonTree.hpp>
 
-namespace antlr3 {
-
-CommonTree::CommonTree(CommonTokenPtr aToken)
-    : BaseTree()
+template<class StringTraits>
+antlr3<StringTraits>::CommonTree::CommonTree(CommonTokenPtr aToken)
+    : BaseTree<CommonTree>()
     , startIndex_(NullIndex)
     , stopIndex_(NullIndex)
     , token_(std::move(aToken))
@@ -50,21 +49,26 @@ CommonTree::CommonTree(CommonTokenPtr aToken)
 {
 }
 
-CommonTokenPtr CommonTree::token()
+template<class StringTraits>
+typename antlr3<StringTraits>::CommonTokenPtr
+    antlr3<StringTraits>::CommonTree::token()
 {
     return token_;
 }
 
-bool CommonTree::hasTokenBoundaries() const {
+template<class StringTraits>
+bool antlr3<StringTraits>::CommonTree::hasTokenBoundaries() const {
     return startIndex_ != NullIndex || stopIndex_ != NullIndex;
 }
 
-Index CommonTree::tokenStartIndex()
+template<class StringTraits>
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::CommonTree::tokenStartIndex()
 {
     if (startIndex_ == NullIndex)
     {
         Index startIndex = NullIndex;
-        for (auto c : children_) {
+        for (auto c : this->children_) {
             Index i = c->tokenStartIndex();
             if (i != NullIndex && (startIndex == NullIndex || i < startIndex)) {
                 startIndex = i;
@@ -80,17 +84,20 @@ Index CommonTree::tokenStartIndex()
     return startIndex_;
 }
 
-void CommonTree::setTokenStartIndex(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTree::setTokenStartIndex(Index index)
 {
     startIndex_ = index;
 }
 
-Index CommonTree::tokenStopIndex()
+template<class StringTraits>
+typename antlr3<StringTraits>::Index
+    antlr3<StringTraits>::CommonTree::tokenStopIndex()
 {
     if (stopIndex_ == NullIndex)
     {
         Index stopIndex = NullIndex;
-        for (auto c : children_) {
+        for (auto c : this->children_) {
             Index i = c->tokenStopIndex();
             if (i != NullIndex && (stopIndex == NullIndex || i > stopIndex)) {
                 stopIndex = i;
@@ -106,27 +113,34 @@ Index CommonTree::tokenStopIndex()
     return stopIndex_;
 }
 
-void CommonTree::setTokenStopIndex(Index index)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTree::setTokenStopIndex(Index index)
 {
     stopIndex_ = index;
 }
 
-CommonTreePtr CommonTree::dupNode()
+template<class StringTraits>
+typename antlr3<StringTraits>::CommonTreePtr
+    antlr3<StringTraits>::CommonTree::dupNode()
 {
     return std::make_shared<CommonTree>(*this);
 }
 
-bool CommonTree::isNil()
+template<class StringTraits>
+bool antlr3<StringTraits>::CommonTree::isNil()
 {
     return !token_;
 }
 
-std::uint32_t CommonTree::type()
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::CommonTree::type()
 {
     return token_ ? token_->type() : 0;
 }
 
-String CommonTree::text()
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonTree::text()
 {
     if (!token_) {
         return String();
@@ -134,7 +148,9 @@ String CommonTree::text()
     return token_->text();
 }
 
-Location CommonTree::location()
+template<class StringTraits>
+typename antlr3<StringTraits>::Location
+    antlr3<StringTraits>::CommonTree::location()
 {
     if (token_ != NULL)
     {
@@ -144,15 +160,17 @@ Location CommonTree::location()
         }
     }
     
-    if  (childCount() > 0)
+    if (this->childCount() > 0)
     {
-        return getChild(0)->location();
+        return this->getChild(0)->location();
     }
     
     return Location();
 }
 
-String CommonTree::toString(ConstString const * tokenNames)
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonTree::toString(StringLiteral const * tokenNames)
 {
     if (isNil())
     {
@@ -162,24 +180,27 @@ String CommonTree::toString(ConstString const * tokenNames)
     return token_->toString(tokenNames);
 }
 
-CommonTreePtr CommonTree::parent()
+template<class StringTraits>
+typename antlr3<StringTraits>::CommonTreePtr
+    antlr3<StringTraits>::CommonTree::parent()
 {
     return parent_.lock();
 }
 
-void CommonTree::setParent(CommonTreePtr aParent)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTree::setParent(CommonTreePtr aParent)
 {
     parent_ = aParent;
 }
 
-void CommonTree::setChildIndex(std::int32_t i)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonTree::setChildIndex(std::int32_t i)
 {
     childIndex_ = i;
 }
 
-std::int32_t CommonTree::childIndex()
+template<class StringTraits>
+std::int32_t antlr3<StringTraits>::CommonTree::childIndex()
 {
     return childIndex_;
 }
-
-} // namespace antlr3

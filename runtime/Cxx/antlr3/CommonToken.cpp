@@ -37,34 +37,9 @@
 #include <antlr3/CommonToken.hpp>
 #include <antlr3/CharStream.hpp>
 
-namespace antlr3 {
-
-CommonToken::CommonToken()
-    : type_(TokenInvalid)
-    , channel_(TokenDefaultChannel)
-    , index_(NullIndex)
-    , input_()
-    , start_()
-    , stop_()
-    , hasText_(false)
-    , tokText_()
-{
-}
-
-CommonToken::CommonToken(std::uint32_t ttype)
-    : CommonToken()
-{
-    setType(ttype);
-}
-
-CommonToken::CommonToken(std::uint32_t ttype, String text)
-    : CommonToken()
-{
-    setType(ttype);
-    setText(std::move(text));
-}
-
-String CommonToken::text() const
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonToken::text() const
 {
     if(hasText_)
     {
@@ -81,7 +56,7 @@ String CommonToken::text() const
     // We had nothing installed in the token, create a new string
     // from the input stream
     //
-    if(input_ != NULL)
+    if (input_ != NULL)
     {
         return input_->substr(startIndex(), stopIndex());
     }
@@ -96,87 +71,29 @@ String CommonToken::text() const
  * and so does not attempt to release any memory it is using.Text not created
  * by a string fctory (not advised) should be released prior to this call.
  */
-void CommonToken::setText(String text)
+template<class StringTraits>
+void antlr3<StringTraits>::CommonToken::setText(String text)
 {
     hasText_ = true;
     tokText_ = std::move(text);
 }
 
-std::uint32_t CommonToken::type() const
-{
-    return type_;
-}
-
-void CommonToken::setType(std::uint32_t type)
-{
-    type_ = type;
-}
-
-std::uint32_t CommonToken::channel() const
-{
-    return channel_;
-}
-
-void CommonToken::setChannel(std::uint32_t channel)
-{
-    channel_ = channel;
-}
-
-LocationSourcePtr CommonToken::inputStream() const
-{
-    return input_;
-}
-
-void CommonToken::setInputStream(LocationSourcePtr stream)
-{
-    input_ = std::move(stream);
-}
-
-Index CommonToken::tokenIndex() const
-{
-    return index_;
-}
-
-void CommonToken::setTokenIndex(Index index)
-{
-    index_ = index;
-}
-
-Index CommonToken::startIndex() const
-{
-    assert(start_ != -1);
-    return start_;
-}
-
-void CommonToken::setStartIndex(Index start)
-{
-    start_ = start;
-}
-    
-Location CommonToken::startLocation() const
+template<class StringTraits>
+antlr3_defs::Location antlr3<StringTraits>::CommonToken::startLocation() const
 {
     return input_ ? input_->location(start_) : Location();
 }
 
-Index CommonToken::stopIndex() const
-{
-    return stop_;
-}
-
-void CommonToken::setStopIndex(Index stop)
-{
-    stop_ = stop;
-}
-    
-Location CommonToken::stopLocation() const
+template<class StringTraits>
+antlr3_defs::Location antlr3<StringTraits>::CommonToken::stopLocation() const
 {
     return input_ ? input_->location(stop_) : Location();
 }
 
-String CommonToken::toString(ConstString const * tokenNames) const
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::CommonToken::toString(StringLiteral const * tokenNames) const
 {
-    using antlr3::toString;
-    
     String outtext;
 
     /* Now we use our handy dandy string utility to assemble the
@@ -184,18 +101,18 @@ String CommonToken::toString(ConstString const * tokenNames) const
      * return ANTLR3_T("[@")+tokenIndex()+ANTLR3_T(",")+start+ANTLR3_T(":")+stop+ANTLR3_T("='")+txt+ANTLR3_T("',<")+type+ANTLR3_T(">")+channelStr+ANTLR3_T(",")+line+ANTLR3_T(":")+charPositionInLine()+ANTLR3_T("]");
      */
     outtext += ANTLR3_T("[@");
-    outtext += antlr3::toString((std::int32_t)tokenIndex());
+    outtext += StringTraits::toString((std::int32_t)tokenIndex());
     outtext += ANTLR3_T(",");
-    outtext += antlr3::toString((std::int32_t)startIndex());
+    outtext += StringTraits::toString((std::int32_t)startIndex());
     outtext += ANTLR3_T(":");
-    outtext += antlr3::toString((std::int32_t)stopIndex());
+    outtext += StringTraits::toString((std::int32_t)stopIndex());
     outtext += ANTLR3_T("='");
     outtext += escape(text());
     outtext += ANTLR3_T("',<");
     if (tokenNames) {
         outtext += getTokenName(type(), tokenNames);
     } else {
-        outtext += antlr3::toString(type());
+        outtext += StringTraits::toString(type());
     }
     outtext += ANTLR3_T(">");
 
@@ -214,5 +131,3 @@ String CommonToken::toString(ConstString const * tokenNames) const
 
     return outtext;
 }
-
-} // namespace antlr3

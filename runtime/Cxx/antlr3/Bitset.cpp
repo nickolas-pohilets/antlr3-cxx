@@ -1,9 +1,3 @@
-///
-/// \file
-/// Contains the C implementation of ANTLR3 bitsets as adapted from Terence Parr's
-/// Java implementation.
-///
-
 // [The "BSD licence"]
 // Copyright (c) 20013-2015 Nickolas Pohilets
 // Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
@@ -37,7 +31,6 @@
 #include <antlr3/Bitset.hpp>
 #include <stdarg.h>
 
-namespace antlr3 {
 namespace {
 
 /** How many bits in the elements
@@ -70,16 +63,16 @@ std::uint32_t wordNumber(std::uint32_t bit)
 
 }
 
-Bitset::Bitset(std::vector<Bitword> data)
+antlr3_defs::Bitset::Bitset(std::vector<Bitword> data)
 : bits_(std::move(data))
 {
 }
 
-Bitset::Bitset()
+antlr3_defs::Bitset::Bitset()
 {
 }
 
-Bitset::Bitset(std::uint32_t numBits)
+antlr3_defs::Bitset::Bitset(std::uint32_t numBits)
 {
     // Avoid memory thrashing at the up front expense of a few bytes
     //
@@ -92,16 +85,16 @@ Bitset::Bitset(std::uint32_t numBits)
     bits_.resize(numElements);
 }
 
-Bitset::~Bitset()
+antlr3_defs::Bitset::~Bitset()
 {
 }
 
-Bitset Bitset::fromData(std::vector<Bitword> data)
+antlr3_defs::Bitset antlr3_defs::Bitset::fromData(std::vector<Bitword> data)
 {
     return Bitset(std::move(data));
 }
 
-Bitset Bitset::fromBits(std::vector<std::uint32_t> const & inBits)
+antlr3_defs::Bitset antlr3_defs::Bitset::fromBits(std::vector<std::uint32_t> const & inBits)
 {
     Bitset retVal;
 
@@ -137,7 +130,7 @@ Bitset Bitset::fromBits(std::vector<std::uint32_t> const & inBits)
 /// added to the set.
 /// 
 ///
-Bitset Bitset::fromBits(std::int32_t bit, ...)
+antlr3_defs::Bitset antlr3_defs::Bitset::fromBits(std::int32_t bit, ...)
 {
     Bitset retVal;
     va_list ap;
@@ -151,28 +144,28 @@ Bitset Bitset::fromBits(std::int32_t bit, ...)
     return std::move(retVal);
 }
 
-Bitset Bitset::bor(Bitset const & other) const
+antlr3_defs::Bitset antlr3_defs::Bitset::bor(Bitset const & other) const
 {
     Bitset retVal = *this;
     retVal.borInPlace(other);
     return std::move(retVal);
 }
 
-void Bitset::add(std::uint32_t bit)
+void antlr3_defs::Bitset::add(std::uint32_t bit)
 {
     std::uint32_t word = wordNumber(bit);
     growToSize(word + 1);
     bits_[word] |= bitMask(bit);
 }
 
-void Bitset::growToSize(std::size_t word)
+void antlr3_defs::Bitset::growToSize(std::size_t word)
 {
     while (word > bits_.size()) {
         bits_.push_back(0);
     }
 }
 
-void Bitset::borInPlace(Bitset const & other)
+void antlr3_defs::Bitset::borInPlace(Bitset const & other)
 {
     // First make sure that the target bitset is big enough
     // for the new bits to be ored in.
@@ -187,7 +180,7 @@ void Bitset::borInPlace(Bitset const & other)
     }
 }
 
-std::uint32_t Bitset::size() const
+std::uint32_t antlr3_defs::Bitset::size() const
 {
     // TODO: Come back to this, it may be faster to & with 0x01
     // then shift right a copy of the 4 bits, than shift left a constant of 1.
@@ -207,7 +200,7 @@ std::uint32_t Bitset::size() const
     return degree;
 }
 
-bool Bitset::equals(Bitset const & other) const
+bool antlr3_defs::Bitset::equals(Bitset const & other) const
 {
     // Work out the minimum comparison set
     //
@@ -250,7 +243,7 @@ bool Bitset::equals(Bitset const & other) const
     return true;
 }
 
-bool Bitset::isMember(std::uint32_t bit) const
+bool antlr3_defs::Bitset::isMember(std::uint32_t bit) const
 {
     std::uint32_t wordNo  = wordNumber(bit);
 
@@ -262,7 +255,7 @@ bool Bitset::isMember(std::uint32_t bit) const
     return ((bits_[wordNo] & bitMask(bit)) != 0);
 }
 
-void Bitset::remove(std::uint32_t bit)
+void antlr3_defs::Bitset::remove(std::uint32_t bit)
 {
     std::uint32_t wordNo = wordNumber(bit);
 
@@ -272,7 +265,7 @@ void Bitset::remove(std::uint32_t bit)
     }
 }
 
-bool Bitset::isNilNode() const
+bool antlr3_defs::Bitset::isNilNode() const
 {
     for(Bitword word : bits_)
     {
@@ -285,7 +278,7 @@ bool Bitset::isNilNode() const
     return true;
 }
 
-std::uint32_t Bitset::capacity() const
+std::uint32_t antlr3_defs::Bitset::capacity() const
 {
     return (std::uint32_t)(bits_.size() << BitsetLogBits);
 }
@@ -297,7 +290,7 @@ std::uint32_t Bitset::capacity() const
  *
  *  The first entry is the number of elements following in the list.
  */
-std::vector<std::uint32_t> Bitset::toIntList() const
+std::vector<std::uint32_t> antlr3_defs::Bitset::toIntList() const
 {
     std::vector<std::uint32_t> intList;
     intList.reserve(size());
@@ -318,7 +311,8 @@ std::vector<std::uint32_t> Bitset::toIntList() const
     return  intList;
 }
 
-String Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
+template<class StringTraits>
+typename antlr3<StringTraits>::String antlr3<StringTraits>::Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
 {
     String buf = ANTLR3_T("{ ");
     bool havePrintedAnElement = false;
@@ -338,7 +332,7 @@ String Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
             }
             else
             {
-                buf += antlr3::toString(i);
+                buf += StringTraits::toString(i);
             }
 
             havePrintedAnElement = true;
@@ -347,5 +341,3 @@ String Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
     buf.append(ANTLR3_T(" }"));
     return std::move(buf);
 }
-
-} // namespace antlr3

@@ -38,9 +38,8 @@
 #include <antlr3/BaseTree.hpp>
 #include <antlr3/CommonToken.hpp>
 
-namespace antlr3 {
-
-class CommonTree : public BaseTree<CommonTree>
+template<class StringTraits>
+class antlr3<StringTraits>::CommonTree : public BaseTree<CommonTree>
 {
 private:
     /// Start token index that encases this tree
@@ -113,11 +112,12 @@ public:
     virtual bool isNil();
     
     String toString() { return toString(nullptr); }
-    virtual String toString(ConstString const * tokenNames);
+    virtual String toString(StringLiteral const * tokenNames);
 };
 
 /// @todo This class inherits some unused fields from CommonTree.
-class CommonErrorNode : public CommonTree
+template<class StringTraits>
+class antlr3<StringTraits>::CommonErrorNode : public CommonTree
 {
 public:
     CommonErrorNode(TokenStreamPtr input, CommonTokenPtr start, CommonTokenPtr stop, ExceptionPtr e)
@@ -149,7 +149,7 @@ public:
         return String();
     }
     
-    virtual String toString(ConstString const * tokenNames) override {
+    virtual String toString(StringLiteral const * tokenNames) override {
         /// @todo
         return String();
     }
@@ -160,8 +160,6 @@ private:
     ExceptionPtr trappedException_;
     
 };
-
-} // namespace antlr3
 
 #endif
 

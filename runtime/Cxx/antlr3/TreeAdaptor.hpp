@@ -39,9 +39,8 @@
 #include <antlr3/String.hpp>
 #include <antlr3/CommonToken.hpp>
 
-namespace antlr3 {
-
-class TreeAdaptor
+template<class StringTraits>
+class antlr3<StringTraits>::TreeAdaptor
 {
 public:
     virtual ~TreeAdaptor() {}
@@ -268,12 +267,8 @@ public:
     virtual Location getLocation(ItemPtr item) = 0;
     
     String toString(ItemPtr item) { return toString(std::move(item), nullptr); }
-    virtual String toString(ItemPtr item, ConstString const * tokenNames) = 0;
+    virtual String toString(ItemPtr item, StringLiteral const * tokenNames) = 0;
 };
 
-/// Produce a DOT specification for graphviz freeware suite from a base tree
-String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree);
-
-} // namespace antlr3
 
 #endif

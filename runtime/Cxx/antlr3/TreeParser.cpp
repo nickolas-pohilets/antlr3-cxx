@@ -75,7 +75,7 @@ void TreeParser::fillException(Exception* ex)
     }
 }
 
-String TreeParser::getErrorMessage(Exception const * e, ConstString const * tokenNames)
+String TreeParser::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     if (!e->item)
     {

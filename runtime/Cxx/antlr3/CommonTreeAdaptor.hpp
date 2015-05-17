@@ -41,13 +41,12 @@
 #include <antlr3/CommonTree.hpp>
 #include <antlr3/DebugEventListener.hpp>
 
-namespace antlr3 {
-
-class CommonTreeAdaptor : public BaseTreeAdaptor<CommonTree>
+template<class StringTraits>
+class antlr3<StringTraits>::CommonTreeAdaptor : public BaseTreeAdaptor<CommonTree>
 {
 public:
-    CommonTreeAdaptor();
-    virtual ~CommonTreeAdaptor();
+    CommonTreeAdaptor() {}
+    virtual ~CommonTreeAdaptor() {}
     
     virtual ItemPtr create(CommonTokenPtr payload) override;
     virtual ItemPtr dupNode(ItemPtr treeNode) override;
@@ -83,9 +82,7 @@ public:
     
     virtual Location getLocation(ItemPtr t) override;
     
-    virtual String toString(ItemPtr t, ConstString const * tokenNames) override;
+    virtual String toString(ItemPtr t, StringLiteral const * tokenNames) override;
 };
-
-} // namespace antlr3
 
 #endif

@@ -75,7 +75,7 @@ public:
 
     /// What this decision represents
     ///
-    ConstString const description;
+    StringLiteral const description;
 
     SPECIAL_FUNC const specialStateTransitionFunc;
 

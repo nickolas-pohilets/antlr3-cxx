@@ -35,26 +35,28 @@
 #include <antlr3/CharStream.hpp>
 #include <antlr3/ConvertUTF.hpp>
 
-namespace antlr3 {
-
-ItemPtr CharStream::itemFromChar(std::uint32_t c) {
+template<class StringTraits>
+antlr3_defs::ItemPtr antlr3<StringTraits>::CharStream::itemFromChar(std::uint32_t c) {
     size_t n = static_cast<size_t>(c);
     void* p = reinterpret_cast<void*>(n);
     return ItemPtr(p, [](void*){});
 }
 
-std::uint32_t CharStream::charFromItem(ItemPtr const & item) {
+template<class StringTraits>
+std::uint32_t antlr3<StringTraits>::CharStream::charFromItem(ItemPtr const & item) {
     size_t n = reinterpret_cast<size_t>(item.get());
     return static_cast<std::uint32_t>(n);
 }
 
-ItemPtr CharStream::LI(std::int32_t i)
+template<class StringTraits>
+antlr3_defs::ItemPtr antlr3<StringTraits>::CharStream::LI(std::int32_t i)
 {
-    return itemFromChar(LA(i));
+    return itemFromChar(this->LA(i));
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-BasicCharStream<CodeUnit>::BasicCharStream(DataRef data, String name)
+antlr3<StringTraits>::BasicCharStream<CodeUnit>::BasicCharStream(DataRef data, String name)
     : CharStream()
     , streamName_(std::move(name))
     , data_(std::move(data))
@@ -65,19 +67,22 @@ BasicCharStream<CodeUnit>::BasicCharStream(DataRef data, String name)
 {
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-BasicCharStream<CodeUnit>::~BasicCharStream()
+antlr3<StringTraits>::BasicCharStream<CodeUnit>::~BasicCharStream()
 {
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-String BasicCharStream<CodeUnit>::sourceName()
+typename antlr3<StringTraits>::String antlr3<StringTraits>::BasicCharStream<CodeUnit>::sourceName()
 {
     return streamName_;
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-void BasicCharStream<CodeUnit>::consume()
+void antlr3<StringTraits>::BasicCharStream<CodeUnit>::consume()
 {
     if (currentPos_ != data_.end())
     {
@@ -92,8 +97,9 @@ void BasicCharStream<CodeUnit>::consume()
     }
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-std::uint32_t BasicCharStream<CodeUnit>::LA(std::int32_t i)
+std::uint32_t antlr3<StringTraits>::BasicCharStream<CodeUnit>::LA(std::int32_t i)
 {
     if (i > 0)
     {
@@ -120,20 +126,23 @@ std::uint32_t BasicCharStream<CodeUnit>::LA(std::int32_t i)
     }
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-MarkerPtr BasicCharStream<CodeUnit>::mark()
+antlr3_defs::MarkerPtr antlr3<StringTraits>::BasicCharStream<CodeUnit>::mark()
 {
     return std::make_shared<CharStreamMarker>(currentPos_, this->shared_from_this());
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-Index BasicCharStream<CodeUnit>::index()
+antlr3_defs::Index antlr3<StringTraits>::BasicCharStream<CodeUnit>::index()
 {
     return currentPos_ - data_.begin();
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-void BasicCharStream<CodeUnit>::seek(Index index)
+void antlr3<StringTraits>::BasicCharStream<CodeUnit>::seek(Index index)
 {
     assert(index >= BasicCharStream<CodeUnit>::index());
     auto p = data_.begin() + index;
@@ -145,8 +154,9 @@ void BasicCharStream<CodeUnit>::seek(Index index)
 
 // CharStream
 
+template<class StringTraits>
 template<class CodeUnit>
-Location BasicCharStream<CodeUnit>::location(Index index)
+antlr3_defs::Location antlr3<StringTraits>::BasicCharStream<CodeUnit>::location(Index index)
 {
     CodeUnit const * ptr = data_.begin() + index;
     if (ptr < data_.begin() || ptr > data_.end()) {
@@ -172,59 +182,73 @@ Location BasicCharStream<CodeUnit>::location(Index index)
     return Location(std::uint32_t(1 + line), std::uint32_t(1 + charPos));
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-String BasicCharStream<CodeUnit>::substr(Index start, Index stop)
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::BasicCharStream<CodeUnit>::substr(Index start, Index stop)
 {
     CodeUnit const * b = data_.begin() + start;
     CodeUnit const * e = data_.begin() + stop;
-    return String(b, e);
+    return StringTraits::string(b, e);
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-void BasicCharStream<CodeUnit>::reset()
+void antlr3<StringTraits>::BasicCharStream<CodeUnit>::reset()
 {
     currentPos_ = data_.begin();
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-std::uint32_t BasicCharStream<CodeUnit>::size()
+std::uint32_t antlr3<StringTraits>::BasicCharStream<CodeUnit>::size()
 {
     return (std::uint32_t)data_.size();
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-std::uint8_t BasicCharStream<CodeUnit>::newLineChar() const
+std::uint8_t antlr3<StringTraits>::BasicCharStream<CodeUnit>::newLineChar() const
 {
     return newlineChar_;
 }
 
+template<class StringTraits>
 template<class CodeUnit>
-void BasicCharStream<CodeUnit>::setNewLineChar(std::uint8_t newLineChar)
+void antlr3<StringTraits>::BasicCharStream<CodeUnit>::setNewLineChar(std::uint8_t newLineChar)
 {
     newlineChar_ = newLineChar;
 }
 
-ByteCharStream::ByteCharStream(DataRef data, String name)
-    : BasicCharStream(std::move(data), std::move(name))
+template<class StringTraits>
+antlr3<StringTraits>::ByteCharStream::ByteCharStream(DataRef data, String name)
+    : Base(std::move(data), std::move(name))
 {}
 
-ByteCharStream::ByteCharStream(void const * data, std::uint32_t size, String name)
-    : BasicCharStream(DataRef(reinterpret_cast<std::uint8_t const *>(data), size), std::move(name))
+template<class StringTraits>
+antlr3<StringTraits>::ByteCharStream::ByteCharStream(void const * data, std::uint32_t size, String name)
+    : Base(DataRef(reinterpret_cast<std::uint8_t const *>(data), size), std::move(name))
 {}
 
-ByteCharStream::ByteCharStream(void const * data, std::uint32_t size, Deleter deleter, String name)
-    : BasicCharStream(DataRef(reinterpret_cast<std::uint8_t const *>(data), size, deleter), std::move(name))
+template<class StringTraits>
+antlr3<StringTraits>::ByteCharStream::ByteCharStream(void const * data, std::uint32_t size, Deleter deleter, String name)
+    : Base(DataRef(reinterpret_cast<std::uint8_t const *>(data), size, deleter), std::move(name))
 {}
 
-ByteCharStream::~ByteCharStream() {}
+template<class StringTraits>
+antlr3<StringTraits>::ByteCharStream::~ByteCharStream() {}
 
-UnicodeCharStream::UnicodeCharStream(void const * data, std::uint32_t size, String name, TextEncoding encoding)
-    : BasicCharStream(decodeData(data, size, encoding), std::move(name))
+template<class StringTraits>
+antlr3<StringTraits>::UnicodeCharStream::UnicodeCharStream(void const * data, std::uint32_t size, String name, TextEncoding encoding)
+    : Base(decodeData(data, size, encoding), std::move(name))
 {}
 
-UnicodeCharStream::~UnicodeCharStream() {}
+template<class StringTraits>
+antlr3<StringTraits>::UnicodeCharStream::~UnicodeCharStream() {}
 
-UnicodeCharStream::DataRef UnicodeCharStream::decodeData(void const * data, std::uint32_t size, TextEncoding encoding)
+template<class StringTraits>
+typename antlr3<StringTraits>::UnicodeCharStream::DataRef
+    antlr3<StringTraits>::UnicodeCharStream::decodeData(void const * data, std::uint32_t size, TextEncoding encoding)
 {
     switch (encoding) {
     case TextEncoding::UTF8:
@@ -239,18 +263,19 @@ UnicodeCharStream::DataRef UnicodeCharStream::decodeData(void const * data, std:
         return decode<utf::UTF32, utf::BE>(data, size);
     default:
         assert(false && !"Unknown encoding");
-        return DataRef(ANTLR3_T(""), std::size_t(0), [](CharType const *) {});
+        return DataRef(ANTLR3_T(""), std::size_t(0), [](Char const *) {});
     }
 }
-    
+
+template<class StringTraits>
 template<class UTF, class ByteOrder, class OutIterator>
-void UnicodeCharStream::decode(void const * data, std::uint32_t size, OutIterator& begin, OutIterator end)
+void antlr3<StringTraits>::UnicodeCharStream::decode(void const * data, std::uint32_t size, OutIterator& begin, OutIterator end)
 {
     std::uint32_t k = size % sizeof(UTF);
     auto dataStart = reinterpret_cast<std::uint8_t const *>(data);
     auto dataEnd = dataStart + size - k;
     
-    typedef utf::CodeUnitForChar<CharType>::type DestUTF;
+    typedef typename utf::CodeUnitForChar<Char>::type DestUTF;
     
     utf::CodeUnitIterator<decltype(dataStart), UTF, ByteOrder> srcStart(dataStart), srcEnd(dataEnd);
     utf::ConversionResult r = utf::Convert<UTF, DestUTF>(srcStart, srcEnd, begin, end, utf::ConversionFlags::LenientConversion);
@@ -261,19 +286,20 @@ void UnicodeCharStream::decode(void const * data, std::uint32_t size, OutIterato
     }
 }
 
+template<class StringTraits>
 template<class UTF, class ByteOrder>
-UnicodeCharStream::DataRef UnicodeCharStream::decode(void const * data, std::uint32_t size)
+typename antlr3<StringTraits>::UnicodeCharStream::DataRef
+    antlr3<StringTraits>::UnicodeCharStream::decode(void const * data, std::uint32_t size)
 {
-    typedef utf::CodeUnitForChar<CharType>::type DestUTF;
+    typedef typename utf::CodeUnitForChar<Char>::type DestUTF;
     utf::DummyWriteIterator<DestUTF> lenStart(0), lenEnd;
     decode<UTF, ByteOrder>(data, size, lenStart, lenEnd);
 
     std::size_t len = lenStart.pos();
-    Deleter del = [](CharType const * d) { delete[] d; };
-    CharType * ptr = new CharType[len];
+    Deleter del = [](Char const * d) { delete[] d; };
+    Char * ptr = new Char[len];
     DataRef retVal(ptr, len, std::move(del));
     decode<UTF, ByteOrder>(data, size, ptr, ptr + len);
     return std::move(retVal);
 }
 
-} // namespace antlr3

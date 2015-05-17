@@ -47,7 +47,7 @@ class TreeParser : public BaseRecognizer
     friend class BaseRecognizer;
 protected:
     virtual void fillException(Exception* e) override;
-    virtual String getErrorMessage(Exception const * e, ConstString const * tokenNames) override;
+    virtual String getErrorMessage(Exception const * e, StringLiteral const * tokenNames) override;
 public:
     TreeParser(CommonTreeNodeStreamPtr ctnstream, RecognizerSharedStatePtr state);
     ~TreeParser();

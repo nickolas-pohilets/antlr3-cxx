@@ -121,7 +121,7 @@ struct RecognizerSharedState
      *  at parser compile time - grammar token names are thus restricted in character
      *  sets, which does not seem to terrible.
      */
-    ConstString const * tokenNames;
+    StringLiteral const * tokenNames;
 
     /** The goal of all lexer rules/methods is to create a token object.
      *  This is an instance variable as multiple rules may collaborate to

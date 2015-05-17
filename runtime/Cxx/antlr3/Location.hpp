@@ -36,9 +36,7 @@
 #include <antlr3/Defs.hpp>
 #include <antlr3/String.hpp>
 
-namespace antlr3 {
-    
-class Location
+class antlr3_defs::Location
 {
 public:
     Location()
@@ -83,31 +81,32 @@ private:
     std::uint32_t line_;
     std::uint32_t charPositionInLine_;
 };
-    
-inline String& operator+=(String& s, Location location) {
-    s += toString(location.line());
-    s += ':';
-    s += toString(location.charPositionInLine());
-    return s;
-}
-    
-inline String operator+(String s, Location location) {
-    s += location;
-    return std::move(s);
-}
 
-inline String operator+(Location location, String const & s) {
-    String s0;
-    s0 += location;
-    s0 += s;
-    return std::move(s0);
-}
+//inline String& operator+=(String& s, Location location) {
+//    s += toString(location.line());
+//    s += ':';
+//    s += toString(location.charPositionInLine());
+//    return s;
+//}
+//    
+//inline String operator+(String s, Location location) {
+//    s += location;
+//    return std::move(s);
+//}
+//
+//inline String operator+(Location location, String const & s) {
+//    String s0;
+//    s0 += location;
+//    s0 += s;
+//    return std::move(s0);
+//}
 
-inline std::ostream& operator<<(std::ostream& s, Location loc) {
+inline std::ostream& operator<<(std::ostream& s, antlr3_defs::Location loc) {
     return s << loc.line() << ':' << loc.charPositionInLine();
 }
 
-class LocationSource
+template<class StringTraits>
+class antlr3<StringTraits>::LocationSource
 {
 public:
     virtual ~LocationSource() {}
@@ -119,8 +118,5 @@ public:
     /// @todo: Clarify interpretation of the stop: is it over-the-end pointer or pointer to first code unit of the last character
     virtual String substr(Index start, Index stop) = 0;
 };
-
-} // namespace antlr3
-
 
 #endif // _ANTLR3_LOCATION

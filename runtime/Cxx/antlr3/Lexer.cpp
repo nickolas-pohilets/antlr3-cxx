@@ -326,7 +326,7 @@ static String getCharSetErrorDisplay(Bitset const & set)
     return set.toString(escape<std::uint32_t>);
 }
 
-String Lexer::getErrorMessage(Exception const * e, ConstString const * tokenNames)
+String Lexer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     class Visitor : public Exception::Visitor
     {

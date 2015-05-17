@@ -165,7 +165,7 @@ protected:
     void setText(String s);
     virtual void fillException(Exception* e) override;
     virtual std::uint32_t itemToInt(ItemPtr item) override;
-    virtual String getErrorMessage(Exception const * e, ConstString const * tokenNames) override;
+    virtual String getErrorMessage(Exception const * e, StringLiteral const * tokenNames) override;
     virtual String traceCurrentItem() override;
 private:
     CommonTokenPtr nextTokenStr();

@@ -35,16 +35,3 @@
 
 #include <antlr3/Exception.hpp>
 
-namespace antlr3 {
-
-Exception::Exception()
-    : streamName()
-    , index()
-    , item()
-    , location()
-    , input()
-{}
-
-Exception::~Exception() {}
-
-} // namespace antlr3

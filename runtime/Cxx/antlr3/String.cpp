@@ -104,7 +104,7 @@ std::string toUTF8(String const & s)
     return std::move(retVal);
 }
 
-std::string toUTF8(ConstString s)
+std::string toUTF8(StringLiteral s)
 {
     std::string retVal;
     appendToUTF8(retVal, s);
@@ -130,7 +130,7 @@ std::string& appendToUTF8(std::string& s8, String const & s)
     return appendUTF(s8, s.c_str(), s.length());
 }
 
-std::string& appendToUTF8(std::string& s8, ConstString s)
+std::string& appendToUTF8(std::string& s8, StringLiteral s)
 {
     return appendUTF(s8, s, std::char_traits<char16_t>::length(s));
 }
@@ -145,81 +145,11 @@ String& appendUTF8(String& s, char const * s8)
     return appendUTF(s, s8, s8 ? strlen(s8) : 0);
 }
 
-String toString(int val)                { return fromLatin1(std::to_string(val)); }
-String toString(long val)               { return fromLatin1(std::to_string(val)); }
-String toString(long long val)          { return fromLatin1(std::to_string(val)); }
-String toString(unsigned val)           { return fromLatin1(std::to_string(val)); }
-String toString(unsigned long val)      { return fromLatin1(std::to_string(val)); }
-String toString(unsigned long long val) { return fromLatin1(std::to_string(val)); }
-String toString(float val)              { return fromLatin1(std::to_string(val)); }
-String toString(double val)             { return fromLatin1(std::to_string(val)); }
-String toString(long double val)        { return fromLatin1(std::to_string(val)); }
-
 std::ostream& operator<<(std::ostream& s, const String& str) { return s << toUTF8(str); }
-std::ostream& operator<<(std::ostream& s, ConstString str) { return s << toUTF8(str); }
+std::ostream& operator<<(std::ostream& s, StringLiteral str) { return s << toUTF8(str); }
 
 #else
 
-String toString(int val)                { return std::to_string(val); }
-String toString(long val)               { return std::to_string(val); }
-String toString(long long val)          { return std::to_string(val); }
-String toString(unsigned val)           { return std::to_string(val); }
-String toString(unsigned long val)      { return std::to_string(val); }
-String toString(unsigned long long val) { return std::to_string(val); }
-String toString(float val)              { return std::to_string(val); }
-String toString(double val)             { return std::to_string(val); }
-String toString(long double val)        { return std::to_string(val); }
-
 #endif
-
-String escape(String const & str)
-{
-    String retVal;
-    appendEscape(retVal, str);
-    return std::move(retVal);
-}
-
-String& appendEscape(String& dest, String const & src)
-{
-    for (String::value_type c : src)
-    {
-        appendEscape(dest, c);
-    }
-    return dest;
-}
-
-String& appendEscape(String& dest, String::value_type src) {
-    switch (src)
-    {
-    case '\"':
-        dest += ANTLR3_T("\\\"");
-        break;
-    case '\n':
-        dest += ANTLR3_T("\\n");
-        break;
-    case '\r':
-        dest += ANTLR3_T("\\r");
-        break;
-    default:
-        dest += src;
-        break;
-    }
-    return dest;
-}
-
-String& appendEscape(String& dest, std::uint32_t src) {
-    if (src == TokenEof) {
-        return dest += ANTLR3_T("<EOF>");
-    }
-    std::uint32_t maxChar = std::uint32_t(1) << (CHAR_BIT * sizeof(String::value_type));
-    if (src < maxChar) {
-        return appendEscape(dest, (String::value_type)src);
-    }
-    dest += "\\u";
-    char buffer[16];
-    sprintf(buffer, "%04X", (unsigned)src);
-    dest.append(buffer, buffer + strlen(buffer));
-    return dest;
-}
 
 } // namespace antlr3

@@ -1,7 +1,3 @@
-/// \file
-/// Definition of the ANTLR3 base tree.
-///
-
 #ifndef _ANTLR3_BASE_TREE_HPP
 #define _ANTLR3_BASE_TREE_HPP
 
@@ -39,8 +35,6 @@
 #include <antlr3/String.hpp>
 #include <antlr3/Location.hpp>
 
-namespace antlr3 {
-
 /// A generic tree implementation with no payload.  You must subclass to
 /// actually have any user data.  ANTLR v3 uses a list of children approach
 /// instead of the child-sibling approach in v2.  A flat tree (a list) is
@@ -48,7 +42,7 @@ namespace antlr3 {
 /// have payload itself), but non-null node is called ANTLR3_T("nil").
 ///
 template<class ChildT>
-class BaseTree : public std::enable_shared_from_this<ChildT>
+class antlr3_defs::BaseTree : public std::enable_shared_from_this<ChildT>
 {
 protected:
     typedef std::shared_ptr<ChildT> ChildPtr;
@@ -208,7 +202,7 @@ protected:
 //
 //    String toStringTree();
 //
-//    virtual String toString(ConstString const * tokenNames) = 0;
+//    virtual String toString(StringLiteral const * tokenNames) = 0;
 //
 //    void freshenPACIndexesAll();
 //
@@ -219,7 +213,5 @@ protected:
 //        return const_cast<BaseTree*>(this)->type();
 //    }
 };
-
-} // namespace antlr3
 
 #endif

@@ -1,7 +1,3 @@
-/** \file
- * Definition of the ANTLR3 base tree adaptor.
- */
-
 #ifndef _ANTLR3_BASE_TREE_ADAPTOR_HPP
 #define _ANTLR3_BASE_TREE_ADAPTOR_HPP
 
@@ -39,10 +35,9 @@
 #include <antlr3/BaseTree.hpp>
 #include <antlr3/CommonToken.hpp>
 
-namespace antlr3 {
-
+template<class StringTraits>
 template<class ChildT>
-class BaseTreeAdaptor : public TreeAdaptor
+class antlr3<StringTraits>::BaseTreeAdaptor : public TreeAdaptor
 {
 public:
     BaseTreeAdaptor() {}
@@ -88,7 +83,7 @@ public:
 			return newRoot;
 		}
 		// handle ^(nil real-node)
-        if (isNil(newRoot)) {
+        if (this->isNil(newRoot)) {
             int nc = getChildCount(newRoot);
             if ( nc==1 ) {
                 newRoot = getChild(newRoot, 0);
@@ -96,7 +91,7 @@ public:
 				assert(false && "more than one node as root");
 			}
         }
-        assert(!isNil(newRoot));
+        assert(!this->isNil(newRoot));
         
 		// add oldRoot to newRoot; addChild takes care of case where oldRoot
 		// is a flat list (i.e., nil-rooted tree).  All children of oldRoot
@@ -106,7 +101,7 @@ public:
     }
     
     virtual ItemPtr rulePostProcessing(ItemPtr root) override {
-		if (root && isNil(root)) {
+		if (root && this->isNil(root)) {
             auto nc = getChildCount(root);
             if (nc == 0) {
                 return nullptr;
@@ -184,7 +179,5 @@ public:
         );
     }
 };
-
-} // namespace antlr3
 
 #endif

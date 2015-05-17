@@ -40,11 +40,6 @@
 #include <antlr3/CommonTreeAdaptor.hpp>
 #include <antlr3/CommonTree.hpp>
 
-namespace antlr3 {
-
-CommonTreeAdaptor::CommonTreeAdaptor() {}
-CommonTreeAdaptor::~CommonTreeAdaptor() {}
-
 ItemPtr CommonTreeAdaptor::create(CommonTokenPtr payload) {
     return std::make_shared<CommonTree>(std::move(payload));
 }
@@ -156,7 +151,7 @@ Location CommonTreeAdaptor::getLocation(ItemPtr t) {
     return std::static_pointer_cast<CommonTree>(t)->location();
 }
 
-String CommonTreeAdaptor::toString(ItemPtr t, ConstString const * tokenNames) {
+String CommonTreeAdaptor::toString(ItemPtr t, StringLiteral const * tokenNames) {
     if (!t) return String();
     return std::static_pointer_cast<CommonTree>(t)->toString(tokenNames);
 }

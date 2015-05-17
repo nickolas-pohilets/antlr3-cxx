@@ -43,36 +43,8 @@
 
 #include <antlr3/CharStream.hpp>
 
-namespace antlr3 {
-
 /* Base token types, which all lexer/parser tokens come after in sequence.
  */
-
-/// Indicator of an invalid token
-std::uint32_t const	TokenInvalid = 0;
-std::uint32_t const	EorTokenType = 1;
-
-/// Imaginary token type to cause a traversal of child nodes in a tree parser
-std::uint32_t const	TokenDown = 2;
-
-/// Imaginary token type to signal the end of a stream of child nodes.
-std::uint32_t const	TokenUp = 3;
-
-/// First token that can be used by users/generated code
-std::uint32_t const MinTokenType = TokenUp + 1;
-
-/** End of file token
- */
-std::uint32_t const TokenEof = CharstreamEof;
-
-/** Default channel for a token
- */
-std::uint32_t const	TokenDefaultChannel = 0;
-
-/** Reserved channel number for a HIDDEN token - a token that
- *  is hidden from the parser.
- */
-std::uint32_t const TokenHiddenChannel = 99;
 
 /** The definition of an ANTLR3 common token structure, which all implementations
  * of a token stream should provide, installing any further structures in the
@@ -82,7 +54,8 @@ std::uint32_t const TokenHiddenChannel = 99;
  * Token streams are in essence provided by lexers or other programs that serve
  * as lexers.
  */
-class CommonToken
+template<class StringTraits>
+class antlr3<StringTraits>::CommonToken
 {
     /// The actual type of this token
     std::uint32_t type_;
@@ -107,9 +80,30 @@ class CommonToken
 	bool hasText_;
 	String tokText_;
 public:
-    CommonToken();
-    CommonToken(std::uint32_t ttype);
-    CommonToken(std::uint32_t ttype, String text);
+    CommonToken()
+        : type_(TokenInvalid)
+        , channel_(TokenDefaultChannel)
+        , index_(NullIndex)
+        , input_()
+        , start_()
+        , stop_()
+        , hasText_(false)
+        , tokText_()
+    {}
+    
+    CommonToken(std::uint32_t ttype)
+        : CommonToken()
+    {
+        setType(ttype);
+    }
+    
+    CommonToken(std::uint32_t ttype, String text)
+        : CommonToken()
+    {
+        setType(ttype);
+        setText(std::move(text));
+    }
+    
     virtual ~CommonToken() {}
 
     // Default copy ctor and assignment op are ok.
@@ -122,30 +116,30 @@ public:
     void setText(String text);
 
     /// Token type of this token
-    std::uint32_t type() const;
-    void setType(std::uint32_t ttype);
+    std::uint32_t type() const { return type_; }
+    void setType(std::uint32_t ttype) { type_ = ttype; }
 
     /// The channel that this token was placed in (parsers can 'tune' to these channels).
-    std::uint32_t channel() const;
-    void setChannel(std::uint32_t channel);
+    std::uint32_t channel() const { return channel_; }
+    void setChannel(std::uint32_t channel) { channel_ = channel; }
 
     /// Pointer to the input stream that this token originated in.
-    LocationSourcePtr inputStream() const;
-    void setInputStream(LocationSourcePtr stream);
+    LocationSourcePtr inputStream() const { return input_; }
+    void setInputStream(LocationSourcePtr stream) { input_ = std::move(stream); }
 
     /// Zero-based index of the token in the token input stream.
-    Index tokenIndex() const;
-    void setTokenIndex(Index);
+    Index tokenIndex() const { return index_; }
+    void setTokenIndex(Index) { index_ = index; }
 
     /// Index of the first character of this token in character stream.
-    Index startIndex() const;
-    void setStartIndex(Index index);
+    Index startIndex() const { return start_; }
+    void setStartIndex(Index index) { start_ = index; }
     
     Location startLocation() const;
     
     /// Index of the first character of next token in character stream.
-    Index stopIndex() const;
-    void setStopIndex(Index index);
+    Index stopIndex() const { return stop_; }
+    void setStopIndex(Index index) { stop_ = index; }
     
     Location stopLocation() const;
 
@@ -153,14 +147,14 @@ public:
     /// printed with embedded control codes such as \n replaced with the printable sequence ANTLR3_T("\\n")
     /// This also yields a string structure that can be used more easily than the pointer to
     /// the input stream in certain situations.
-    String  toString(ConstString const * tokenNames = nullptr) const;
+    String toString(StringLiteral const * tokenNames = nullptr) const;
 };
 
-inline ConstString getTokenName(std::uint32_t tokenType, ConstString const * tokenNames)
+template<class StringTraits>
+typename antlr3<StringTraits>::StringLiteral
+    antlr3<StringTraits>::getTokenName(std::uint32_t tokenType, StringLiteral const * tokenNames)
 {
-    return tokenType == TokenEof ? ANTLR3_T("EOF") : tokenNames[tokenType];
+    return tokenType == antlr3_defs::TokenEof ? ANTLR3_T("EOF") : tokenNames[tokenType];
 }
-
-} // namespace antlr3
 
 #endif

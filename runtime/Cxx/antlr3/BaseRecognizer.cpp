@@ -481,7 +481,7 @@ Bitset BaseRecognizer::combineFollows(bool exact)
 /// separate translation unit, rather than install them all as pointers to functions
 /// in the base recognizer.
 ///
-void BaseRecognizer::displayRecognitionError(Exception const * e, ConstString const * tokenNames)
+void BaseRecognizer::displayRecognitionError(Exception const * e, StringLiteral const * tokenNames)
 {
     emitErrorMessage(getErrorHeader(e, tokenNames) + ANTLR3_T(" ") + getErrorMessage(e, tokenNames));
 }
@@ -904,7 +904,7 @@ ItemPtr BaseRecognizer::getMissingSymbol(
     return ItemPtr();
 }
 
-String BaseRecognizer::getErrorHeader(Exception const * e, ConstString const *)
+String BaseRecognizer::getErrorHeader(Exception const * e, StringLiteral const *)
 {
     String retVal;
 
@@ -927,12 +927,12 @@ String BaseRecognizer::getErrorHeader(Exception const * e, ConstString const *)
     return retVal;
 }
 
-static String getTokenErrorDisplay(std::uint32_t type, ConstString const * tokenNames)
+static String getTokenErrorDisplay(std::uint32_t type, StringLiteral const * tokenNames)
 {
     return String(ANTLR3_T("<")) + getTokenName(type, tokenNames) + ANTLR3_T(">");
 }
 
-static String getTokenErrorDisplay(ItemPtr item, ConstString const * tokenNames)
+static String getTokenErrorDisplay(ItemPtr item, StringLiteral const * tokenNames)
 {
     CommonTokenPtr t = std::static_pointer_cast<CommonToken>(item);
     if (t == nullptr)
@@ -951,7 +951,7 @@ static String getTokenErrorDisplay(ItemPtr item, ConstString const * tokenNames)
     return getTokenErrorDisplay(t->type(), tokenNames);
 }
 
-static String getTokenSetErrorDisplay(Bitset const & set, ConstString const * tokenNames)
+static String getTokenSetErrorDisplay(Bitset const & set, StringLiteral const * tokenNames)
 {
     return set.toString(
         [=](std::uint32_t ttype) -> String {
@@ -960,7 +960,7 @@ static String getTokenSetErrorDisplay(Bitset const & set, ConstString const * to
     );
 }
 
-String BaseRecognizer::getErrorMessage(Exception const * e, ConstString const * tokenNames)
+String BaseRecognizer::getErrorMessage(Exception const * e, StringLiteral const * tokenNames)
 {
     // Default implementation is provided for parser.
 
@@ -970,9 +970,9 @@ String BaseRecognizer::getErrorMessage(Exception const * e, ConstString const * 
     {
     public:
         String retVal;
-        ConstString const * const tokenNames;
+        StringLiteral const * const tokenNames;
 
-        Visitor(ConstString const * names) : tokenNames(names) {}
+        Visitor(StringLiteral const * names) : tokenNames(names) {}
 
 //        virtual void visit(RecognitionException const * e) override
 //        {
@@ -1032,7 +1032,7 @@ std::ostream& BaseRecognizer::traceStream() {
     return std::cout;
 }
     
-void BaseRecognizer::traceIn(ConstString ruleName, int ruleNo) {
+void BaseRecognizer::traceIn(StringLiteral ruleName, int ruleNo) {
     auto itemStr = traceCurrentItem();
     auto & s = traceStream();
     s << "enter " << ruleName << " " << itemStr;
@@ -1042,7 +1042,7 @@ void BaseRecognizer::traceIn(ConstString ruleName, int ruleNo) {
     s << std::endl;
 }
 
-void BaseRecognizer::traceOut(ConstString ruleName, int ruleNo) {
+void BaseRecognizer::traceOut(StringLiteral ruleName, int ruleNo) {
     auto itemStr = traceCurrentItem();
     auto & s = traceStream();
     s << "enter " << ruleName << " " << itemStr;

@@ -41,9 +41,7 @@
 #include <antlr3/Defs.hpp>
 #include <antlr3/String.hpp>
 
-namespace antlr3 {
-
-class Bitset
+class antlr3_defs::Bitset
 {
 public:
     typedef std::vector<Bitword> Data;
@@ -68,9 +66,6 @@ public:
     void remove(std::uint32_t bit);
     bool isNilNode() const;
     std::vector<std::uint32_t> toIntList() const;
-
-    String toString() const { return toString(nullptr); }
-    String toString(std::function<String(std::uint32_t)> tokenNamer) const;
 private:
     /// The actual bits themselves
 	///
@@ -80,7 +75,12 @@ private:
     void growToSize(std::size_t size);
 };
 
-} // namespace antlr3
+template <class StringTraits>
+class antlr3<StringTraits>::Bitset : public antlr3_defs::Bitset {
+public:
+    String toString() const { return toString(nullptr); }
+    String toString(std::function<String(std::uint32_t)> tokenNamer) const;
+};
 
 #endif
 

@@ -31,7 +31,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace antlr3 {
+namespace antlr3_detail {
 
 template<class... T> class TypeList;
 
@@ -98,6 +98,6 @@ public:
     typedef DefVisitorImpl<Visitor> DefVisitor;
 };
 
-} // namespace antlr3
+} // namespace antlr3_detail
 
 #endif // _ANTLR3_VISITOR_HPP

@@ -40,15 +40,14 @@
 #include <antlr3/Bitset.hpp>
 #include <antlr3/Location.hpp>
 
-namespace antlr3 {
-
 /** Base structure for an ANTLR3 exception tracker
  */
-class Exception
+template<class StringTraits>
+class antlr3<StringTraits>::Exception
 {
     template<class T> struct AddConstPtr { typedef T const * type; };
 public:
-    typedef ::antlr3::TypeList<
+    typedef ::antlr3_detail::TypeList<
         class MismatchedTokenException,
         class UnwantedTokenException,
         class MissingTokenException,
@@ -60,9 +59,9 @@ public:
         class RewriteEarlyExitException
     > TypeList;
 
-    typedef TransformTypeList<AddConstPtr, TypeList>::type PtrTypeList;
-    typedef ::antlr3::VisitorBuilder<PtrTypeList>::Visitor Visitor;
-    typedef ::antlr3::VisitorBuilder<PtrTypeList>::DefVisitor DefVisitor;
+    typedef typename antlr3_detail::TransformTypeList<AddConstPtr, TypeList>::type PtrTypeList;
+    typedef typename antlr3_detail::VisitorBuilder<PtrTypeList>::Visitor Visitor;
+    typedef typename antlr3_detail::VisitorBuilder<PtrTypeList>::DefVisitor DefVisitor;
 
     /** Name of the file/input source for reporting. Note that this may be NULL!!
      */
@@ -87,8 +86,14 @@ public:
      */
     IntStreamPtr input;
 
-    Exception();
-    virtual ~Exception();
+    Exception()
+        : streamName()
+        , index()
+        , item()
+        , location()
+        , input()
+    {}
+    virtual ~Exception() {}
 
     virtual char const * name() const = 0;
     virtual std::unique_ptr<Exception> clone() const = 0;
@@ -103,6 +108,7 @@ protected:
 
 #define CommonExceptionStuff \
 public: \
+    typedef typename Exception::Visitor Visitor; \
     virtual std::unique_ptr<Exception> clone() const override \
     { return makeClone(this); } \
     virtual void accept(Visitor& v) const override \
@@ -110,11 +116,12 @@ public: \
 
 /// Indicates that the recognizer was expecting one token and found a
 /// a different one.
-class MismatchedTokenException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::MismatchedTokenException : public Exception
 {
     CommonExceptionStuff
 public:
-     /// Indicates the token we were expecting to see next when the error occurred
+    /// Indicates the token we were expecting to see next when the error occurred
     std::uint32_t const expecting;
 
     MismatchedTokenException(std::uint32_t expectingType)
@@ -130,7 +137,8 @@ public:
 
 /// Custom case of the MismatchedTokenException
 /// Recognnizer recovers by removing this token.
-class UnwantedTokenException : public MismatchedTokenException
+template<class StringTraits>
+class antlr3<StringTraits>::UnwantedTokenException : public MismatchedTokenException
 {
     CommonExceptionStuff
 public:
@@ -146,7 +154,8 @@ public:
 
 /// Custom case of the MismatchedTokenException
 /// Recognnizer recovers by inserting imaginary expected token.
-class MissingTokenException : public MismatchedTokenException
+template<class StringTraits>
+class antlr3<StringTraits>::MissingTokenException : public MismatchedTokenException
 {
     CommonExceptionStuff
 public:
@@ -161,18 +170,19 @@ public:
 };
 
 /// Recognizer could not find a valid alternative from the input
-class NoViableAltException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::NoViableAltException : public Exception
 {
     CommonExceptionStuff
 public:
-    NoViableAltException(ConstString descr, std::uint32_t decision, std::uint32_t s)
+    NoViableAltException(StringLiteral descr, std::uint32_t decision, std::uint32_t s)
         : Exception()
         , decisionDescription(descr)
         , decisionNum(decision)
         , state(s)
     {}
     
-    ConstString const decisionDescription;
+    StringLiteral const decisionDescription;
 
     /// Decision number.
     std::uint32_t const decisionNum;
@@ -187,7 +197,8 @@ public:
 };
 
 /// Character in a set was not found
-class MismatchedSetException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::MismatchedSetException : public Exception
 {
     CommonExceptionStuff
 public:
@@ -213,7 +224,8 @@ public:
     }
 };
 
-class MismatchedRangeException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::MismatchedRangeException : public Exception
 {
     CommonExceptionStuff
 public:
@@ -233,7 +245,8 @@ public:
 
 /// A rule predicting at least n elements found less than that,
 /// such as: WS: " "+;
-class EarlyExitException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::EarlyExitException : public Exception
 {
     CommonExceptionStuff
 public:
@@ -244,18 +257,19 @@ public:
 };
 
 /// Input was recognizer successfully, but validating predicate failed.
-class FailedPredicateException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::FailedPredicateException : public Exception
 {
     CommonExceptionStuff
 public:
-    FailedPredicateException(ConstString rule, ConstString predicate)
+    FailedPredicateException(StringLiteral rule, StringLiteral predicate)
         : Exception()
         , ruleName(rule)
         , predicateText(predicate)
     {}
 
-    ConstString const ruleName;
-    ConstString const predicateText;
+    StringLiteral const ruleName;
+    StringLiteral const predicateText;
 
     virtual char const * name() const override
     {
@@ -263,18 +277,20 @@ public:
     }
 };
 
-class RewriteCardinalityException : public Exception
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteCardinalityException : public Exception
 {
 public:
-    RewriteCardinalityException(ConstString elementDescr = nullptr)
+    RewriteCardinalityException(StringLiteral elementDescr = nullptr)
         : Exception()
         , elementDescription(elementDescr)
     {}
     
-    ConstString const elementDescription;
+    StringLiteral const elementDescription;
 };
 
-class RewriteEarlyExitException : public RewriteCardinalityException
+template<class StringTraits>
+class antlr3<StringTraits>::RewriteEarlyExitException : public RewriteCardinalityException
 {
     CommonExceptionStuff
 public:
@@ -291,6 +307,5 @@ public:
 
 #undef CommonExceptionStuff
 
-} // namespace antlr3
 
 #endif

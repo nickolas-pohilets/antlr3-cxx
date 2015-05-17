@@ -49,12 +49,11 @@
 #include <antlr3/BaseTree.hpp>
 #include <antlr3/CommonToken.hpp>
 
-namespace antlr3 {
-
 /** The ANTLR3 debugging interface for communicating with ANLTR Works. Function comments
  *  mostly taken from the Java version.
  */
-class DebugEventListener
+template<class StringTraits>
+class antlr3<StringTraits>::DebugEventListener
 {
 public:
     virtual ~DebugEventListener() {}
@@ -329,8 +328,6 @@ public:
     virtual void setTokenBoundaries(ItemPtr t, Index tokenStartIndex, Index tokenStopIndex) = 0;
 
 };
-
-} // namespace antlr3
 
 #endif
 

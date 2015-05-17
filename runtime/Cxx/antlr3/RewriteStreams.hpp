@@ -60,9 +60,9 @@ namespace antlr3 {
 class RewriteRuleElementStream
 {
 public:
-    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description);
-    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement);
-    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector);
+    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
+    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement);
+    RewriteRuleElementStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector);
     virtual ~RewriteRuleElementStream();
 
     // Methods 
@@ -109,7 +109,7 @@ public:
 
     /// Returns the description string if there is one available (check for NULL).
     ///
-    ConstString description();
+    StringLiteral description();
     
 protected:
     /// Pointer to the tree adaptor in use for this stream
@@ -151,7 +151,7 @@ private:
     /// rule reference that this list tracks. Can include rulename too, but
     /// the exception would track that info.
     ///
-    ConstString elementDescription_;
+    StringLiteral elementDescription_;
 
     /// Once a node / subtree has been used in a stream, it must be dup'ed
     /// from then on. Streams are reset after sub rules so that the streams
@@ -171,9 +171,9 @@ private:
 class RewriteRuleTokenStream : public RewriteRuleElementStream
 {
 public:
-    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description);
-    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, CommonTokenPtr oneElement);
-    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<CommonTokenPtr> const & vector);
+    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
+    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, CommonTokenPtr oneElement);
+    RewriteRuleTokenStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<CommonTokenPtr> const & vector);
     
     ItemPtr dup(ItemPtr el) override;
     ItemPtr nextNode() override;
@@ -189,9 +189,9 @@ public:
 class RewriteRuleSubtreeStream : public RewriteRuleElementStream
 {
 public:
-    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description);
-    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement);
-    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector);
+    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
+    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement);
+    RewriteRuleSubtreeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector);
 
     ItemPtr dup(ItemPtr el) override;
     ItemPtr nextNode() override;
@@ -203,9 +203,9 @@ public:
 class RewriteRuleNodeStream : public RewriteRuleElementStream
 {
 public:
-    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description);
-    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, ItemPtr oneElement);
-    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, ConstString description, std::vector<ItemPtr> vector);
+    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description);
+    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, ItemPtr oneElement);
+    RewriteRuleNodeStream(TreeAdaptorPtr adaptor, BaseRecognizer * rec, StringLiteral description, std::vector<ItemPtr> vector);
 
     ItemPtr dup(ItemPtr el) override;
     ItemPtr nextNode() override;

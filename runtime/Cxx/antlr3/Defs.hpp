@@ -1,6 +1,6 @@
 /** \file
- * Basic type and constant definitions for ANTLR3 Runtime.
- */
+* Basic type and constant definitions for ANTLR3 Runtime.
+*/
 #ifndef	_ANTLR3DEFS_H
 #define	_ANTLR3DEFS_H
 
@@ -35,7 +35,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Common definitions come first
- */
+*/
 #include <cassert>
 #include <new>
 #include <memory>
@@ -46,7 +46,14 @@
 #include <algorithm>
 #include <cstdint>
 
-namespace antlr3 {
+#define ANTLR3_DECL_PTR(ClassName) \
+class ClassName; \
+typedef std::shared_ptr<class ClassName> ClassName##Ptr; \
+typedef std::weak_ptr<class ClassName> ClassName##WeakPtr
+
+/// Pseudo-namespace that contains definitions that don't depend on string traits.
+class antlr3_defs {
+public:
 
 /// Definitions that indicate the encoding scheme character streams and strings etc
 enum class TextEncoding
@@ -61,30 +68,89 @@ enum class TextEncoding
 typedef std::uint64_t Bitword;
 typedef std::size_t	  Index;
 
-/// Indicates end of character stream and is an invalid Unicode code point.
-std::uint32_t const CharstreamEof = 0xFFFFFFFF;
+template<class T> class StringLiteralRef;
+class StdUTF16StringTraits;
+class StdUTF8StringTraits;
 
-Index const NullIndex = Index(std::ptrdiff_t(-1));
+template<class ChildT> class BaseTree;
+/// Indicates end of character stream and is an invalid Unicode code point.
+static std::uint32_t const CharstreamEof = 0xFFFFFFFF;
+
+static Index const NullIndex = Index(std::ptrdiff_t(-1));
 
 /// Indicates memoizing on a rule failed.
-Index const MEMO_RULE_FAILED = NullIndex - 1;
-Index const MEMO_RULE_UNKNOWN = NullIndex;
+static Index const MEMO_RULE_FAILED = NullIndex - 1;
+/// Indicates that rule haven't been parsed yet.
+static Index const MEMO_RULE_UNKNOWN = NullIndex;
 
-#define ANTLR3_DECL_PTR(ClassName) \
-    typedef std::shared_ptr<class ClassName> ClassName##Ptr; \
-    typedef std::weak_ptr<class ClassName> ClassName##WeakPtr
+/// Indicator of an invalid token
+static std::uint32_t const	TokenInvalid = 0;
+static std::uint32_t const	EorTokenType = 1;
+
+/// Imaginary token type to cause a traversal of child nodes in a tree parser
+static std::uint32_t const	TokenDown = 2;
+
+/// Imaginary token type to signal the end of a stream of child nodes.
+static std::uint32_t const	TokenUp = 3;
+
+/// First token that can be used by users/generated code
+static std::uint32_t const MinTokenType = TokenUp + 1;
+
+/// End of file token
+static std::uint32_t const TokenEof = CharstreamEof;
+
+/// Default channel for a token
+static std::uint32_t const	TokenDefaultChannel = 0;
+
+/// Reserved channel number for a HIDDEN token - a token that is hidden from the parser.
+static std::uint32_t const TokenHiddenChannel = 99;
 
 typedef std::shared_ptr<void> ItemPtr;
 typedef std::weak_ptr<void> ItemWeakPtr;
 
 ANTLR3_DECL_PTR(Marker);
+ANTLR3_DECL_PTR(Location);
+ANTLR3_DECL_PTR(Bitset);
+
+template<class T, class Y> static inline T pointer_cast(std::shared_ptr<Y> p)
+{
+    return std::static_pointer_cast<typename T::element_type>(std::move(p));
+}
+
+template<class T> static std::shared_ptr<T> pointer_cast(std::shared_ptr<T> p)
+{
+    return std::move(p);
+}
+
+static inline bool isBetween(std::uint32_t min, std::uint32_t val, std::uint32_t max)
+{
+    return min <= val && val <= max;
+}
+
+};
+
+/// Pseudo-namespace that contains all ANTLR defintinitions.
+template<class StringTraits>
+class antlr3 : public antlr3_defs {
+public:
+typedef typename StringTraits::String String;
+typedef typename StringTraits::Char Char;
+typedef typename StringTraits::StringLiteral StringLiteral;
+
+class StringUtils;
+
+template<class CodeUnit> class BasicCharStream;
+template<class ChildT> class BaseTreeAdaptor;
+
 ANTLR3_DECL_PTR(CharItem);
 ANTLR3_DECL_PTR(CommonToken);
 ANTLR3_DECL_PTR(CommonTree);
-ANTLR3_DECL_PTR(Location);
+ANTLR3_DECL_PTR(CommonErrorNode);
 ANTLR3_DECL_PTR(LocationSource);
 ANTLR3_DECL_PTR(IntStream);
 ANTLR3_DECL_PTR(CharStream);
+ANTLR3_DECL_PTR(ByteCharStream);
+ANTLR3_DECL_PTR(UnicodeCharStream);
 ANTLR3_DECL_PTR(TokenStream);
 ANTLR3_DECL_PTR(CommonTokenStream);
 ANTLR3_DECL_PTR(TreeNodeStream);
@@ -95,6 +161,16 @@ ANTLR3_DECL_PTR(Lexer);
 ANTLR3_DECL_PTR(Parser);
 ANTLR3_DECL_PTR(TreeParser);
 ANTLR3_DECL_PTR(Exception);
+ANTLR3_DECL_PTR(MismatchedTokenException);
+ANTLR3_DECL_PTR(UnwantedTokenException);
+ANTLR3_DECL_PTR(MissingTokenException);
+ANTLR3_DECL_PTR(NoViableAltException);
+ANTLR3_DECL_PTR(MismatchedSetException);
+ANTLR3_DECL_PTR(MismatchedRangeException);
+ANTLR3_DECL_PTR(EarlyExitException);
+ANTLR3_DECL_PTR(FailedPredicateException);
+ANTLR3_DECL_PTR(RewriteCardinalityException);
+ANTLR3_DECL_PTR(RewriteEarlyExitException);
 ANTLR3_DECL_PTR(TokenSource);
 ANTLR3_DECL_PTR(TreeAdaptor);
 ANTLR3_DECL_PTR(CommonTreeAdaptor);
@@ -104,24 +180,14 @@ ANTLR3_DECL_PTR(RewriteRuleNodeStream);
 ANTLR3_DECL_PTR(DebugEventListener);
 ANTLR3_DECL_PTR(Bitset);
 ANTLR3_DECL_PTR(CyclicDfa);
-    
+
+static StringLiteral getTokenName(std::uint32_t tokenType, StringLiteral const * tokenNames);
+
+/// Produce a DOT specification for graphviz freeware suite from a base tree
+static String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree);
+
+};
+
 #undef ANTLR3_DECL_PTR
-
-template<class T, class Y> inline T pointer_cast(std::shared_ptr<Y> p)
-{
-    return std::static_pointer_cast<typename T::element_type>(std::move(p));
-}
-
-template<class T> std::shared_ptr<T> pointer_cast(std::shared_ptr<T> p)
-{
-    return std::move(p);
-}
-
-inline bool isBetween(std::uint32_t min, std::uint32_t val, std::uint32_t max)
-{
-    return min <= val && val <= max;
-}
-
-} // namespace antlr3 {
 
 #endif	/* _ANTLR3DEFS_H	*/

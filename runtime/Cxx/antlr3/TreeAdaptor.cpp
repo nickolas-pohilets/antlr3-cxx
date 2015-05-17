@@ -36,7 +36,12 @@
 
 #include <antlr3/TreeAdaptor.hpp>
 
-namespace antlr3 {
+template<class StringTraits>
+class dot_utils : public antlr3<StringTraits> {
+
+typedef typename antlr3<StringTraits>::String String;
+typedef typename antlr3<StringTraits>::TreeAdaptorPtr TreeAdaptorPtr;
+typedef typename antlr3<StringTraits>::ItemPtr ItemPtr;
 
 static void defineDotNodes(TreeAdaptorPtr adaptor, ItemPtr t, String & dotSpec)
 {
@@ -125,17 +130,22 @@ static void defineDotEdges(TreeAdaptorPtr adaptor, ItemPtr t, String & dotSpec)
 	}
 }
 
-String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree)
+};
+
+template<class StringTraits>
+typename antlr3<StringTraits>::String
+    antlr3<StringTraits>::makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree)
 {
     // Default look and feel
     //
-    String dotSpec = 
-        ANTLR3_T("digraph {\n\n")
-        ANTLR3_T("\tordering=out;\n")
-        ANTLR3_T("\tranksep=.4;\n")
-        ANTLR3_T("\tbgcolor=\")lightgrey\";  node [shape=box, fixedsize=false, fontsize=12, fontname=\"Helvetica-bold\", fontcolor=\"blue\"\n")
-        ANTLR3_T("\twidth=.25, height=.25, color=\"black\", fillcolor=\"white\", style=\"filled, solid, bold\"];\n\n")
-        ANTLR3_T("\tedge [arrowsize=.5, color=\"black\", style=\"bold\"]\n\n");
+    String dotSpec = ANTLR3_T(
+        "digraph {\n\n"
+        "\tordering=out;\n"
+        "\tranksep=.4;\n"
+        "\tbgcolor=\")lightgrey\";  node [shape=box, fixedsize=false, fontsize=12, fontname=\"Helvetica-bold\", fontcolor=\"blue\"\n"
+        "\twidth=.25, height=.25, color=\"black\", fillcolor=\"white\", style=\"filled, solid, bold\"];\n\n"
+        "\tedge [arrowsize=.5, color=\"black\", style=\"bold\"]\n\n"
+    );
 
     if	(theTree == NULL)
 	{
@@ -153,9 +163,9 @@ String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree)
 
 	// First produce the node defintions
 	//
-	defineDotNodes(adaptor, theTree, dotSpec);
+	dot_utils<StringTraits>::defineDotNodes(adaptor, theTree, dotSpec);
 	dotSpec += ANTLR3_T("\n");
-	defineDotEdges(adaptor, theTree, dotSpec);
+	dot_utils<StringTraits>::defineDotEdges(adaptor, theTree, dotSpec);
 	
 	// Terminate the spec
 	//
@@ -165,5 +175,3 @@ String makeDot(TreeAdaptorPtr adaptor, ItemPtr theTree)
 	//
 	return dotSpec;
 }
-
-} // namespace antlr3
