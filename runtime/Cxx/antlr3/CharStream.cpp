@@ -264,7 +264,7 @@ typename antlr3<StringTraits>::UnicodeCharStream::DataRef
         return decode<utf::UTF32, utf::BE>(data, size);
     default:
         assert(false && !"Unknown encoding");
-        return DataRef(ANTLR3_T(""), std::size_t(0), [](Char const *) {});
+        return DataRef(nullptr, std::size_t(0), [](Char const *) {});
     }
 }
 

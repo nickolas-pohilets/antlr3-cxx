@@ -1,6 +1,3 @@
-#ifndef _ANTLR3_INL
-#define _ANTLR3_INL
-
 // [The "BSD licence"]
 // Copyright (c) 20013-2015 Nickolas Pohilets
 // Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
@@ -31,24 +28,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <antlr3/BaseRecognizer.cpp>
-#include <antlr3/BaseTree.cpp>
-#include <antlr3/Bitset.inl>
-#include <antlr3/CharStream.cpp>
-#include <antlr3/CommonToken.cpp>
-#include <antlr3/CommonTree.cpp>
-#include <antlr3/CommonTreeAdaptor.cpp>
-#include <antlr3/CommonTreeNodeStream.cpp>
-//#include <antlr3/ConvertUTF.cpp>
-#include <antlr3/CyclicDFA.cpp>
-#include <antlr3/DebugEventSocketProxy.cpp>
-#include <antlr3/Exception.cpp>
-#include <antlr3/Lexer.cpp>
-#include <antlr3/Parser.cpp>
-#include <antlr3/RewriteStreams.cpp>
-#include <antlr3/String.cpp>
-#include <antlr3/TokenStream.cpp>
-#include <antlr3/TreeAdaptor.cpp>
-#include <antlr3/TreeParser.cpp>
+#include <antlr3/Bitset.hpp>
 
-#endif // _ANTLR3_INL
+template<class StringTraits>
+typename antlr3<StringTraits>::String antlr3<StringTraits>::Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
+{
+    String buf = ANTLR3_T("{ ");
+    bool havePrintedAnElement = false;
+    std::uint32_t cap = capacity();
+    for (std::uint32_t i = 0; i < cap; i++)
+    {
+        if (isMember(i))
+        {
+            if (havePrintedAnElement)
+            {
+                buf.append(ANTLR3_T(", "));
+            }
+            
+            if ( tokenNamer)
+            {
+                buf += tokenNamer(i);
+            }
+            else
+            {
+                buf += StringTraits::toString(i);
+            }
+            
+            havePrintedAnElement = true;
+        }
+    }
+    buf.append(ANTLR3_T(" }"));
+    return std::move(buf);
+}

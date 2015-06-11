@@ -1,5 +1,5 @@
-#ifndef	_ANTLR3_H
-#define	_ANTLR3_H
+#ifndef	_ANTLR3_HPP
+#define	_ANTLR3_HPP
 
 // [The "BSD licence"]
 // Copyright (c) 20013-2015 Nickolas Pohilets
@@ -52,4 +52,4 @@
 #include <antlr3/DebugEventListener.hpp>
 #include <antlr3/DebugEventSocketProxy.hpp>
 
-#endif
+#endif //_ANTLR3_HPP

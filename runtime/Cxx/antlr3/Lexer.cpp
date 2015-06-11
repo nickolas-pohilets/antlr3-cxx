@@ -313,7 +313,7 @@ void antlr3<StringTraits>::Lexer::reportError()
     // Indicate this recognizer had an error while processing.
     //
     this->state_->errorCount++;
-    displayRecognitionError(this->state_->exception.get(), this->state_->tokenNames);
+    this->displayRecognitionError(this->state_->exception.get(), this->state_->tokenNames);
 }
 
 template<class StringTraits>

@@ -28,8 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <BaseRecognizer.hpp>
-#include <RecognizerSharedState.hpp>
+#include <antlr3/BaseRecognizer.hpp>
+#include <antlr3/RecognizerSharedState.hpp>
 #include <iostream>
 
 template<class StringTraits>
@@ -964,9 +964,9 @@ typename antlr3<StringTraits>::String
 
     // Next comes the line number
     retVal += ANTLR3_T(":");
-    retVal += toString(e->location.line());
+    retVal += StringTraits::toString(e->location.line());
     retVal += ANTLR3_T(":");
-    retVal += toString(e->location.charPositionInLine());
+    retVal += StringTraits::toString(e->location.charPositionInLine());
     retVal += ANTLR3_T(": error: ");
     return retVal;
 }

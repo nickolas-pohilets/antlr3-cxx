@@ -214,7 +214,7 @@ typename antlr3<StringTraits>::String
 {
     if(start != NULL && stop != NULL)
     {
-        return toString((std::uint32_t)start->tokenIndex(), (std::uint32_t)stop->tokenIndex());
+        return this->toString((std::uint32_t)start->tokenIndex(), (std::uint32_t)stop->tokenIndex());
     }
     else
     {

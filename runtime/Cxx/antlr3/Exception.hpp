@@ -110,7 +110,7 @@ protected:
 public: \
     typedef typename Exception::Visitor Visitor; \
     virtual std::unique_ptr<Exception> clone() const override \
-    { return makeClone(this); } \
+    { return Exception::makeClone(this); } \
     virtual void accept(Visitor& v) const override \
     { v.visit(this); }
 

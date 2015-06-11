@@ -176,7 +176,7 @@ template<class StringTraits>
 typename antlr3<StringTraits>::StringLiteral
     antlr3<StringTraits>::RewriteRuleElementStream::description()
 {
-    return elementDescription_ ? elementDescription_ : ANTLR3_T("<unknown source>");
+    return elementDescription_.empty() ? ANTLR3_T("<unknown source>") : elementDescription_;
 }
 
 template<class StringTraits>
@@ -253,7 +253,7 @@ template<class StringTraits>
 typename antlr3<StringTraits>::ItemPtr
     antlr3<StringTraits>::RewriteRuleTokenStream::dup(ItemPtr)
 {
-    assert(false && ANTLR3_T("dup() cannot be called on a token rewrite stream!!"));
+    assert(false && "dup() cannot be called on a token rewrite stream!!");
 	return nullptr;
 }
 
@@ -324,7 +324,7 @@ template<class StringTraits>
 typename antlr3<StringTraits>::ItemPtr
     antlr3<StringTraits>::RewriteRuleNodeStream::dup(ItemPtr element)
 {
-	assert(false && ANTLR3_T("dup() cannot be called on a node rewrite stream!!!"));
+	assert(false && "dup() cannot be called on a node rewrite stream!!!");
 	return nullptr;
 }
 

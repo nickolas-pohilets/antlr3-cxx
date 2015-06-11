@@ -262,7 +262,7 @@ bool antlr3<StringTraits>::DebugEventSocketProxy::handshake()
     char message[256];
     sprintf(message, "ANTLR %d\n", PROTOCOL_VERSION);
     sockSend(message,(int)strlen(message));
-    sprintf(message, "grammar \"%s\n", toUTF8(grammarFileName_).c_str());
+    sprintf(message, "grammar \"%s\n", StringTraits::toUTF8(grammarFileName_).c_str());
     sockSend(message, (int)strlen(message));
     ack();
 

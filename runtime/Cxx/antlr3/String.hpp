@@ -41,104 +41,6 @@
 #include <string>
 #include <sstream>
 
-template<class T>
-class antlr3_defs::StringLiteralRef {
-public:
-    typedef T                                       value_type;
-    typedef size_t                                  size_type;
-    typedef ptrdiff_t                               difference_type;
-    typedef value_type&                             reference;
-    typedef const value_type&                       const_reference;
-    typedef T const *                               pointer;
-    typedef T const *                               const_pointer;
-    typedef const_pointer                           iterator;
-    typedef const_pointer                           const_iterator;
-    typedef std::reverse_iterator<iterator>         reverse_iterator;
-    typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
-    
-    StringLiteralRef(T const * data, size_t len) : data_(data), len_(len) {}
-    
-    bool empty() const { return len_ == 0; }
-    size_t size() const { return len_; }
-    
-    const_iterator begin() const { return data_; }
-    const_iterator end() const { return data_ + len_; }
-    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
-    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
-private:
-    T const * data_;
-    size_t len_;
-};
-    
-class antlr3_defs::StdUTF16StringTraits {
-public:
-    /// Class of the mutable string
-    typedef std::u16string String;
-    /// Class of the element of String or StringLiteral
-    typedef String::value_type Char;
-    /// Thin wrapper around string literal.
-    typedef StringLiteralRef<char16_t> StringLiteral;
-    /// Stream object that can be used to construct String
-    typedef std::basic_stringstream<char16_t> StringStream;
-    
-    template<size_t N8, size_t N16, size_t N32>
-    static StringLiteral literal(
-        char const (&)[N8],
-        char16_t const (& s)[N16],
-        char32_t const (&)[N32]
-    ) { return StringLiteralRef<char16_t>(s, N16); }
-    
-    String string(std::uint8_t const * b, std::uint8_t const * e) { return String(b, e); }
-    String string(Char const * b, Char const * e) { return String(b, e); }
-    
-    static String toString(int val)                { return fromLatin1(std::to_string(val)); }
-    static String toString(long val)               { return fromLatin1(std::to_string(val)); }
-    static String toString(long long val)          { return fromLatin1(std::to_string(val)); }
-    static String toString(unsigned val)           { return fromLatin1(std::to_string(val)); }
-    static String toString(unsigned long val)      { return fromLatin1(std::to_string(val)); }
-    static String toString(unsigned long long val) { return fromLatin1(std::to_string(val)); }
-    static String toString(float val)              { return fromLatin1(std::to_string(val)); }
-    static String toString(double val)             { return fromLatin1(std::to_string(val)); }
-    static String toString(long double val)        { return fromLatin1(std::to_string(val)); }
-    
-    std::string toUTF8(String const & s);
-private:
-    static String fromLatin1(std::string const & s)
-    {
-        return String(s.begin(), s.end());
-    }
-};
-    
-class antlr3_defs::StdUTF8StringTraits {
-public:
-    typedef std::string String;
-    typedef String::value_type Char;
-    typedef StringLiteralRef<char> StringLiteral;
-    typedef std::stringstream StringStream;
-    
-    template<size_t N8, size_t N16, size_t N32>
-    static StringLiteral literal(
-        char const (&)[N8],
-        char16_t const (& s)[N16],
-        char32_t const (&)[N32]
-    ) { return StringLiteral(s, N16); }
-    
-    String string(std::uint8_t const * b, std::uint8_t const * e) { return String(b, e); }
-    String string(Char const * b, Char const * e) { return String(b, e); }
-    
-    static String toString(int val)                { return std::to_string(val); }
-    static String toString(long val)               { return std::to_string(val); }
-    static String toString(long long val)          { return std::to_string(val); }
-    static String toString(unsigned val)           { return std::to_string(val); }
-    static String toString(unsigned long val)      { return std::to_string(val); }
-    static String toString(unsigned long long val) { return std::to_string(val); }
-    static String toString(float val)              { return std::to_string(val); }
-    static String toString(double val)             { return std::to_string(val); }
-    static String toString(long double val)        { return std::to_string(val); }
-    
-    std::string toUTF8(String s) { return std::move(s); }
-};
-
 #define ANTLR3_T(X) StringTraits::literal(X, u##X, U##X)
 
 //std::string toUTF8(String const & s);
@@ -150,9 +52,6 @@ public:
 //std::string& appendToUTF8(std::string& s8, StringLiteral s);
 //String& appendUTF8(String& s, std::string const & s8);
 //String& appendUTF8(String& s, char const * s8);
-//
-//std::ostream& operator<<(std::ostream& s, const String& str);
-//std::ostream& operator<<(std::ostream& s, StringLiteral str);
 
 
 template<class StringTraits>
@@ -197,7 +96,7 @@ public:
         return dest;
     }
     
-    String& appendEscape(String& dest, std::uint32_t src) {
+    static String& appendEscape(String& dest, std::uint32_t src) {
         if (src == CharstreamEof) {
             return dest += ANTLR3_T("<EOF>");
         }
@@ -205,7 +104,7 @@ public:
         if (src < maxChar) {
             return appendEscape(dest, (Char)src);
         }
-        dest += "\\u";
+        dest += ANTLR3_T("\\u");
         char buffer[16];
         sprintf(buffer, "%04X", (unsigned)src);
         dest.append(buffer, buffer + strlen(buffer));

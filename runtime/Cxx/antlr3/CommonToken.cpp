@@ -107,7 +107,7 @@ typename antlr3<StringTraits>::String
     outtext += ANTLR3_T(":");
     outtext += StringTraits::toString((std::int32_t)stopIndex());
     outtext += ANTLR3_T("='");
-    outtext += escape(text());
+    StringUtils::appendEscape(outtext, text());
     outtext += ANTLR3_T("',<");
     if (tokenNames) {
         outtext += getTokenName(type(), tokenNames);
@@ -119,15 +119,15 @@ typename antlr3<StringTraits>::String
     if (channel() > TokenDefaultChannel)
     {
         outtext += ANTLR3_T(",channel=");
-        outtext += toString((std::int32_t)channel());
+        outtext += StringTraits::toString((std::int32_t)channel());
     }
 
     Location loc = startLocation();
     outtext += ANTLR3_T(",");
-    outtext += toString(loc.line());
+    outtext += StringTraits::toString(loc.line());
     outtext += ANTLR3_T(":");
-    outtext += toString(loc.charPositionInLine());
-    outtext += "]";
+    outtext += StringTraits::toString(loc.charPositionInLine());
+    outtext += ANTLR3_T("]");
 
     return outtext;
 }

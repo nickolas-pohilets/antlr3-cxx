@@ -77,7 +77,13 @@ private:
 
 template <class StringTraits>
 class antlr3<StringTraits>::Bitset : public antlr3_defs::Bitset {
+    typedef antlr3_defs::Bitset Base;
 public:
+    Bitset() {}
+    using Base::Base;
+    Bitset(Base const & other) : Base(other) {}
+    Bitset(Base && other) : Base(std::move(other)) {}
+    
     String toString() const { return toString(nullptr); }
     String toString(std::function<String(std::uint32_t)> tokenNamer) const;
 };

@@ -129,7 +129,7 @@ public:
 
     /// Zero-based index of the token in the token input stream.
     Index tokenIndex() const { return index_; }
-    void setTokenIndex(Index) { index_ = index; }
+    void setTokenIndex(Index index) { index_ = index; }
 
     /// Index of the first character of this token in character stream.
     Index startIndex() const { return start_; }

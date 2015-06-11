@@ -95,7 +95,7 @@ typename antlr3<StringTraits>::ItemPtr
     // Create the token text that shows it has been inserted
     //
     String text = ANTLR3_T("<missing ");
-    text += expectedTokenType == TokenEof ? "EOF" : this->state_->tokenNames[expectedTokenType];
+    text += expectedTokenType == TokenEof ? ANTLR3_T("EOF") : this->state_->tokenNames[expectedTokenType];
     text += ANTLR3_T(">");
     token->setText(text);
 

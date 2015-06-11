@@ -59,7 +59,7 @@ public:
 
     /// Returns the line number of the current position in the input stream.
     /// Interpretation of line number is determined by the stream itself.
-    virtual Location currentLocation() { return location(this->index()); }
+    virtual Location currentLocation() { return this->location(this->index()); }
 };
 
 template<class StringTraits>

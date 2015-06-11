@@ -56,6 +56,7 @@
 template <class StringTraits>
 class antlr3<StringTraits>::RecognizerSharedState
 {
+public:
     RecognizerSharedState();
     ~RecognizerSharedState();
 

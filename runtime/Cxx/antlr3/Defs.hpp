@@ -68,42 +68,44 @@ enum class TextEncoding
 typedef std::uint64_t Bitword;
 typedef std::size_t	  Index;
 
-template<class T> class StringLiteralRef;
-class StdUTF16StringTraits;
-class StdUTF8StringTraits;
-
 template<class ChildT> class BaseTree;
-/// Indicates end of character stream and is an invalid Unicode code point.
-static std::uint32_t const CharstreamEof = 0xFFFFFFFF;
 
-static Index const NullIndex = Index(std::ptrdiff_t(-1));
+enum : std::uint32_t {
+    /// Indicates end of character stream and is an invalid Unicode code point.
+    CharstreamEof = 0xFFFFFFFF,
 
-/// Indicates memoizing on a rule failed.
-static Index const MEMO_RULE_FAILED = NullIndex - 1;
-/// Indicates that rule haven't been parsed yet.
-static Index const MEMO_RULE_UNKNOWN = NullIndex;
+    /// Indicator of an invalid token
+    TokenInvalid = 0,
 
-/// Indicator of an invalid token
-static std::uint32_t const	TokenInvalid = 0;
-static std::uint32_t const	EorTokenType = 1;
+    EorTokenType = 1,
 
-/// Imaginary token type to cause a traversal of child nodes in a tree parser
-static std::uint32_t const	TokenDown = 2;
+    /// Imaginary token type to cause a traversal of child nodes in a tree parser
+    TokenDown = 2,
 
-/// Imaginary token type to signal the end of a stream of child nodes.
-static std::uint32_t const	TokenUp = 3;
+    /// Imaginary token type to signal the end of a stream of child nodes.
+    TokenUp = 3,
 
-/// First token that can be used by users/generated code
-static std::uint32_t const MinTokenType = TokenUp + 1;
+    /// First token that can be used by users/generated code
+    MinTokenType = TokenUp + 1,
 
-/// End of file token
-static std::uint32_t const TokenEof = CharstreamEof;
+    /// End of file token
+    TokenEof = CharstreamEof,
 
-/// Default channel for a token
-static std::uint32_t const	TokenDefaultChannel = 0;
+    /// Default channel for a token
+    TokenDefaultChannel = 0,
 
-/// Reserved channel number for a HIDDEN token - a token that is hidden from the parser.
-static std::uint32_t const TokenHiddenChannel = 99;
+    /// Reserved channel number for a HIDDEN token - a token that is hidden from the parser.
+    TokenHiddenChannel = 99,
+};
+
+enum : Index {
+    NullIndex = Index(std::ptrdiff_t(-1)),
+
+    /// Indicates memoizing on a rule failed.
+    MEMO_RULE_FAILED = NullIndex - 1,
+    /// Indicates that rule haven't been parsed yet.
+    MEMO_RULE_UNKNOWN = NullIndex,
+};
 
 typedef std::shared_ptr<void> ItemPtr;
 typedef std::weak_ptr<void> ItemWeakPtr;

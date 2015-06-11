@@ -310,34 +310,3 @@ std::vector<std::uint32_t> antlr3_defs::Bitset::toIntList() const
     //
     return  intList;
 }
-
-template<class StringTraits>
-typename antlr3<StringTraits>::String antlr3<StringTraits>::Bitset::toString(std::function<String(std::uint32_t)> tokenNamer) const
-{
-    String buf = ANTLR3_T("{ ");
-    bool havePrintedAnElement = false;
-    std::uint32_t cap = capacity();
-    for (std::uint32_t i = 0; i < cap; i++)
-    {
-        if (isMember(i))
-        {
-            if (havePrintedAnElement)
-            {
-                buf.append(ANTLR3_T(", "));
-            }
-
-            if ( tokenNamer)
-            {
-                buf += tokenNamer(i);
-            }
-            else
-            {
-                buf += StringTraits::toString(i);
-            }
-
-            havePrintedAnElement = true;
-        }
-    }
-    buf.append(ANTLR3_T(" }"));
-    return std::move(buf);
-}
