@@ -28,7 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <antlr3/antlr3cxx-Cocoa.hh>
+#include <antlr3/ex/antlr3cxx-Cocoa.hh>
 
 typedef antlr3ex::CocoaStringTraits StringTraits;
 typedef StringTraits::String String;

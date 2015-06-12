@@ -32,7 +32,7 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <antlr3/antlr3.cpp>
-#include <antlr3/StringLiteral.hpp>
+#include <antlr3/ex/StringLiteral.hpp>
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
 

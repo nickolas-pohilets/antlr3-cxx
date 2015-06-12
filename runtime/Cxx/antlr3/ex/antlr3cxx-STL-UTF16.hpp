@@ -1,5 +1,5 @@
-#ifndef _ANTLR3_STL_UTF8_HPP
-#define _ANTLR3_STL_UTF8_HPP
+#ifndef _ANTLR3_STL_UTF16_HPP
+#define _ANTLR3_STL_UTF16_HPP
 
 // [The "BSD licence"]
 // Copyright (c) 20013-2015 Nickolas Pohilets
@@ -32,43 +32,47 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <antlr3/antlr3.cpp>
-#include <antlr3/StringLiteral.hpp>
+#include <antlr3/ex/StringLiteral.hpp>
 
 namespace antlr3ex {
 
-class StdUTF8StringTraits {
+class StdUTF16StringTraits {
 public:
-    typedef std::string String;
+    /// Class of the mutable string
+    typedef std::u16string String;
+    /// Class of the element of String or StringLiteral
     typedef String::value_type Char;
-    typedef StringLiteralRef<char, String> StringLiteral;
-    typedef std::stringstream StringStream;
+    /// Thin wrapper around string literal that can be used together with String.
+    typedef StringLiteralRef<char16_t, String> StringLiteral;
+    /// Stream object that can be used to construct String
+    typedef std::basic_stringstream<char16_t> StringStream;
     
     template<class T> static antlr3_defs::TryNextStringLiteral selectLiteral(T);
     template<size_t N>
-    static StringLiteral selectLiteral(char const (&s)[N]) { return StringLiteral(s, N - 1); }
+    static StringLiteral selectLiteral(char16_t const (&s)[N]) { return StringLiteral(s, N - 1); }
     
     static String string(std::uint8_t const * b, std::uint8_t const * e) { return String(b, e); }
     static String string(Char const * b, Char const * e) { return String(b, e); }
     
-    static String toString(int val)                { return std::to_string(val); }
-    static String toString(long val)               { return std::to_string(val); }
-    static String toString(long long val)          { return std::to_string(val); }
-    static String toString(unsigned val)           { return std::to_string(val); }
-    static String toString(unsigned long val)      { return std::to_string(val); }
-    static String toString(unsigned long long val) { return std::to_string(val); }
-    static String toString(float val)              { return std::to_string(val); }
-    static String toString(double val)             { return std::to_string(val); }
-    static String toString(long double val)        { return std::to_string(val); }
+    static String toString(int val)                { return fromLatin1(std::to_string(val)); }
+    static String toString(long val)               { return fromLatin1(std::to_string(val)); }
+    static String toString(long long val)          { return fromLatin1(std::to_string(val)); }
+    static String toString(unsigned val)           { return fromLatin1(std::to_string(val)); }
+    static String toString(unsigned long val)      { return fromLatin1(std::to_string(val)); }
+    static String toString(unsigned long long val) { return fromLatin1(std::to_string(val)); }
+    static String toString(float val)              { return fromLatin1(std::to_string(val)); }
+    static String toString(double val)             { return fromLatin1(std::to_string(val)); }
+    static String toString(long double val)        { return fromLatin1(std::to_string(val)); }
     
-    static std::string toUTF8(String s) { return std::move(s); }
-    static StringLiteral toUTF8(StringLiteral s) { return s; }
-    static String fromUTF8(std::string s) { return std::move(s); }
-    static StringLiteral fromUTF8(char const * s) { return StringLiteral(s, strlen(s)); }
+    static std::string toUTF8(String const & s);
+    static std::string toUTF8(StringLiteral s);
+    static String fromUTF8(std::string const & s);
+    static String fromUTF8(char const * s);
 
-    static std::string& appendToUTF8(std::string& s8, String const & s) { return s8 += s; }
-    static std::string& appendToUTF8(std::string& s8, StringLiteral s) { return s8 += s; }
-    static String& appendUTF8(String& s, std::string const & s8) { return s += s8; }
-    static String& appendUTF8(String& s, char const * s8) { return s += s8; }
+    static std::string& appendToUTF8(std::string& s8, String const & s);
+    static std::string& appendToUTF8(std::string& s8, StringLiteral s);
+    static String& appendUTF8(String& s, std::string const & s8);
+    static String& appendUTF8(String& s, char const * s8);
     
     static String& appendEscape(String& dest, String const & src);
     static String& appendEscape(String& dest, StringLiteral const & src);
@@ -81,10 +85,20 @@ public:
         appendEscape(retVal, x);
         return std::move(retVal);
     }
+private:
+    static String fromLatin1(std::string const & s)
+    {
+        return String(s.begin(), s.end());
+    }
 };
 
 } // namespace antlr3ex
 
-extern template class antlr3<antlr3ex::StdUTF8StringTraits>;
+namespace std {
+std::ostream& operator<<(std::ostream& s, antlr3ex::StdUTF16StringTraits::String const & str);
+std::ostream& operator<<(std::ostream& s, antlr3ex::StdUTF16StringTraits::StringLiteral str);
+} // namespace std
 
-#endif //_ANTLR3_STL_UTF8_HPP
+extern template class antlr3<antlr3ex::StdUTF16StringTraits>;
+
+#endif //_ANTLR3_STL_UTF16_HPP

@@ -28,16 +28,57 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <antlr3/antlr3cxx-STL-UTF8.hpp>
-#include <antlr3/EscapingUtils.hpp>
+#include <antlr3/ex/antlr3cxx-STL-UTF16.hpp>
+#include <antlr3/ex/UTFConvertionUtils.hpp>
+#include <antlr3/ex/EscapingUtils.hpp>
 
-typedef antlr3ex::StdUTF8StringTraits StringTraits;
+typedef antlr3ex::StdUTF16StringTraits StringTraits;
 typedef StringTraits::String String;
 typedef StringTraits::StringLiteral StringLiteral;
 
 template class antlr3<StringTraits>;
 
 namespace antlr3ex {
+
+std::string StringTraits::toUTF8(String const & s) {
+    std::string retVal;
+    appendToUTF8(retVal, s);
+    return std::move(retVal);
+}
+
+std::string StringTraits::toUTF8(StringLiteral s) {
+    std::string retVal;
+    appendToUTF8(retVal, s);
+    return std::move(retVal);
+}
+
+String StringTraits::fromUTF8(std::string const & s) {
+    String retVal;
+    appendUTF8(retVal, s);
+    return std::move(retVal);
+}
+
+String StringTraits::fromUTF8(char const * s) {
+    String retVal;
+    appendUTF8(retVal, s);
+    return std::move(retVal);
+}
+
+std::string& StringTraits::appendToUTF8(std::string& s8, String const & s) {
+    return appendUTF(s8, s.c_str(), s.size());
+}
+
+std::string& StringTraits::appendToUTF8(std::string& s8, StringLiteral s) {
+    return appendUTF(s8, s.data(), s.size());
+}
+
+String& StringTraits::appendUTF8(String& s, std::string const & s8) {
+    return appendUTF(s, s8.c_str(), s8.size());
+}
+
+String& StringTraits::appendUTF8(String& s, char const * s8) {
+    return appendUTF(s, s8, s8 ? strlen(s8) : 0);
+}
 
 String& StringTraits::appendEscape(String& dest, String const & src) {
     return EscapingUtils<StringTraits>::appendEscapedString(dest, src);
@@ -56,3 +97,15 @@ String& StringTraits::appendEscape(String& dest, std::uint32_t src) {
 }
 
 } // namespace antlr3ex
+
+namespace std {
+
+std::ostream& operator<<(std::ostream& s, String const & str) {
+    return antlr3ex::outputUTF(s, str.c_str(), str.size());
+}
+
+std::ostream& operator<<(std::ostream& s, StringLiteral str) {
+    return antlr3ex::outputUTF(s, str.data(), str.size());
+}
+
+} // namespace std

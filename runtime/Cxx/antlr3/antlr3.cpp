@@ -46,7 +46,6 @@
 #include <antlr3/Lexer.cpp>
 #include <antlr3/Parser.cpp>
 #include <antlr3/RewriteStreams.cpp>
-#include <antlr3/String.cpp>
 #include <antlr3/TokenStream.cpp>
 #include <antlr3/TreeAdaptor.cpp>
 #include <antlr3/TreeParser.cpp>

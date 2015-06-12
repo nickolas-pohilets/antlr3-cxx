@@ -28,11 +28,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <antlr3/antlr3cxx-STL-UTF16.hpp>
-#include <antlr3/UTFConvertionUtils.hpp>
-#include <antlr3/EscapingUtils.hpp>
+#include <antlr3/ex/antlr3cxx-Qt5.hpp>
+#include <antlr3/ex/UTFConvertionUtils.hpp>
+#include <antlr3/ex/EscapingUtils.hpp>
 
-typedef antlr3ex::StdUTF16StringTraits StringTraits;
+typedef antlr3ex::Qt5StringTraits StringTraits;
 typedef StringTraits::String String;
 typedef StringTraits::StringLiteral StringLiteral;
 
@@ -40,10 +40,10 @@ template class antlr3<StringTraits>;
 
 namespace antlr3ex {
 
+template<> struct UTFType<QChar> { typedef utf::UTF16 t; };
+
 std::string StringTraits::toUTF8(String const & s) {
-    std::string retVal;
-    appendToUTF8(retVal, s);
-    return std::move(retVal);
+    return s.toStdString();
 }
 
 std::string StringTraits::toUTF8(StringLiteral s) {
@@ -53,19 +53,15 @@ std::string StringTraits::toUTF8(StringLiteral s) {
 }
 
 String StringTraits::fromUTF8(std::string const & s) {
-    String retVal;
-    appendUTF8(retVal, s);
-    return std::move(retVal);
+    return String::fromStdString(s);
 }
 
 String StringTraits::fromUTF8(char const * s) {
-    String retVal;
-    appendUTF8(retVal, s);
-    return std::move(retVal);
+    return String::fromUtf8(s);
 }
 
 std::string& StringTraits::appendToUTF8(std::string& s8, String const & s) {
-    return appendUTF(s8, s.c_str(), s.size());
+    return appendUTF(s8, reinterpret_cast<char16_t const*>(s.data()), s.size());
 }
 
 std::string& StringTraits::appendToUTF8(std::string& s8, StringLiteral s) {
@@ -101,7 +97,7 @@ String& StringTraits::appendEscape(String& dest, std::uint32_t src) {
 namespace std {
 
 std::ostream& operator<<(std::ostream& s, String const & str) {
-    return antlr3ex::outputUTF(s, str.c_str(), str.size());
+    return antlr3ex::outputUTF(s, reinterpret_cast<char16_t const*>(str.data()), str.size());
 }
 
 std::ostream& operator<<(std::ostream& s, StringLiteral str) {
@@ -109,3 +105,4 @@ std::ostream& operator<<(std::ostream& s, StringLiteral str) {
 }
 
 } // namespace std
+
