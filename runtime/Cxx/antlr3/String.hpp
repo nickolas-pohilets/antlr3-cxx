@@ -41,7 +41,50 @@
 #include <string>
 #include <sstream>
 
-#define ANTLR3_T(X) StringTraits::literal(X, u##X, U##X)
+namespace antlr3_detail {
+
+template<class T> T const & make();
+
+template<class StringTraits, class T, class... Args> class StringLiteralHelper;
+
+template<class StringTraits, class T, class X, class... Args> class StringLiteralHelper<StringTraits, T, X, Args...> {
+public:
+    typedef T CompilerLiteral;
+    
+    static T literal(X const & x, Args const & ... args) {
+        return StringTraits::selectLiteral(x);
+    }
+};
+
+template<class StringTraits, class X, class Y, class... Args> class StringLiteralHelper<StringTraits, antlr3_defs::TryNextStringLiteral, X, Y, Args...> {
+public:
+    typedef StringLiteralHelper<StringTraits, decltype(StringTraits::selectLiteral(make<Y>())), Y, Args...> Next;
+    typedef typename Next::CompilerLiteral CompilerLiteral;
+    static CompilerLiteral literal(X const & x, Y const & y, Args const & ... args) {
+        return Next::literal(y, args...);
+    }
+};
+
+template<class StringTraits, class X> class StringLiteralHelper<StringTraits, antlr3_defs::TryNextStringLiteral, X> {
+private:
+    typedef void CompilerLiteral;
+};
+
+template<class StringTraits, class X, class... Args>
+typename StringLiteralHelper<StringTraits, decltype(StringTraits::selectLiteral(make<X>())), X, Args...>::CompilerLiteral
+    selectLiteral(X const & x, Args const &... args) {
+    return StringLiteralHelper<StringTraits, decltype(StringTraits::selectLiteral(make<X>())), X, Args...>::literal(x, args...);
+}
+
+} // namespace antlr3_detail
+
+#ifdef __OBJC__
+#define ANTLR3_COMPILER_STRING_LITERALS(X) X, u##X, @X
+#else
+#define ANTLR3_COMPILER_STRING_LITERALS(X) X, u##X
+#endif
+
+#define ANTLR3_T(X) antlr3_detail::selectLiteral<StringTraits>(ANTLR3_COMPILER_STRING_LITERALS(X))
 
 //std::string toUTF8(String const & s);
 //std::string toUTF8(StringLiteral s);
@@ -61,16 +104,9 @@ public:
     typedef typename StringTraits::Char Char;
     typedef typename StringTraits::StringLiteral StringLiteral;
     
-    static String& appendEscape(String& dest, String const & src) {
-        for (Char c : src)
-        {
-            appendEscape(dest, c);
-        }
-        return dest;
-    }
-    
-    static String& appendEscape(String& dest, StringLiteral const & src) {
-        for (Char c : src)
+    template<class T>
+    static String& appendEscape(String& dest, T const & src) {
+        for (T c : src)
         {
             appendEscape(dest, c);
         }
@@ -78,20 +114,14 @@ public:
     }
     
     static String& appendEscape(String& dest, Char src) {
-        switch (src)
-        {
-            case '\"':
-                dest += ANTLR3_T("\\\"");
-                break;
-            case '\n':
-                dest += ANTLR3_T("\\n");
-                break;
-            case '\r':
-                dest += ANTLR3_T("\\r");
-                break;
-            default:
-                dest += src;
-                break;
+        if (src == '\"') {
+            dest += ANTLR3_T("\\\"");
+        } else if (src == '\n') {
+            dest += ANTLR3_T("\\n");
+        } else if (src == '\r') {
+            dest += ANTLR3_T("\\r");
+        } else {
+            dest += src;
         }
         return dest;
     }
@@ -107,7 +137,7 @@ public:
         dest += ANTLR3_T("\\u");
         char buffer[16];
         sprintf(buffer, "%04X", (unsigned)src);
-        dest.append(buffer, buffer + strlen(buffer));
+        StringTraits::appendUTF8(dest, buffer);
         return dest;
     }
     

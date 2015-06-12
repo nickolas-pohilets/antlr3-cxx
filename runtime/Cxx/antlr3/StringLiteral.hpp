@@ -33,7 +33,15 @@
 
 namespace antlr3ex {
 
-template<class T>
+template<class CharT, class StringT>
+class StringLiteralHelper {
+public:
+    static StringT reserve(size_t n) { StringT retVal; retVal.reserve(n); return std::move(retVal); }
+    static StringT make(CharT const * b, CharT const * e) { return StringT(b, e); }
+    static StringT & append(StringT & s, CharT const * b, CharT const * e) { return s.append(b, e); }
+};
+
+template<class T, class StringT>
 class StringLiteralRef {
 public:
     typedef T                                       value_type;
@@ -50,8 +58,8 @@ public:
     
     StringLiteralRef(T const * data, size_t len) : data_(data), len_(len) {}
     
-    operator std::basic_string<T>() const {
-        return std::basic_string<T>(begin(), end());
+    operator StringT() const {
+        return StringLiteralHelper<T, StringT>::make(begin(), end());
     }
     
     bool empty() const { return len_ == 0; }
@@ -68,37 +76,35 @@ private:
     size_t len_;
 };
 
-template<class T>
-std::basic_string<T> operator+(StringLiteralRef<T> s1, StringLiteralRef<T> s2) {
-    std::basic_string<T> retVal;
-    retVal.reserve(s1.size() + s2.size());
+template<class T, class StringT>
+StringT operator+(StringLiteralRef<T, StringT> s1, StringLiteralRef<T, StringT> s2) {
+    StringT retVal = StringLiteralHelper<T, StringT>::reserve(s1.size() + s2.size());
     retVal += s1;
     retVal += s2;
     return std::move(retVal);
 }
 
-template<class T>
-std::basic_string<T>& operator+=(std::basic_string<T>& s1, StringLiteralRef<T> s2) {
-    return s1.append(s2.begin(), s2.end());
+template<class T, class StringT>
+StringT& operator+=(StringT& s1, StringLiteralRef<T, StringT> s2) {
+    return StringLiteralHelper<T, StringT>::append(s1, s2.begin(), s2.end());
 }
 
-template<class T>
-std::basic_string<T> operator+(std::basic_string<T> s1, StringLiteralRef<T> s2) {
+template<class T, class StringT>
+StringT operator+(StringT s1, StringLiteralRef<T, StringT> s2) {
     s1 += s2;
     return std::move(s1);
 }
 
-template<class T>
-std::basic_string<T> operator+(StringLiteralRef<T> s1, std::basic_string<T> const & s2) {
-    std::basic_string<T> retVal;
-    retVal.reserve(s1.size() + s2.size());
+template<class T, class StringT>
+StringT operator+(StringLiteralRef<T, StringT> s1, StringT const & s2) {
+    StringT retVal = StringLiteralHelper<T, StringT>::reserve(s1.size() + s2.size());
     retVal += s1;
     retVal += s2;
     return std::move(retVal);
 }
 
-template<class T>
-std::basic_ostream<T>& operator<<(std::basic_ostream<T>& os, StringLiteralRef<T> s) {
+template<class T, class StringT>
+std::basic_ostream<T>& operator<<(std::basic_ostream<T>& os, StringLiteralRef<T, StringT> s) {
     return os.write(s.data(), s.size());
 }
 

@@ -59,7 +59,7 @@ public:
 		return newTree;
     }
     
-    virtual ItemPtr nil() override {
+    virtual ItemPtr nilNode() override {
         return create(nullptr);
     }
     

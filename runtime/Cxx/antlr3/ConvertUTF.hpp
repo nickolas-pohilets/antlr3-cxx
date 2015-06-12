@@ -103,6 +103,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <climits>
 
 namespace utf {
 
@@ -147,10 +148,14 @@ inline bool IsValidCP(UTF32 ch) {
     return ch < UNI_SUR_HIGH_START || (ch > UNI_SUR_LOW_END && ch <= UNI_MAX_LEGAL_UTF32);
 }
 
-template<class Ch> struct CodeUnitForChar;
-template<> struct CodeUnitForChar<char> { typedef UTF8 type; };
-template<> struct CodeUnitForChar<char16_t> { typedef UTF16 type; };
-template<> struct CodeUnitForChar<char32_t> { typedef UTF32 type; };
+template<size_t N> struct CodeUnitForCharHelper;
+template<> struct CodeUnitForCharHelper<8>  { typedef UTF8 type; };
+template<> struct CodeUnitForCharHelper<16> { typedef UTF16 type; };
+template<> struct CodeUnitForCharHelper<32> { typedef UTF32 type; };
+
+template<class Ch> struct CodeUnitForChar {
+    typedef typename CodeUnitForCharHelper<sizeof(Ch) * CHAR_BIT>::type type;
+};
 
 template<class T> class Traits;
 

@@ -40,15 +40,12 @@ class StdUTF8StringTraits {
 public:
     typedef std::string String;
     typedef String::value_type Char;
-    typedef StringLiteralRef<char> StringLiteral;
+    typedef StringLiteralRef<char, String> StringLiteral;
     typedef std::stringstream StringStream;
     
-    template<size_t N8, size_t N16, size_t N32>
-    static StringLiteral literal(
-        char const (&s)[N8],
-        char16_t const (&)[N16],
-        char32_t const (&)[N32]
-    ) { return StringLiteral(s, N8); }
+    template<class T> static antlr3_defs::TryNextStringLiteral selectLiteral(T);
+    template<size_t N>
+    static StringLiteral selectLiteral(char const (&s)[N]) { return StringLiteral(s, N - 1); }
     
     static String string(std::uint8_t const * b, std::uint8_t const * e) { return String(b, e); }
     static String string(Char const * b, Char const * e) { return String(b, e); }

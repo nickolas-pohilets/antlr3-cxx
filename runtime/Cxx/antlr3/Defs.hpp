@@ -45,6 +45,10 @@
 #include <sstream>
 #include <algorithm>
 #include <cstdint>
+#include <array>
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+#endif
 
 #define ANTLR3_DECL_PTR(ClassName) \
 class ClassName; \
@@ -67,6 +71,8 @@ enum class TextEncoding
 
 typedef std::uint64_t Bitword;
 typedef std::size_t	  Index;
+
+class TryNextStringLiteral;
 
 template<class ChildT> class BaseTree;
 

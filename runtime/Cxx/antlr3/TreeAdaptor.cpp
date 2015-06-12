@@ -40,6 +40,7 @@ template<class StringTraits>
 class dot_utils : public antlr3<StringTraits> {
 
 typedef typename antlr3<StringTraits>::String String;
+typedef typename antlr3<StringTraits>::StringLiteral StringLiteral;
 typedef typename antlr3<StringTraits>::StringUtils StringUtils;
 typedef typename antlr3<StringTraits>::TreeAdaptorPtr TreeAdaptorPtr;
 typedef typename antlr3<StringTraits>::ItemPtr ItemPtr;

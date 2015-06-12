@@ -65,7 +65,7 @@ public:
 	 *  a list of element as the children.  If you want a flat tree (a list)
 	 *  use "t=adaptor->nil(); adaptor->addChild(t, x); adaptor->addChild(t, y);"
 	 */
-    virtual ItemPtr nil() = 0;
+    virtual ItemPtr nilNode() = 0;
     
     /** Return a tree node representing an error.  This node records the
 	 *  tokens consumed during error recovery.  The start token indicates the
