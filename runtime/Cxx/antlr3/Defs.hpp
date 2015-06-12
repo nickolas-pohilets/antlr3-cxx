@@ -145,8 +145,6 @@ typedef typename StringTraits::String String;
 typedef typename StringTraits::Char Char;
 typedef typename StringTraits::StringLiteral StringLiteral;
 
-class StringUtils;
-
 template<class CodeUnit> class BasicCharStream;
 template<class ChildT> class BaseTreeAdaptor;
 

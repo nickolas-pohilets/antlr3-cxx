@@ -1,3 +1,6 @@
+#ifndef _ANTLR3_ESCAPING_UTILS_HPP
+#define _ANTLR3_ESCAPING_UTILS_HPP
+
 // [The "BSD licence"]
 // Copyright (c) 20013-2015 Nickolas Pohilets
 // Copyright (c) 2005-2009 Jim Idle, Temporal Wave LLC
@@ -28,31 +31,57 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <antlr3/antlr3cxx-STL-UTF8.hpp>
-#include <antlr3/EscapingUtils.hpp>
-
-typedef antlr3ex::StdUTF8StringTraits StringTraits;
-typedef StringTraits::String String;
-typedef StringTraits::StringLiteral StringLiteral;
-
-template class antlr3<StringTraits>;
+#include <antlr3/String.hpp>
 
 namespace antlr3ex {
 
-String& StringTraits::appendEscape(String& dest, String const & src) {
-    return EscapingUtils<StringTraits>::appendEscapedString(dest, src);
-}
-
-String& StringTraits::appendEscape(String& dest, StringLiteral const & src) {
-    return EscapingUtils<StringTraits>::appendEscapedString(dest, src);
-}
-
-String& StringTraits::appendEscape(String& dest, Char src) {
-    return EscapingUtils<StringTraits>::appendEscapedChar(dest, src);
-}
-
-String& StringTraits::appendEscape(String& dest, std::uint32_t src) {
-    return EscapingUtils<StringTraits>::appendEscapedANTLRChar(dest, src);
-}
+template<class StringTraits>
+class EscapingUtils {
+public:
+    typedef typename StringTraits::String String;
+    typedef typename StringTraits::Char Char;
+    typedef typename StringTraits::StringLiteral StringLiteral;
+    
+    template<class T>
+    static String& appendEscapedString(String& dest, T const & src) {
+        for (auto c : src)
+        {
+            appendEscapedChar(dest, c);
+        }
+        return dest;
+    }
+    
+    template<class T>
+    static String& appendEscapedChar(String& dest, T src) {
+        if (src == '\"') {
+            dest += ANTLR3_T("\\\"");
+        } else if (src == '\n') {
+            dest += ANTLR3_T("\\n");
+        } else if (src == '\r') {
+            dest += ANTLR3_T("\\r");
+        } else {
+            dest += src;
+        }
+        return dest;
+    }
+    
+    static String& appendEscapedANTLRChar(String& dest, std::uint32_t src) {
+        if (src == antlr3_defs::CharstreamEof) {
+            return dest += ANTLR3_T("<EOF>");
+        }
+        std::uint32_t maxChar = std::uint32_t(1) << (CHAR_BIT * sizeof(Char));
+        if (src < maxChar) {
+            return appendEscapedChar(dest, (Char)src);
+        }
+        dest += ANTLR3_T("\\u");
+        char buffer[16];
+        sprintf(buffer, "%04X", (unsigned)src);
+        StringTraits::appendUTF8(dest, buffer);
+        return dest;
+    }
+};
 
 } // namespace antlr3ex
+
+
+#endif // _ANTLR3_ESCAPING_UTILS_HPP

@@ -38,36 +38,75 @@ namespace antlr3ex {
 
 class CocoaString {
 public:
-    CocoaString() : immutable_(nil), mutable_(nil) {}
-    CocoaString(NSString* s) : immutable_(s), mutable_(nil) {}
-    CocoaString(NSMutableString* s) : immutable_(nil), mutable_(s) {}
+    CocoaString fromMutableString(NSMutableString* s) {
+        return CocoaString(s);
+    }
+    CocoaString() : string_(nil), isMutable_(false) {}
+    CocoaString(NSString* s) : string_(s), isMutable_(false) {}
     CocoaString(CocoaString const & other) = default;
     CocoaString(CocoaString && other)
-        : immutable_(other.immutable_)
-        , mutable_(other.mutable_)
+        : string_(other.string_)
+        , isMutable_(other.isMutable_)
     {
-        other.immutable_ = nil;
-        other.mutable_ = nil;
+        other.string_ = nil;
     }
     
+    CocoaString& operator=(CocoaString other) {
+        string_ = other.string_;
+        isMutable_ = other.isMutable_;
+        other.string_ = nil;
+        return *this;
+    }
     
-    CocoaString& operator=(CocoaString other);
-    CocoaString& operator+=(unichar c);
-    CocoaString& operator+=(CocoaString const & c);
+    CocoaString& operator+=(char16_t c) {
+        unichar x = c;
+        // For ASCII characters this creates tagged pointer
+        appendString([NSString stringWithCharacters:&x length:1]);
+        return *this;
+    }
     
-    bool empty() const;
-    size_t size() const;
+    CocoaString& operator+=(CocoaString const & s) {
+        appendString(s.string());
+        return *this;
+    }
     
-    unichar const* begin() const;
-    unichar const* end() const;
-    
+    bool empty() const { return string_.length == 0; };
+    size_t size() const { return (size_t)string_.length; }
+        
     CocoaString& append(char const * b, char const * e);
+    
+    NSString* string() const { return string_; }
+    
+    NSMutableString* mutableString() {
+        if (string_ == nil) {
+            string_ = [NSMutableString new];
+            isMutable_ = true;
+        } else if (!isMutable_ || CFGetRetainCount((CFStringRef)string_) != 1) {
+            string_ = [string_ mutableCopy];
+            isMutable_ = true;
+        }
+        return (NSMutableString*)string_;
+    }
+    
+    void appendString(NSString* s) {
+        if (!empty()) {
+            [mutableString() appendString:s];
+        } else {
+            string_ = s;
+            isMutable_ = false;
+        }
+    }
 private:
-    NSString* immutable_;
-    NSMutableString* mutable_;
+    NSString* string_;
+    bool isMutable_;
+    
+    explicit CocoaString(NSMutableString* s) : string_(s), isMutable_(true) {}
 };
 
-CocoaString operator+(CocoaString lhs, CocoaString const & rhs);
+inline CocoaString operator+(CocoaString lhs, CocoaString const & rhs) {
+    lhs.appendString(rhs.string());
+    return std::move(lhs);
+}
 
 class CocoaStringStream {
 private:
@@ -86,6 +125,7 @@ public:
 
 class CocoaStringTraits {
 public:
+    typedef CocoaStringTraits StringTraits;
     typedef CocoaString String;
     typedef char16_t Char;
     typedef CocoaString StringLiteral;
@@ -112,9 +152,9 @@ public:
     static String toString(double val);
     static String toString(long double val);
     
-    static std::string toUTF8(String s);
+    static std::string toUTF8(String const & s);
     /* static std::string toUTF8(StringLiteral s); */
-    static String fromUTF8(std::string s);
+    static String fromUTF8(std::string const & s);
     static String fromUTF8(char const * s);
 
     static std::string& appendToUTF8(std::string& s8, String s);
@@ -122,9 +162,15 @@ public:
     static String& appendUTF8(String& s, std::string const & s8);
     static String& appendUTF8(String& s, char const * s8);
     
-    static void foo() {
-        NSString* s = selectLiteral(@"ABC");
-        NSLog(@"%@", s);
+    static String& appendEscape(String& dest, CocoaString const & src);
+    static String& appendEscape(String& dest, Char src);
+    static String& appendEscape(String& dest, std::uint32_t src);
+    
+    template<class T>
+    static String escape(T const & x) {
+        String retVal;
+        appendEscape(retVal, x);
+        return std::move(retVal);
     }
 };
 

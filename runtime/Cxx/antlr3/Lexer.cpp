@@ -335,14 +335,14 @@ template<class StringTraits>
 typename antlr3<StringTraits>::String
     antlr3<StringTraits>::getCharErrorDisplay(std::uint32_t c)
 {
-    return ANTLR3_T("\'") + StringUtils::escape(c) + ANTLR3_T("\'");
+    return ANTLR3_T("\'") + StringTraits::escape(c) + ANTLR3_T("\'");
 }
 
 template<class StringTraits>
 typename antlr3<StringTraits>::String
     antlr3<StringTraits>::getCharSetErrorDisplay(Bitset const & set)
 {
-    return set.toString(StringUtils::template escape<std::uint32_t>);
+    return set.toString([](std::uint32_t x) -> String { return StringTraits::escape(x); });
 }
 
 template<class StringTraits>

@@ -41,7 +41,6 @@ class dot_utils : public antlr3<StringTraits> {
 
 typedef typename antlr3<StringTraits>::String String;
 typedef typename antlr3<StringTraits>::StringLiteral StringLiteral;
-typedef typename antlr3<StringTraits>::StringUtils StringUtils;
 typedef typename antlr3<StringTraits>::TreeAdaptorPtr TreeAdaptorPtr;
 typedef typename antlr3<StringTraits>::ItemPtr ItemPtr;
 
@@ -76,7 +75,7 @@ static void defineDotNodes(TreeAdaptorPtr adaptor, ItemPtr t, String & dotSpec)
         char buff[64];
 		sprintf(buff, "\tn%p[label=\"", child.get());
 		StringTraits::appendUTF8(dotSpec, buff);
-        StringUtils::appendEscape(dotSpec, adaptor->getText(child));
+        StringTraits::appendEscape(dotSpec, adaptor->getText(child));
 		dotSpec += ANTLR3_T("\"]\n");
 
 		// And now define the children of this child (if any)
@@ -123,9 +122,9 @@ static void defineDotEdges(TreeAdaptorPtr adaptor, ItemPtr t, String & dotSpec)
 
 		// Document the relationship
 		//
-        StringUtils::appendEscape(dotSpec, adaptor->getText(t));
+        StringTraits::appendEscape(dotSpec, adaptor->getText(t));
         dotSpec += ANTLR3_T(" -> ");
-        StringUtils::appendEscape(dotSpec, adaptor->getText(child));
+        StringTraits::appendEscape(dotSpec, adaptor->getText(child));
 		dotSpec += ANTLR3_T("\n");
         
 		// Define edges for this child
@@ -162,7 +161,7 @@ typename antlr3<StringTraits>::String
     char buff[64];
     sprintf(buff, "\tn%p[label=\"", theTree.get());
 	StringTraits::appendUTF8(dotSpec, buff);
-    StringUtils::appendEscape(dotSpec, adaptor->getText(theTree));
+    StringTraits::appendEscape(dotSpec, adaptor->getText(theTree));
     dotSpec += ANTLR3_T("\"]\n");
 
 	// First produce the node defintions

@@ -30,6 +30,7 @@
 
 #include <antlr3/antlr3cxx-Qt5.hpp>
 #include <antlr3/UTFConvertionUtils.hpp>
+#include <antlr3/EscapingUtils.hpp>
 
 typedef antlr3ex::Qt5StringTraits StringTraits;
 typedef StringTraits::String String;
@@ -73,6 +74,22 @@ String& StringTraits::appendUTF8(String& s, std::string const & s8) {
 
 String& StringTraits::appendUTF8(String& s, char const * s8) {
     return appendUTF(s, s8, s8 ? strlen(s8) : 0);
+}
+
+String& StringTraits::appendEscape(String& dest, String const & src) {
+    return EscapingUtils<StringTraits>::appendEscapedString(dest, src);
+}
+
+String& StringTraits::appendEscape(String& dest, StringLiteral const & src) {
+    return EscapingUtils<StringTraits>::appendEscapedString(dest, src);
+}
+
+String& StringTraits::appendEscape(String& dest, Char src) {
+    return EscapingUtils<StringTraits>::appendEscapedChar(dest, src);
+}
+
+String& StringTraits::appendEscape(String& dest, std::uint32_t src) {
+    return EscapingUtils<StringTraits>::appendEscapedANTLRChar(dest, src);
 }
 
 } // namespace antlr3ex

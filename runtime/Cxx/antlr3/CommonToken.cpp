@@ -107,7 +107,7 @@ typename antlr3<StringTraits>::String
     outtext += ANTLR3_T(":");
     outtext += StringTraits::toString((std::int32_t)stopIndex());
     outtext += ANTLR3_T("='");
-    StringUtils::appendEscape(outtext, text());
+    StringTraits::appendEscape(outtext, text());
     outtext += ANTLR3_T("',<");
     if (tokenNames) {
         outtext += getTokenName(type(), tokenNames);

@@ -110,6 +110,18 @@ public:
     static std::string& appendToUTF8(std::string& s8, StringLiteral s);
     static String& appendUTF8(String& s, std::string const & s8);
     static String& appendUTF8(String& s, char const * s8);
+    
+    static String& appendEscape(String& dest, String const & src);
+    static String& appendEscape(String& dest, StringLiteral const & src);
+    static String& appendEscape(String& dest, Char src);
+    static String& appendEscape(String& dest, std::uint32_t src);
+    
+    template<class T>
+    static String escape(T const & x) {
+        String retVal;
+        appendEscape(retVal, x);
+        return std::move(retVal);
+    }
 };
 
 } // namespace antlr3ex
