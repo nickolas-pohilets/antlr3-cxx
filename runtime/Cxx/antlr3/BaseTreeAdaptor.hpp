@@ -47,8 +47,8 @@ public:
     BaseTreeAdaptor() {}
     virtual ~BaseTreeAdaptor() {}
     
-    virtual ItemPtr create(CommonTokenPtr payload) = 0;
-    virtual ItemPtr dupNode(ItemPtr treeNode) = 0;
+//    virtual ItemPtr create(CommonTokenPtr payload) = 0;
+//    virtual ItemPtr dupNode(ItemPtr treeNode) = 0;
     virtual ItemPtr dupTree(ItemPtr tree) override {
         if (!tree) {
 			return nullptr;
@@ -67,12 +67,12 @@ public:
         return create(nullptr);
     }
     
-    virtual ItemPtr errorNode(
-        TokenStreamPtr input,
-        CommonTokenPtr start,
-        CommonTokenPtr stop,
-        ExceptionPtr e
-    ) = 0;
+//    virtual ItemPtr errorNode(
+//        TokenStreamPtr input,
+//        CommonTokenPtr start,
+//        CommonTokenPtr stop,
+//        ExceptionPtr e
+//    ) = 0;
     
     virtual void addChild(ItemPtr t, ItemPtr child) override {
         if (t && child) {
@@ -129,20 +129,20 @@ public:
         return becomeRoot(create(newRoot), std::move(oldRoot));
     }
     
-    virtual ItemPtr create(std::uint32_t tokenType, CommonTokenPtr fromToken) = 0;
-    virtual ItemPtr create(std::uint32_t tokenType, CommonTokenPtr fromToken, String text) = 0;
-    virtual ItemPtr create(std::uint32_t tokenType, String text) = 0;
+//    virtual ItemPtr create(std::uint32_t tokenType, CommonTokenPtr fromToken) = 0;
+//    virtual ItemPtr create(std::uint32_t tokenType, CommonTokenPtr fromToken, String text) = 0;
+//    virtual ItemPtr create(std::uint32_t tokenType, String text) = 0;
     
     // C o n t e n t
     
-    virtual std::uint32_t getType(ItemPtr t) = 0;
+//    virtual std::uint32_t getType(ItemPtr t) = 0;
 //    virtual void setType(ItemPtr t, std::uint32_t type) = 0;
-    virtual String getText(ItemPtr t) = 0;
+//    virtual String getText(ItemPtr t) = 0;
 //    virtual void setText(ItemPtr t, String text) = 0;
-    virtual CommonTokenPtr getToken(ItemPtr) = 0;
-    virtual void setTokenBoundaries(ItemPtr t, CommonTokenPtr startToken, CommonTokenPtr stopToken) = 0;
-    virtual Index getTokenStartIndex(ItemPtr t) = 0;
-    virtual Index getTokenStopIndex(ItemPtr t) = 0;
+//    virtual CommonTokenPtr getToken(ItemPtr) = 0;
+//    virtual void setTokenBoundaries(ItemPtr t, CommonTokenPtr startToken, CommonTokenPtr stopToken) = 0;
+//    virtual Index getTokenStartIndex(ItemPtr t) = 0;
+//    virtual Index getTokenStopIndex(ItemPtr t) = 0;
 
     // N a v i g a t i o n  /  T r e e  P a r s i n g
     
@@ -165,10 +165,10 @@ public:
         return std::static_pointer_cast<BaseTree<ChildT>>(t)->childCount();
     }
     
-    virtual ItemPtr getParent(ItemPtr child) = 0;
-    virtual void setParent(ItemPtr child, ItemPtr parent) = 0;
-    virtual void setChildIndex(ItemPtr, std::int32_t i) = 0;
-    virtual std::int32_t getChildIndex(ItemPtr) = 0;
+//    virtual ItemPtr getParent(ItemPtr child) = 0;
+//    virtual void setParent(ItemPtr child, ItemPtr parent) = 0;
+//    virtual void setChildIndex(ItemPtr, std::int32_t i) = 0;
+//    virtual std::int32_t getChildIndex(ItemPtr) = 0;
     
     virtual void replaceChildren(
         ItemPtr parent,

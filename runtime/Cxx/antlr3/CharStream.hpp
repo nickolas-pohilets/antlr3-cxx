@@ -53,8 +53,6 @@ public:
     static ItemPtr itemFromChar(Char c);
     static Char charFromItem(ItemPtr const & item);
     
-    virtual String sourceName() = 0;
-    
     virtual ItemPtr LI(std::int32_t i) override;
 
     /// Returns the line number of the current position in the input stream.
