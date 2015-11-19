@@ -75,6 +75,7 @@ public:
             Deleter del = [](CodeUnit const * d) { delete[] d; };
             ptr_ = decltype(ptr_)(new CodeUnit[size], std::move(del));
             memcpy(const_cast<CodeUnit*>(ptr_.get()), data, size);
+            end_ = ptr_.get() + size;
         }
 
         DataRef(CodeUnit const * data, CodeUnit const * dataEnd)
