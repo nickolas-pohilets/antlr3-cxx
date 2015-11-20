@@ -514,6 +514,10 @@ public class Rule {
 		inlineActions.add(actionAST);
 	}
 
+	public boolean isTokensRule() {
+		return name.equals(Grammar.ARTIFICIAL_TOKENS_RULENAME);
+	}
+
 	public Map<String, Object> getActions() {
 		return actions;
 	}

@@ -518,13 +518,17 @@ optionsSpec returns [Map<String, Object> opts=new HashMap<String, Object>()]
 option[Map<String, Object> opts]
 	:	id ASSIGN^ optionValue
 		{
-			$opts.put($id.text, $optionValue.value);
+
+			String key = $id.text;
+			Object value = $optionValue.value;
+			assert (value instanceof String) || (value instanceof Integer);
+			$opts.put(key, value);
 		}
 	;
 
 optionValue returns [Object value = null]
 	:	x=id			 {$value = $x.text;}
-	|	s=STRING_LITERAL {$value = Grammar.getUnescapedStringFromGrammarStringLiteral($s.text);}
+	|	s=STRING_LITERAL {$value = Grammar.getUnescapedStringFromGrammarStringLiteral($s.text).toString();}
 	|	i=INT            {$value = Integer.parseInt($i.text);}
 	|	ss=STAR			 {$value = "*";} // used for k=*
 		-> STRING_LITERAL[$ss]

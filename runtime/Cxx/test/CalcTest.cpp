@@ -29,7 +29,7 @@ std::string parseWithAST(char const * data, std::uint32_t size)
 {
     auto nullDeleter = [](std::uint8_t const *) {};
     auto inputStream = std::make_shared<antlr3::ByteCharStream>(data, size, nullDeleter, ANTLR3_T(""));
-    auto lexer = std::make_shared<CalcLexer>(inputStream);
+    auto lexer = std::make_shared<CalcASTLexer>(inputStream);
     auto tokenStream = std::make_shared<antlr3::CommonTokenStream>(lexer);
     CalcASTParser parser(tokenStream);
 

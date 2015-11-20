@@ -238,27 +238,24 @@ public:
     ~<name>();
 
 <if(LEXER)>
-    <rules:{r | <if(!r.ruleDescriptor.isSynPred)><headerReturnType(ruleDescriptor=r.ruleDescriptor)> m<r.ruleDescriptor.name>(<r.ruleDescriptor.parameterScope:parameterScope()>);<endif>}; separator="\n">
-<endif>
-<if(!LEXER)>
-    <rules:{r | <headerReturnType(ruleDescriptor=r.ruleDescriptor)> <r.ruleDescriptor.name>(<r.ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
-<! generate rule/method definitions for imported rules so they
-   appear to be defined in this recognizer. !>
+    <rules:{r | <lexerRuleDeclaration(r.ruleDescriptor)>}; separator="\n">
+<else>
+    <rules:{r | <ruleDeclaration(r.ruleDescriptor)>}; separator="\n">
+<! generate rule/method definitions for imported rules so they appear to be defined in this recognizer. !>
 <if(recognizer.grammar.delegatedRules)>
     // Delegated rules
-<recognizer.grammar.delegatedRules:{ruleDescriptor|
-    <headerReturnType(ruleDescriptor)> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>);}; separator="\n">
+<recognizer.grammar.delegatedRules:{ruleDescriptor|<ruleDeclaration(ruleDescriptor)>}; separator="\n">
 <endif>
 <endif>
 
     const char * grammarFileName();
-    void reset();
 
 private:
     <recognizer.grammar.delegates:{g|std::shared_ptr\<<g.recognizerName>\> <g:delegateName()>_;}; separator="\n">
     <recognizer.grammar.delegators:{g|<g.recognizerName> * <g:delegateName()>_;}; separator="\n">
     <scopes:{it | <if(it.isDynamicGlobalScope)><globalAttributeScopeDef(it)><endif>}; separator="\n">
     <rules: {r |<if(r.ruleDescriptor.ruleScope)><ruleAttributeScopeDef(scope=r.ruleDescriptor.ruleScope)><endif>}; separator="\n">
+    <rules: {r |<synpredDeclarations(r.ruleDescriptor)>}; separator="\n">
 <if(cyclicDFAs)>
     friend class <name>_SST_Func_Provider;
     <cyclicDFAs:declDFA_SST()>
@@ -280,6 +277,25 @@ extern char const * const <recognizer.grammar.composite.rootGrammar.recognizerNa
 #endif // _<name>_hpp_
 
 >>
+
+lexerRuleDeclaration(ruleDescriptor) ::= <%
+<if(!ruleDescriptor.isSynPred)>
+<headerReturnType(ruleDescriptor=ruleDescriptor)> m<ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>)<if(ruleDescriptor.tokensRule)> override<endif>;
+<endif>
+%>
+
+ruleDeclaration(ruleDescriptor) ::= <%
+<if(!ruleDescriptor.isSynPred)>
+<headerReturnType(ruleDescriptor=ruleDescriptor)> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>);
+<endif>
+%>
+
+synpredDeclarations(ruleDescriptor) ::= <%
+<if(ruleDescriptor.isSynPred)>
+<headerReturnType(ruleDescriptor=ruleDescriptor)> <ruleDescriptor.name>(<ruleDescriptor.parameterScope:parameterScope()>);<\n>
+void <ruleDescriptor.name>_fragment();
+<endif>
+%>
 
 inputType() ::= <%
 <if(LEXER)>antlr3::CharStreamPtr<endif>
@@ -333,11 +349,6 @@ lexer(  grammar,
 <name>::~<name>()
 {
 <actions.(actionScope).dtor_body>
-}
-
-void <name>::reset()
-{
-    Lexer::reset();
 }
 
 /** \brief Name of the grammar file that generated this code
@@ -520,16 +531,6 @@ const char * <name>::grammarFileName()
 <actions.(actionScope).ctor_body><\\>
 }
 
-void <name>::reset()
-{
-<if(PARSER)>
-    Parser::reset();
-<endif>
-<if(TREE_PARSER)>
-    TreeParser::reset();
-<endif>
-}
-
 <name>::~<name>()
 {
     <actions.(actionScope).dtor_body>
@@ -633,7 +634,7 @@ treeParser(	grammar,
 synpredRule(ruleName, ruleDescriptor, block, description, nakedBlock) ::=
 <<
 // $ANTLR start <ruleName>
-static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:parameterScope()>)
+void <name>::<ruleName>_fragment(<ruleDescriptor.parameterScope:parameterScope()>)
 {
 	<ruleLabelDefs()>
 	<ruleLabelInitializations()>
@@ -650,14 +651,14 @@ static void <ruleName>_fragment(p<name> ctx <ruleDescriptor.parameterScope:param
 >>
 
 synpred(predname) ::= <<
-static bool <predname>(p<name> ctx)
+bool <name>::<predname>()
 {
     state_->backtracking++;
     <@start()>
-    antlr3::Marker start = input_->mark();
-    <predname>_fragment(ctx); // can never throw exception
+    antlr3::MarkerPtr start = input_->mark();
+    <predname>_fragment(); // can never throw exception
     bool success = !state_->failed;
-    input_->rewind(start);
+    start->rewind();
     <@stop()>
     state_->backtracking--;
     state_->failed = false;
@@ -1218,14 +1219,14 @@ else
 <if(LEXER)>
     recover();
 <else>
-    recoverFromMismatchedSet(FOLLOW_set_in_<ruleName><elementIndex>);
+    //recoverFromMismatchedSet(FOLLOW_set_in_<ruleName><elementIndex>);
 <endif>
     goto rule<ruleDescriptor.name>Ex;
 }<\n>
 >>
 
 mismatchedSetEx() ::= <<
-recordException(new antlr3::MismatchedSetException(<if(PARSER)>FOLLOW_set_in_<ruleName><elementIndex><else>/*nullptr*/<endif>));
+recordException(new antlr3::MismatchedSetException());
 >>
 
 matchRuleBlockSet ::= matchSet
