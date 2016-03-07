@@ -59,11 +59,11 @@ Lexer::~Lexer()
 
 void Lexer::reset()
 {
-    state_->token			    = NULL;
-    state_->type			    = TokenInvalid;
-    state_->channel			    = TokenDefaultChannel;
+    state_->tokenBuffer.clear();
+    state_->type = TokenInvalid;
+    state_->channel = TokenDefaultChannel;
     state_->tokenStartCharIndex	= -1;
-    state_->text	            = ANTLR3_T("");
+    state_->text = ANTLR3_T("");
 }
 
 ///
@@ -92,70 +92,59 @@ CommonTokenPtr Lexer::nextTokenNormal()
     ///
     for	(;;)
     {
-        // Get rid of any previous token (token factory takes care of
-        // any de-allocation when this token is finally used up.
-        //
-        state_->token		    = NULL;
-        state_->error		    = false;	    // Start out without an exception
-        state_->failed		    = false;
-
-        // Now call the matching rules and see if we can generate a new token
-        //
-        for	(;;)
-        {
-            // Record the start of the token in our input stream.
-            //
-            state_->channel = TokenDefaultChannel;
-            state_->tokenStartCharIndex	= charStream()->index();
-            state_->text = ANTLR3_T("");
-
-            if  (input_->LA(1) == CharstreamEof)
-            {
-                // Reached the end of the current stream, nothing more to do if this is
-                // the last in the stack.
-                //
-                CommonTokenPtr teof = std::make_shared<CommonToken>(TokenEof);
-                teof->setInputStream(charStream());
-                teof->setStartIndex(charIndex());
-                teof->setStopIndex(charIndex());
-                return teof;
-            }
-
-            state_->token		= NULL;
-            state_->error		= false;	    // Start out without an exception
-            state_->failed		= false;
-
-            // Call the generated lexer, see if it can get a new token together.
-            //
-            mTokens();
-
-            if  (state_->error  == true)
-            {
-                // Recognition exception, report it and try to recover.
-                //
-                state_->failed	    = true;
-                reportError();
-                recover(); 
-            }
-            else
-            {
-                if (state_->token == NULL)
-                {
-                    // Emit the real token, which adds it in to the token stream basically
-                    //
-                    emit();
-                }
-                else if	(state_->token->type() == TokenInvalid)
-                {
-                    // A real token could have been generated, but "Computer say's naaaaah" and it
-                    // it is just something we need to skip altogether.
-                    //
-                    continue;
-                }
-
+        /// First return previous buffered tokens, if any
+        while (!state_->tokenBuffer.empty()) {
+            if (state_->tokenBuffer.front()->type() == TokenInvalid) {
+                // A real token could have been generated, but "Computer say's naaaaah" and it
+                // it is just something we need to skip altogether.
+                state_->tokenBuffer.pop_front();
+            } else {
                 // Good token, not skipped, not EOF token
-                //
-                return  state_->token;
+                auto t = state_->tokenBuffer.front();
+                state_->tokenBuffer.pop_front();
+                return std::move(t);
+            }
+        }
+        
+        if (input_->LA(1) == CharstreamEof)
+        {
+            // Reached the end of the current stream, nothing more to do if this is
+            // the last in the stack.
+            //
+            CommonTokenPtr teof = std::make_shared<CommonToken>(TokenEof);
+            teof->setInputStream(charStream());
+            teof->setStartIndex(charIndex());
+            teof->setStopIndex(charIndex());
+            return teof;
+        }
+        
+        // Now call the matching rules and see if we can generate a new token
+
+        // Start out without an exception
+        state_->error		= false;
+        state_->failed		= false;
+        
+        // Record the start of the token in our input stream.
+        state_->channel = TokenDefaultChannel;
+        state_->tokenStartCharIndex	= charStream()->index();
+        state_->text = ANTLR3_T("");
+
+        // Call the generated lexer, see if it can get a new token together.
+        mTokens();
+
+        if  (state_->error  == true)
+        {
+            // Recognition exception, report it and try to recover.
+            state_->failed = true;
+            reportError();
+            recover(); 
+        }
+        else
+        {
+            if (state_->tokenBuffer.empty())
+            {
+                // Emit the real token, which adds it in to the token stream basically
+                emit();
             }
         }
     }
@@ -169,37 +158,50 @@ CommonTokenPtr Lexer::nextTokenNormal()
  */
 CommonTokenPtr Lexer::nextTokenFiltering()
 {
-    /* Get rid of any previous token (token factory takes care of
-     * any deallocation when this token is finally used up.
-     */
-    state_->token = nullptr;
-    state_->error = false;	 // Start out without an exception
-    state_->failed = false;
-
-    // Record the start of the token in our input stream.
-    state_->tokenStartCharIndex = input_->index();
-    state_->text = antlr3::String();
-
-    // Now call the matching rules and see if we can generate a new token
+/// Loop until we get a non skipped token or EOF
+    ///
     for	(;;)
     {
-		if (input_->LA(1) == antlr3::CharstreamEof)
-		{
-			/* Reached the end of the stream, nothing more to do.
-			 */
-			antlr3::CommonTokenPtr teof = std::make_shared<CommonToken>(antlr3::TokenEof);
+        /// First return previous buffered tokens, if any
+        while (!state_->tokenBuffer.empty()) {
+            if (state_->tokenBuffer.front()->type() == TokenInvalid) {
+                // A real token could have been generated, but "Computer say's naaaaah" and it
+                // it is just something we need to skip altogether.
+                state_->tokenBuffer.pop_front();
+            } else {
+                // Good token, not skipped, not EOF token
+                auto t = state_->tokenBuffer.front();
+                state_->tokenBuffer.pop_front();
+                return std::move(t);
+            }
+        }
+        
+        if  (input_->LA(1) == CharstreamEof)
+        {
+            // Reached the end of the current stream, nothing more to do if this is
+            // the last in the stack.
+            //
+            CommonTokenPtr teof = std::make_shared<CommonToken>(TokenEof);
             teof->setInputStream(charStream());
             teof->setStartIndex(charIndex());
             teof->setStopIndex(charIndex());
             return teof;
-		}
-
-		state_->token = nullptr;
-		state_->error = false; // Start out without an exception
+        }
+        
+        // Now call the matching rules and see if we can generate a new token
+        //
+        
+        // Start out without an exception
+        state_->error		= false;
+        state_->failed		= false;
+        
+        // Record the start of the token in our input stream.
+        state_->channel = TokenDefaultChannel;
+        state_->tokenStartCharIndex	= charStream()->index();
+        state_->text = ANTLR3_T("");
 
         antlr3::MarkerPtr m = input_->mark();
         state_->backtracking = 1; // No exceptions
-        state_->failed = false;
 
         // Call the generated lexer, see if it can get a new token together.
         mTokens();
@@ -218,7 +220,6 @@ CommonTokenPtr Lexer::nextTokenFiltering()
         {
             // Assemble the token and emit it to the stream
             emit();
-            return state_->token;
         }
     }
 }
@@ -401,7 +402,7 @@ void Lexer::setCharStream(CharStreamPtr input)
 
     /* Set the current token to nothing
      */
-    state_->token = NULL;
+    state_->tokenBuffer.clear();
     state_->text = ANTLR3_T("");
     state_->tokenStartCharIndex	= -1;
 }
@@ -470,11 +471,6 @@ void Lexer::popCharStream()
     }
 }
 
-void Lexer::emitNew(CommonTokenPtr token)
-{
-    state_->token    = token;
-}
-
 CommonTokenPtr Lexer::emit()
 {
     /* We could check pointers to token factories and so on, but
@@ -494,14 +490,18 @@ CommonTokenPtr Lexer::emit()
     token->setStopIndex(charIndex());
     token->setInputStream(charStream());
 
-    if(!state_->text.empty())
+    if (!state_->text.empty())
     {
         token->setText(state_->text);
     }
+    
+    state_->type = TokenInvalid;
+    state_->channel = TokenDefaultChannel;
+    state_->tokenStartCharIndex = charIndex();
+    state_->text.clear();
 
-    state_->token	    = token;
-
-    return  token;
+    state_->tokenBuffer.push_back(token);
+    return token;
 }
 
 bool Lexer::matchs(char const * string, size_t len)

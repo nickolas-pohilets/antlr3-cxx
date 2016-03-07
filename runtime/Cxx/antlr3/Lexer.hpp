@@ -101,14 +101,9 @@ public:
      */
     void			popCharStream();
 
-    /** Pointer to a function that emits the supplied token as the next token in
-     *  the stream.
-     */
-    void			emitNew(CommonTokenPtr token);
-
     /** Pointer to a function that constructs a new token from the lexer stored information 
      */
-    CommonTokenPtr	emit();
+    virtual CommonTokenPtr emit();
 
     /** Pointer to the user provided (either manually or through code generation
      *  function that causes the lexer rules to run the lexing rules and produce 

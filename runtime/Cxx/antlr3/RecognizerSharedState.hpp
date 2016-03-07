@@ -128,7 +128,7 @@ struct RecognizerSharedState
      *  In this case, you want the INT or FLOAT rule to set token and not
      *  have it reset to a NUM token in rule NUM.
      */
-    CommonTokenPtr token;
+    std::deque<CommonTokenPtr> tokenBuffer;
 
     /** The channel number for the current token
      */
