@@ -163,8 +163,6 @@ protected:
     virtual String traceCurrentItem() override;
 private:
     CommonTokenPtr nextTokenStr();
-    CommonTokenPtr nextTokenNormal();
-    CommonTokenPtr nextTokenFiltering();
     
     template<class T>
     bool matchStr(T const * string, size_t len);
